@@ -4,6 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>SASINS · segurosdelins.com</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://accounts.google.com/gsi/client" async defer></script>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Mulish:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
@@ -203,6 +205,58 @@ textarea.fi{resize:vertical;min-height:58px;}
   .dg{grid-template-columns:1fr;}
   .main{padding:11px;}
 }
+
+/* ═══ COBROS MODULE ═══ */
+.cobros-layout{display:grid;grid-template-columns:290px 1fr;gap:18px;align-items:start;}
+.cob-sidebar{background:var(--surf);border:1px solid var(--bdr);border-radius:12px;overflow:hidden;position:sticky;top:74px;}
+.cob-sec{padding:14px;}
+.cob-sec+.cob-sec{border-top:1px solid var(--bdr);}
+.cob-sec-title{font-family:var(--fh);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);margin-bottom:10px;}
+.import-drop{border:2px dashed var(--bdr2);border-radius:8px;padding:18px 12px;text-align:center;cursor:pointer;transition:all .2s;margin-bottom:8px;}
+.import-drop:hover,.import-drop.drag-over{border-color:var(--accent);background:#4f7cff08;}
+.import-drop.loaded{border-color:var(--green);border-style:solid;background:var(--gdim);}
+.prog-track{height:4px;background:var(--bdr);border-radius:3px;overflow:hidden;margin:6px 0;}
+.prog-fill{height:100%;width:0;background:linear-gradient(90deg,var(--accent),var(--green));border-radius:3px;transition:width .3s;}
+.mes-chip{display:inline-flex;align-items:center;gap:5px;background:var(--surf2);border:1px solid var(--bdr);border-radius:6px;padding:4px 9px;font-size:11px;margin:2px;}
+.mes-chip.mes-active{border-color:var(--accent);color:var(--accent);}
+.gmail-bar{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:var(--surf2);border:1px solid var(--bdr);border-radius:9px;gap:10px;margin-bottom:14px;flex-wrap:wrap;}
+.gmail-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;transition:background .3s;}
+.cob-stats{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:14px;}
+.cob-stat{background:var(--surf2);border:1px solid var(--bdr);border-radius:8px;padding:10px 12px;text-align:center;}
+.cob-stat-v{font-family:var(--fh);font-size:18px;font-weight:800;}
+.cob-stat-l{font-size:9px;color:var(--muted);font-family:var(--fh);text-transform:uppercase;letter-spacing:.6px;margin-top:2px;}
+.plt-toggle{display:flex;justify-content:space-between;align-items:center;padding:11px 16px;cursor:pointer;}
+.plt-toggle.open{border-bottom:1px solid var(--bdr);}
+.plt-body{display:none;padding:14px 16px;border-top:1px solid var(--bdr);}
+.plt-body.open{display:block;}
+.chip-row{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:10px;}
+.cob-chip{padding:4px 12px;border-radius:20px;border:1px solid var(--bdr2);background:none;color:var(--muted);cursor:pointer;font-size:11px;font-family:var(--fh);font-weight:700;transition:all .15s;}
+.cob-chip:hover{border-color:var(--accent2);color:var(--text);}
+.cob-chip.on{background:var(--accent);color:#fff;border-color:var(--accent);}
+.cob-chip.gon{background:var(--green);border-color:var(--green);color:#fff;}
+.cob-chip.yon{background:var(--yellow);border-color:var(--yellow);color:#000;}
+.cob-chip.ron{background:var(--red);border-color:var(--red);color:#fff;}
+.pag-btn{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:14px;cursor:pointer;font-size:10px;font-weight:700;font-family:var(--mono);border:none;transition:all .15s;}
+.pag-btn.is-pag{background:var(--gdim);color:var(--green);}
+.pag-btn.no-pag{background:var(--surf3);color:var(--muted);border:1px dashed var(--bdr2);}
+.send-prog-box{background:var(--surf2);border:1px solid var(--bdr);border-radius:9px;padding:13px;margin-bottom:13px;display:none;}
+.send-log{max-height:80px;overflow-y:auto;font-size:10px;font-family:var(--mono);color:var(--muted);line-height:1.8;margin-top:6px;}
+/* Buscador cartera */
+.sq-panel{background:var(--surf);border:1px solid var(--bdr);border-radius:12px;padding:20px;margin-bottom:16px;}
+.sq-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:12px;}
+.sq-field{display:flex;flex-direction:column;gap:3px;}
+.sq-label{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;font-family:var(--fh);}
+.sq-input{background:var(--surf2);border:1px solid var(--bdr);border-radius:6px;padding:7px 9px;color:var(--text);font-size:12px;outline:none;transition:border .15s;}
+.sq-input:focus{border-color:var(--accent);}
+.empty-state{text-align:center;padding:60px 20px;}
+.empty-state .es-icon{font-size:40px;margin-bottom:12px;}
+.empty-state h3{font-family:var(--fh);font-size:14px;font-weight:700;color:var(--muted);margin-bottom:5px;}
+.empty-state p{font-size:12px;color:var(--muted);}
+.danger-box{background:#ef444408;border:1px solid #ef444430;border-radius:8px;padding:12px;}
+.danger-box h4{font-family:var(--fh);font-size:12px;font-weight:700;color:var(--red);margin-bottom:4px;}
+.danger-box p{font-size:11px;color:var(--muted);margin-bottom:8px;}
+@media(max-width:900px){.cobros-layout{grid-template-columns:1fr;}.cob-sidebar{position:static;}.sq-grid{grid-template-columns:1fr 1fr;}.cob-stats{grid-template-columns:repeat(3,1fr);}}
+
 </style>
 </head>
 <body>
@@ -212,7 +266,8 @@ textarea.fi{resize:vertical;min-height:58px;}
   <div class="hdiv"></div>
   <nav class="nav">
     <button class="nb active" onclick="showView('cartera',this)">Cartera</button>
-    <button class="nb" onclick="showView('importar',this)">Importar Mes</button>
+    <button class="nb" onclick="showView('cobros',this)">Cobros</button>
+    <button class="nb" onclick="showView('importar',this)" style="font-size:10px;opacity:.5;" title="Temporal — primer año">📥 Import</button>
     <button class="nb" onclick="showView('clientes',this)">Clientes</button>
     <button class="nb" onclick="showView('productos',this)">Productos</button>
     <button class="nb" onclick="showView('dashboard',this)">Dashboard</button>
@@ -230,7 +285,53 @@ textarea.fi{resize:vertical;min-height:58px;}
 <!-- ══ CARTERA ══ -->
 <div id="view-cartera" class="view active">
   <div class="kgrid" id="kpi-grid"></div>
-  <div class="tabs">
+
+  <!-- Buscador inicial -->
+  <div class="sq-panel">
+    <div style="font-family:var(--fh);font-size:14px;font-weight:700;margin-bottom:14px;">🔍 Búsqueda de Pólizas</div>
+    <div class="sq-grid">
+      <div class="sq-field"><label class="sq-label">Número de Póliza</label><input type="text" id="sq-pol" class="sq-input" placeholder="01-01-AUT-XXXXXXX" onkeydown="if(event.key==='Enter')buscarC()"></div>
+      <div class="sq-field"><label class="sq-label">Nombre / Asegurado</label><input type="text" id="sq-nom" class="sq-input" placeholder="Ej: HERNANDEZ" onkeydown="if(event.key==='Enter')buscarC()"></div>
+      <div class="sq-field"><label class="sq-label">Identificación</label><input type="text" id="sq-ced" class="sq-input" placeholder="Cédula o cédula jurídica" onkeydown="if(event.key==='Enter')buscarC()"></div>
+      <div class="sq-field"><label class="sq-label">Producto</label><select id="sq-prod-sel" class="sq-input"><option value="">Todos los productos</option></select></div>
+      <div class="sq-field"><label class="sq-label">Estado Póliza</label><select id="sq-est" class="sq-input"><option value="">Todos</option><option value="Vigente">Vigente</option><option value="Período gracia">Período gracia</option><option value="Cancelada">Cancelada</option></select></div>
+      <div class="sq-field"><label class="sq-label">Moneda</label><select id="sq-mon" class="sq-input"><option value="">Todas</option><option value="CRC">₡ Colones</option><option value="USD">$ Dólares</option></select></div>
+    </div>
+    <div style="display:flex;gap:9px;align-items:center;">
+      <button onclick="buscarC()" style="background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border:none;padding:8px 20px;border-radius:8px;font-weight:700;cursor:pointer;font-family:var(--fh);font-size:12px;">🔍 Buscar</button>
+      <button onclick="limpiarC()" style="background:transparent;border:1px solid var(--bdr);color:var(--muted);padding:8px 14px;border-radius:8px;cursor:pointer;font-size:12px;">✕ Limpiar</button>
+      <span id="sq-hint" style="font-size:11px;color:var(--muted);margin-left:auto;">Ingrese al menos un criterio de búsqueda</span>
+    </div>
+  </div>
+
+  <!-- Resultados búsqueda -->
+  <div id="cart-results" style="display:none;margin-bottom:14px;">
+    <div style="display:flex;gap:8px;align-items:center;margin-bottom:10px;">
+      <select id="cr-sort" onchange="sortCR()" class="fsel"><option value="dias">Días venc. ↑</option><option value="az">Nombre A→Z</option><option value="tdesc">Total mayor→menor</option></select>
+      <span id="cr-count" class="cbadge">—</span>
+      <button onclick="window.loadAll()" class="fsel" style="cursor:pointer;margin-left:auto;">↻ Sync</button>
+    </div>
+    <div class="tw">
+      <table><thead><tr>
+        <th>✓</th><th>Días</th><th>Asegurado</th><th>Póliza</th><th>Producto</th>
+        <th>Desde</th><th>Hasta</th><th>Prox.Renov.</th><th>Fr</th>
+        <th style="text-align:right">Total</th><th>Mon.</th><th>Estado</th>
+      </tr></thead>
+      <tbody id="tbody-cr"></tbody></table>
+      <div class="pag" id="pag-cr"></div>
+    </div>
+  </div>
+
+  <!-- Estado vacío inicial -->
+  <div id="cart-empty" class="tw">
+    <div class="empty-state">
+      <div class="es-icon">🔎</div>
+      <h3>Busque una póliza o cliente</h3>
+      <p>Use el formulario para encontrar registros en su cartera</p>
+    </div>
+  </div>
+
+  <div class="tabs" style="display:none;">
     <div class="tab active" onclick="setTab('todos',this)">Todos</div>
     <div class="tab" onclick="setTab('sinconf',this)">Sin confirmar</div>
     <div class="tab" onclick="setTab('gracia',this)">Período gracia</div>
@@ -383,6 +484,177 @@ textarea.fi{resize:vertical;min-height:58px;}
     <div class="dc"><div class="st">Top 8 · Mayores totales</div><div id="dash-top"></div></div>
   </div>
   <div class="dc" style="margin-bottom:14px;"><div class="st">Próximas Renovaciones</div><div id="dash-renov"></div></div>
+</div>
+
+
+<!-- ══ VIEW: COBROS ══ -->
+<div id="view-cobros" class="view">
+  <div class="cobros-layout">
+
+    <!-- SIDEBAR -->
+    <div class="cob-sidebar">
+      <div class="cob-sec">
+        <div class="cob-sec-title">📥 Importar Mes (temporal)</div>
+        <div style="background:#1a2040;border:1px solid var(--accent);border-radius:8px;padding:11px;margin-bottom:9px;">
+          <div style="font-family:var(--fh);font-size:12px;font-weight:700;margin-bottom:3px;">Mayo 2026 — 175 pólizas</div>
+          <div style="font-size:10px;color:var(--muted);margin-bottom:8px;">₡46,498,516 · $16,926 · MAYO26.xls</div>
+          <button id="btn-mayo" onclick="loadMayo()" style="width:100%;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border:none;padding:7px;border-radius:7px;font-size:11px;font-weight:700;cursor:pointer;font-family:var(--fh);">📥 Cargar Mayo 2026</button>
+          <div id="mayo-prog" style="display:none;margin-top:6px;"><div class="prog-track"><div class="prog-fill" id="mayo-fill"></div></div><div id="mayo-ptxt" style="font-size:10px;color:var(--muted);">Preparando…</div></div>
+        </div>
+        <div class="import-drop" id="drop-xls" onclick="document.getElementById('xls-file').click()">
+          <input type="file" id="xls-file" accept=".xls,.xlsx" style="display:none" onchange="handleXLS(this.files[0])">
+          <div style="font-size:22px;margin-bottom:4px;">📂</div>
+          <div style="font-family:var(--fh);font-size:12px;font-weight:700;margin-bottom:2px;">Cargar otro mes XLS</div>
+          <div style="font-size:10px;color:var(--muted);">Arrastre el archivo aquí</div>
+        </div>
+        <div id="xls-prev" style="display:none;background:var(--surf2);border-radius:7px;padding:9px;margin-top:7px;">
+          <div id="xls-prev-title" style="font-size:11px;font-weight:700;margin-bottom:2px;">—</div>
+          <div id="xls-prev-stats" style="font-size:10px;color:var(--muted);margin-bottom:7px;">—</div>
+          <div id="xls-pg-wrap" style="display:none;"><div class="prog-track"><div class="prog-fill" id="xls-fill"></div></div><div id="xls-ptxt" style="font-size:10px;color:var(--muted);"></div></div>
+          <div style="display:flex;gap:6px;margin-top:6px;">
+            <button onclick="confirmXLS()" style="flex:1;background:var(--green);color:#061a0c;border:none;padding:6px;border-radius:6px;font-weight:700;cursor:pointer;font-size:11px;">✅ Importar</button>
+            <button onclick="cancelXLS()" style="background:transparent;border:1px solid var(--bdr);color:var(--muted);padding:6px 10px;border-radius:6px;cursor:pointer;font-size:11px;">✕</button>
+          </div>
+        </div>
+      </div>
+      <div class="cob-sec">
+        <div class="cob-sec-title">📅 Meses en Firebase</div>
+        <div id="meses-list" style="font-size:11px;color:var(--muted);margin-bottom:9px;">Cargando…</div>
+        <div style="font-size:10px;font-weight:700;color:var(--muted);margin-bottom:5px;">Mes activo para cobros:</div>
+        <select id="mes-activo-sel" onchange="setMesActivo(this.value)" class="fsel" style="width:100%;"><option value="">— Seleccionar mes —</option></select>
+      </div>
+      <div class="cob-sec">
+        <div class="danger-box">
+          <h4>⚠ Administración</h4>
+          <p>Elimina TODOS los registros de la colección de pólizas.</p>
+          <button onclick="confirmLimpiar()" style="background:var(--red);color:#fff;border:none;padding:6px 12px;border-radius:7px;font-size:11px;font-weight:700;cursor:pointer;">🗑 Limpiar colección</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- PANEL PRINCIPAL -->
+    <div>
+      <!-- Gmail bar -->
+      <div class="gmail-bar">
+        <div style="display:flex;align-items:center;gap:9px;">
+          <div class="gmail-dot" id="gmail-dot" style="background:var(--red);"></div>
+          <div><div id="gmail-status" style="font-size:12px;font-weight:600;">Gmail no conectado</div><div id="gmail-user-lbl" style="font-size:10px;color:var(--green);font-family:var(--mono);"></div></div>
+        </div>
+        <div style="display:flex;gap:7px;">
+          <button id="btn-gm-login" onclick="gmailLogin()" style="background:var(--surf2);color:#4285f4;border:1px solid #4285f4;padding:5px 12px;border-radius:7px;font-size:11px;cursor:pointer;font-family:var(--fb);">Conectar Gmail</button>
+          <button id="btn-gm-logout" onclick="gmailLogout()" style="display:none;background:var(--surf2);color:var(--muted);border:1px solid var(--bdr);padding:5px 10px;border-radius:7px;font-size:11px;cursor:pointer;">Desconectar</button>
+        </div>
+      </div>
+
+      <!-- Stats cobros -->
+      <div class="cob-stats">
+        <div class="cob-stat"><div class="cob-stat-v" id="cs-total">0</div><div class="cob-stat-l">Total</div></div>
+        <div class="cob-stat"><div class="cob-stat-v" id="cs-pend" style="color:var(--yellow);">0</div><div class="cob-stat-l">Pendientes</div></div>
+        <div class="cob-stat"><div class="cob-stat-v" id="cs-venc" style="color:var(--red);">0</div><div class="cob-stat-l">Período gracia</div></div>
+        <div class="cob-stat"><div class="cob-stat-v" id="cs-pag" style="color:var(--green);">0</div><div class="cob-stat-l">Pagados</div></div>
+        <div class="cob-stat"><div class="cob-stat-v" id="cs-wa" style="color:#25d366;">0</div><div class="cob-stat-l">WA enviados</div></div>
+      </div>
+
+      <!-- Plantilla correo colapsable -->
+      <div class="tw" style="margin-bottom:14px;padding:0;">
+        <div class="plt-toggle" id="plt-toggle" onclick="togglePlt()">
+          <span style="font-family:var(--fh);font-size:12px;font-weight:700;">✉️ Plantilla de correo <span id="plt-saved" style="font-size:10px;color:var(--green);display:none;">✓ Guardada</span></span>
+          <span id="plt-arrow" style="font-size:11px;color:var(--muted);">▼ Editar</span>
+        </div>
+        <div class="plt-body" id="plt-body">
+          <div style="font-size:10px;color:var(--muted);background:var(--surf2);border-radius:6px;padding:8px;margin-bottom:9px;line-height:1.8;">
+            Variables: <code style="background:var(--surf3);padding:1px 4px;border-radius:3px;">{nombre}</code> <code style="background:var(--surf3);padding:1px 4px;border-radius:3px;">{poliza}</code> <code style="background:var(--surf3);padding:1px 4px;border-radius:3px;">{producto}</code> <code style="background:var(--surf3);padding:1px 4px;border-radius:3px;">{vence}</code> <code style="background:var(--surf3);padding:1px 4px;border-radius:3px;">{total}</code> <code style="background:var(--surf3);padding:1px 4px;border-radius:3px;">{moneda}</code> <code style="background:var(--surf3);padding:1px 4px;border-radius:3px;">{frecuencia}</code>
+          </div>
+          <div class="fg" style="margin-bottom:8px;"><label class="fl">Asunto</label><input class="fi" id="plt-subject" type="text"></div>
+          <div class="fg"><label class="fl">Cuerpo del correo (HTML permitido)</label><textarea class="fi" id="plt-body-text" rows="8" style="font-size:11px;line-height:1.6;"></textarea></div>
+          <div style="display:flex;gap:7px;margin-top:9px;justify-content:flex-end;">
+            <button onclick="resetPlt()" class="bc" style="font-size:11px;padding:5px 12px;">↺ Restaurar</button>
+            <button onclick="savePlt()" class="bs" style="font-size:11px;padding:5px 12px;">💾 Guardar</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Filtros cobros -->
+      <div class="chip-row" id="cob-chips">
+        <button class="cob-chip on" id="chip-all-cob" onclick="setCobTab('all',this)">Todos</button>
+        <button class="cob-chip" id="chip-pend-cob" onclick="setCobTab('Pendiente',this)">⏳ Pendientes</button>
+        <button class="cob-chip" id="chip-gracia-cob" onclick="setCobTab('Período gracia',this)">🔴 Período gracia</button>
+        <button class="cob-chip" id="chip-pag-cob" onclick="setCobTab('pagado',this)">✅ Pagados</button>
+        <button class="cob-chip" id="chip-nowa-cob" onclick="toggleCobF('nowa')">⏱ Sin WA</button>
+        <button class="cob-chip" id="chip-noemail-cob" onclick="toggleCobF('noemail')">📧 Sin correo</button>
+      </div>
+
+      <div class="toolbar">
+        <div class="sw"><span class="si">⌕</span><input type="text" id="cob-search" placeholder="Buscar póliza o nombre…" oninput="renderCobros()"></div>
+        <select id="cob-prod-sel" class="fsel" onchange="renderCobros()"><option value="">Todos los productos</option></select>
+        <select id="cob-fr-sel" class="fsel" onchange="renderCobros()"><option value="">Todas las frec.</option><option>Mensual</option><option>Trimestral</option><option>Semestral</option><option>Anual</option></select>
+        <span id="cob-count" class="cbadge">—</span>
+        <div style="margin-left:auto;display:flex;gap:6px;">
+          <button onclick="enviarCorreos()" class="btn-ghost" style="font-size:11px;padding:5px 11px;">✉️ Enviar correos</button>
+          <button onclick="abrirWaMasivo()" style="background:#25d366;color:#fff;border:none;padding:5px 11px;border-radius:7px;font-size:11px;font-weight:700;cursor:pointer;font-family:var(--fb);">📱 WA masivo</button>
+        </div>
+      </div>
+
+      <!-- Progress envío -->
+      <div class="send-prog-box" id="send-prog-box">
+        <div style="display:flex;justify-content:space-between;font-size:12px;font-weight:600;margin-bottom:4px;"><span id="send-lbl">Enviando…</span><span id="send-cnt" style="color:var(--cyan);font-family:var(--mono);"></span></div>
+        <div class="prog-track"><div class="prog-fill" id="send-fill"></div></div>
+        <div class="send-log" id="send-log"></div>
+      </div>
+
+      <!-- Tabla cobros -->
+      <div class="tw">
+        <table>
+          <thead><tr>
+            <th><input type="checkbox" id="chk-all-cob" onchange="toggleAllCob(this)" style="cursor:pointer"></th>
+            <th>Póliza</th><th>Asegurado</th><th>Producto</th>
+            <th>Vence</th><th>Fr</th><th style="text-align:right">Total</th>
+            <th>Correo</th><th>WA</th><th>Pagado</th><th></th>
+          </tr></thead>
+          <tbody id="tbody-cobros"></tbody>
+        </table>
+        <div class="pag" id="pag-cobros"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal WA -->
+<div class="ov" id="modal-wa">
+  <div class="modal" style="max-width:480px;">
+    <div class="mhdr"><div class="micon" style="background:#25d36620;">📱</div>
+      <div><div class="mtitle">Enviar WhatsApp</div><div class="msub" id="wa-modal-sub">—</div></div>
+      <button class="mclose" onclick="closeModal('modal-wa')">✕</button>
+    </div>
+    <div class="mbody">
+      <div class="fg" style="margin-bottom:10px;"><label class="fl">Teléfono (sin +506)</label><input class="fi" id="wa-phone" type="text" style="font-family:var(--mono);"></div>
+      <div class="fg"><label class="fl">Mensaje (editable antes de enviar)</label><textarea class="fi" id="wa-msg" rows="10" style="font-size:11px;line-height:1.6;font-family:var(--mono);"></textarea></div>
+    </div>
+    <div class="mftr">
+      <button class="bc" onclick="closeModal('modal-wa')">Cancelar</button>
+      <button onclick="confirmarWa()" style="background:#25d366;color:#fff;border:none;padding:7px 16px;border-radius:7px;font-weight:800;cursor:pointer;font-size:12px;">📱 Abrir WhatsApp</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal confirmar limpiar -->
+<div class="ov" id="modal-limpiar">
+  <div class="modal" style="max-width:420px;">
+    <div class="mhdr"><div class="micon" style="background:#ef444420;">⚠️</div>
+      <div><div class="mtitle" style="color:var(--red);">Confirmar limpieza</div><div class="msub">Elimina TODAS las pólizas de Firestore</div></div>
+      <button class="mclose" onclick="closeModal('modal-limpiar')">✕</button>
+    </div>
+    <div class="mbody">
+      <p style="font-size:13px;margin-bottom:12px;">Se eliminarán <strong id="limp-count" style="color:var(--red);">todos</strong> los registros. Esta acción no se puede deshacer.</p>
+      <div class="fg"><label class="fl">Escriba CONFIRMAR para continuar</label>
+        <input class="fi" id="limp-input" placeholder="CONFIRMAR" oninput="document.getElementById('btn-limp-ok').disabled=this.value!=='CONFIRMAR'">
+      </div>
+    </div>
+    <div class="mftr">
+      <button class="bc" onclick="closeModal('modal-limpiar')">Cancelar</button>
+      <button id="btn-limp-ok" disabled onclick="ejecutarLimpiar()" style="background:var(--red);color:#fff;border:none;padding:7px 16px;border-radius:7px;font-weight:700;cursor:pointer;font-size:12px;">🗑 Eliminar todo</button>
+    </div>
+  </div>
 </div>
 
 </div><!-- /main -->
@@ -575,8 +847,8 @@ textarea.fi{resize:vertical;min-height:58px;}
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import {
-  getFirestore, collection, doc, addDoc, updateDoc, getDocs,
-  query, orderBy, serverTimestamp, where, deleteDoc, writeBatch
+  getFirestore, collection, doc, addDoc, updateDoc, setDoc, deleteDoc, getDocs,
+  query, orderBy, serverTimestamp, where, writeBatch, getDoc
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 // ── FIREBASE CONFIG ─────────────────────────────────────────
@@ -649,6 +921,7 @@ const toast = (msg, type='s') => {
   t.classList.add('show');
   setTimeout(()=>t.classList.remove('show'),3500);
 };
+const showToast = toast; // alias for cobros module
 
 // ── LOAD ALL ──────────────────────────────────────────────────
 window.loadAll = async function() {
@@ -1244,6 +1517,638 @@ dz.addEventListener('drop',e=>{e.preventDefault();dz.classList.remove('drag-over
 // ESC + click overlay
 document.addEventListener('keydown',e=>{if(e.key==='Escape')document.querySelectorAll('.ov.open').forEach(o=>o.classList.remove('open'));});
 document.querySelectorAll('.ov').forEach(o=>o.addEventListener('click',e=>{if(e.target===o)o.classList.remove('open');}));
+
+
+// ══════════════════════════════════════════════════════
+// MAYO 2026 DATA (extraído de MAYO26.xls)
+// ══════════════════════════════════════════════════════
+const MAYO_DATA = [{"poliza": "0312378", "asegurado": "COSTA FIT S.A.", "prod": "RIESGOS DEL TRABAJO", "desde": "2026-05-01", "hasta": "2027-04-30", "prima": 932886.0, "total": 932886.0, "moneda": "CRC", "estado_poliza": "Vigente", "estado_recibo": "Pendiente", "fr": "Anual", "dias_venc": 23, "verif": true, "confirmar": "2026-05-01", "telefonos": "", "correos": "acerdas@performiacr.com; randaldrm@gmail.com", "ultima_gestion": "SE PROGRAMA ENVIO 1-4-2026", "resultado": "No se pudo obtener una confirmación de pago", "proxima_renovacion": "2028-04-30", "mes_origen": "MAYO2026", "tipo": "RENOVACION"}, {"poliza": "0319355", "asegurado": "EDUCACION MBE S.A.", "prod": "RIESGOS DEL TRABAJO", "desde": "2026-05-01", "hasta": "2026-07-31", "prima": 33350.0, "total": 33350.0, "moneda": "CRC", "estado_poliza": "Vigente", "estado_recibo": "Pendiente", "fr": "Trimestral", "dias_venc": 23, "verif": true, "confirmar": "", "telefonos": "", "correos": "mariella@newworldcr.com; infopinares@newworldcr.com", "ultima_gestion": "AUTORIZA HACER EL CARGO POR CORREO", "resultado": "Se obtuvo una confirmación de pago", "proxima_renovacion": "2026-10-31", "mes_origen": "MAYO2026", "tipo": "RENOVACION"}, {"poliza": "0309011", "asegurado": "HERNANDEZ VARGAS LUIS FERNANDO", "prod": "RIESGOS DEL TRABAJO", "desde": "2026-05-01", "hasta": "2027-04-30", "prima": 33350.0, "total": 33350.0, "moneda": "CRC", "estado_poliza": "Vigente", "estado_recibo": "Pendiente", "fr": "Anual", "dias_venc": 23, "verif": true, "confirmar": "2026-05-01", "telefonos": "2296-4504 (OFICINA), 8526-3532 (CELULAR)", "correos": "", "ultima_gestion": "SE PROGRAMA ENVIO PARA EL 1 DE ABRIL", "resultado": "No se pudo obtener una confirmación de pago", "proxima_renovacion": "2028-04-30", "mes_origen": "MAYO2026", "tipo": "RENOVACION"}, {"poliza": "9260156", "asegurado": "IMPORTACIONES SELECTA", "prod": "RIESGOS DEL TRABAJO", "desde": "2026-05-01", "hasta": "2027-04-30", "prima": 335333.0, "total": 335333.0, "moneda": "CRC", "estado_poliza": "Vigente", "estado_recibo": "Pendiente", "fr": "Anual", "dias_venc": 23, "verif": true, "confirmar": "2026-05-01", "telefonos": "8843-8566", "correos": "walid@magnate-inc.com; ahmed@magnate-inc.com; contabilidad@magnate-inc.com; ikram@magnate-inc.com; rawadajab@gmail.com", "ultima_gestion": "SE PROGRAMA PARA EL 1-4-2026", "resultado": "No se pudo obtener una confirmación de pago", "proxima_renovacion": "2028-04-30", "mes_origen": "MAYO2026", "tipo": "RENOVACION"}, {"poliza": "8450838", "asegurado": "NAVARRO VARGAS JOSE RAMON", "prod": "RIESGOS DEL TRABAJO", "desde": "2026-05-01", "hasta": "2026-07-31", "prima": 712899.0, "total": 712899.0, "moneda": "CRC", "estado_poliza": "Vigente", "estado_recibo": "Pendiente", "fr": "Trimestral", "dias_venc": 23, "verif": true, "confirmar": "2026-05-01", "telefonos": "2439-6371; 8822-4559; 2438-1194", "correos": "josepelon07@hotmail.com; fe@managercr.com", "ultima_gestion": "SE PROGRAMA ENVIO 1 4 2026", "resultado": "No se pudo obtener una confirmación de pago", "proxima_renovacion": "2026-10-31", "mes_origen": "MAYO2026", "tipo": "RENOVACION"}, {"poliza": "0312442", "asegurado": "NOVALASER S.A.", "prod": "RIESGOS DEL TRABAJO", "desde": "2026-05-01", "hasta": "2027-04-30", "prima": 2788382.0, "total": 2788382.0, "moneda": "CRC", "estado_poliza": "Vigente", "estado_recibo": "Pendiente", "fr": "Anual", "dias_venc": 23, "verif": true, "confirmar": "2026-05-01", "telefonos": "8840-6380 (CELULAR)", "correos": "contabilidadesyauditorias01@yahoo.com.mx; notarolanovalaser@hotmail.com", "ultima_gestion": "SE PROGRAMA ENVIO 1-4-2026", "resultado": "No se pudo obtener una confirmación de pago", "proxima_renovacion": "2028-04-30", "mes_origen": "MAYO2026", "tipo": "RENOVACION"}, {"poliza": "0341740", "asegurado": "PARRA PACHECO HELIANA", "prod": "RIESGOS DEL TRABAJO", "desde": "2026-05-01", "hasta": "2027-04-30", "prima": 117354.0, "total": 117354.0, "moneda": "CRC", "estado_poliza": "Vigente", "estado_recibo": "Pendiente", "fr": "Anual", "dias_venc": 23, "verif": true, "confirmar": "2026-05-01", "telefonos": "6223-6893 (CELULAR)", "correos": "helianap@hotmail.com", "ultima_gestion": "SE PROGRAMA ENVIO 1-4-2026", "resultado": "No se pudo obtener una confirmación de pago", "proxima_renovacion": "2028-04-30", "mes_origen": "MAYO2026", "tipo": "RENOVACION"}, {"poliza": "01-19-COL-0017075", "asegurado": "SCHOCH MULLER PETER HERMANN", "prod": "PLAN FAMILIAR (COL)", "desde": "2026-05-01", "hasta": "2026-11-01", "prima": 453550.0, "total": 512512.0, "moneda": "CRC", "estado_poliza": "Vigente", "estado_recibo": "Pendiente", "fr": "Semestral", "dias_venc": 23, "verif": false, "confirmar": "", "telefonos": "", "correos": "", "ultima_gestion": "", "resultado": "", "proxima_renovacion": "2027-05-01", "mes_origen": "MAYO2026", "tipo": "RENOVACION"}, {"poliza": "0291828", "asegurado": "SUPERFOTOS SHOPS SOCIEDAD ANONIMA", "prod": "RIESGOS DEL TRABAJO", "desde": "2026-05-01", "hasta": "2027-04-30", "prima": 42008.0, "total": 42008.0, "moneda": "CRC", "estado_poliza": "Vigente", "estado_recibo": "Pendiente", "fr": "Anual", "dias_venc": 23, "verif": true, "confirmar": "2026-05-01", "telefonos": "", "correos": "", "ultima_gestion": "SE PROGRAMA ENVIO 1-4-2026", "resultado": "No se pudo obtener una confirmación de pago", "proxima_renovacion": "2028-04-30", "mes_origen": "MAYO2026", "tipo": "RENOVACION"}, {"poliza": "0302666", "asegurado": "UGALDE CERDAS LAURA", "prod": "RIESGOS DEL TRABAJO", "desde": "2026-05-01", "hasta": "2027-04-30", "prima": 65435.0, "total": 65435.0, "moneda": "CRC", "estado_poliza": "Vigente", "estado_recibo": "Pendiente", "fr": "Anual", "dias_venc": 23, "verif": true, "confirmar": "2026-05-01", "telefonos": "2220-2691 (CASA), 2437-8139 (OFICINA), 8364-8914 (CELULAR)", "correos": "", "ultima_gestion": "SE PROGRAMA ENVIO 1-4-2026", "resultado": "No se pudo obtener una confirmación de pago", "proxima_renovacion": "2028-04-30", "mes_origen": "MAYO2026", "tipo": "RENOVACION"}, {"poliza": "01-01-AUT-1991782", "asegurado": "JIMENEZ GOMEZ CHRISTIAN FERNANDO", "prod": "AUTOMOVILES VOLUNTARIO - ANUAL", "desde": "2026-05-02", "hasta": "2027-05-02", "prima": 604425.0, "total": 683000.0, "moneda": "CRC", "estado_poliza": "Vigente", "estado_recibo": "Pendiente", "fr": "Anual", "dias_venc": 24, "verif": true, "confirmar": "2026-05-02", "telefonos": "8308-0182 (CELULAR)", "correos": "cj.cr.me@gmail.com", "ultima_gestion": "SE PROGRAMA ENVIO 7-4-2026", "resultado": "No se pudo obtener una confirmación de pago", "proxima_renovacion": "2028-05-02", "mes_origen": "MAYO2026", "tipo": "RENOVACION"}, {"poliza": "02-01-RCU-0000431", "asegurado": "JL COSTA RICA SPECIALIZED S.A", "prod": "RESP. CIVIL UMBRELLA", "desde": "2026-05-02", "hasta": "2026-11-02", "prima": 2225.0, "total": 2514.0, "moneda": "USD", "estado_poliza": "Vigente", "estado_recibo": "Pendiente", "fr": "Semestral", "dias_venc": 24, "verif": true, "confirmar": "2026-05-02", "telefonos": "", "correos": "", "ultima_gestion": "SE PROGRAMA ENVIO PARA EL 8-04-2026", "resultado": "No se pudo obtener una confirmación de pago", "proxima_renovacion": "2027-05-02", "mes_origen": "MAYO2026", "tipo": "RENOVACION"}, {"poliza": "02-01-RCG-0002815", "asegurado": "JL COSTA RICA SPECIALIZED S.A", "prod": "RESPONSABILIDAD CIVIL", "desde": "2026-05-02", "hasta": "2026-08-02", "prima": 809.0, "total": 914.0, "moneda": "USD", "estado_poliza": "Vigente", "estado_recibo": "Pendiente", "fr": "Trimestral", "dias_venc": 24, "verif": true, "confirmar": "2026-05-02", "telefonos": "", "correos": "", "ultima_gestion": "SE PROGRAMA ENVIO PARA EL 8-4-2026", "resultado": "No se pudo obtener una confirmación de pago", "proxima_renovacion": "2026-11-02", "mes_origen": "MAYO2026", "tipo": "RENOVACION"}, {"poliza": "01-01-AUT-2183408", "asegurado": "LAZO ZUÑIGA VALERY", "prod": "AUTOMOVILES VOLUNTARIO - ANUAL", "desde": "2026-05-02", "hasta": "2026-08-02", "prima": 83562.0, "total": 94425.0, "moneda": "CRC", "estado_poliza": "Vigente", "estado_recibo": "Pendiente", "fr": "Trimestral", "dias_venc": 24, "verif": true, "confirmar": "2026-05-02", "telefonos": "8515-3846 (CELULAR)", "correos": "valelazo2242@hotmail.com", "ultima_gestion": "SE PROGRAMA ENVIO 8-4-2026", "resultado": "No se pudo obtener una confirmación de pago", "proxima_renovacion": "2026-11-02", "mes_origen": "MAYO2026", "tipo": "RENOVACION"}, {"poliza": "01-01-AUT-1809615", "asegurado": "3-102-746455 SRL", "prod": "AUTOMOVILES VOLUNTARIO", "desde": "2026-05-03", "hasta": "2026-11-03", "prima": 280833.0, "total": 317341.0, "moneda": "CRC", "estado_poliza": "Vigente", "estado_recibo": "Pendiente", "fr": "Semestral", "dias_venc": 25, "verif": true, "confirmar": "2026-05-03", "telefonos": "8328-2234 (CELULAR)", "correos": "drulate@me.com", "ultima_gestion": "SE PROGRAMA ENVIO PARA EL 8-4-2026", "resultado": "No se pudo obtener una confirmación de pago", "proxima_renovacion": "2027-05-03", "mes_origen": "MAYO2026", "tipo": "RENOVACION"}, {"poliza": "01-21-AUT-0075635", "asegurado": "AGUILAR MONTOYA JOSE CARLOS", "prod": "AUTOMOVILES VOLUNTARIO - ANUAL", "desde": "2026-05-03", "hasta": "2027-05-03", "prima": 378929.0, "total": 428190.0, "moneda": "CRC", "estado_poliza": "Vigente", "estado_recibo": "Pendiente", "fr": "Anual", "dias_venc": 25, "verif": true, "confirmar": "2026-05-03", "telefonos": "", "correos": "", "ultima_gestion": "SE PROGRAMA ENVIO 8-4-2026", "resultado": "No se pudo obtener una confirmación de pago", "proxima_renovacion": "2028-05-03", "mes_origen": "MAYO2026", "tipo": "RENOVACION"}, {"poliza": "01-01-AUT-1112997", "asegurado": "AZOFEIFA BARRIENTOS ARIEL", "prod": "AUTOMOVILES VOLUNTARIO", "desde": "2026-05-03", "hasta": "2026-11-03", "prima": 172749.0, "total": 195206.0, "moneda": "CRC", "estado_poliza": "Vigente", "estado_recibo": "Pendiente", "fr": "Semestral", "dias_venc": 25, "verif": true, "confirmar": "2026-05-03", "telefonos": "", "correos": "", "ultima_gestion": "SE PROGRAMA ENVIO 8-4-2026", "resultado": "No se pudo obtener una confirmación de pago", "proxima_renovacion": "2027-05-03", "mes_origen": "MAYO2026", "tipo": "RENOVACION"}, {"poliza": "01-01-AUT-2192690", "asegurado": "MASIS GUNTANIS DIEGO", "prod": "AUTOMOVILES VOLUNTARIO - ANUAL", "desde": "2026-05-03", "hasta": "2026-11-03", "prima": 201321.0, "total": 227493.0, "moneda": "CRC", "estado_poliza": "Vigente", "estado_recibo": "Pendiente", "fr": "Semestral", "dias_venc": 25, "verif": true, "confirmar": "2026-05-03", "telefonos": "8627-6824", "correos": "diegomasis@hotmail.es", "ultima_gestion": "SE PROGRAMA ENVIO PARA 8-3-2026", "resultado": "No se pudo obtener una confirmación de pago", "proxima_renovacion": "2027-05-03", "mes_origen": "MAYO2026", "tipo": "RENOVACION"}, {"poliza": "01-01-AUT-2159853", "asegurado": "PEREZ MANZANARES ANDRES", "prod": "AUTOMOVILES VOLUNTARIO - ANUAL", "desde": "2026-05-03", "hasta": "2026-08-03", "prima": 174887.0, "total": 197622.0, "moneda": "CRC", "estado_poliza": "Vigente", "estado_recibo": "Pendiente", "fr": "Trimestral", "dias_venc": 25, "verif": true, "confirmar": "2026-05-03", "telefonos": "", "correos": "", "ultima_gestion": "SE PROGRAMA ENVIO 8-4-2026", "resultado": "No se pudo obtener una confirmación de pago", "proxima_renovacion": "2026-11-03", "mes_origen": "MAYO2026", "tipo": "RENOVACION"}, {"poliza": "01-19-AUT-0126331", "asegurado": "ROMAN SANCHEZ SERGIO ROMEO", "prod": "AUTOMOVILES VOLUNTARIO - ANUAL", "desde": "2026-05-03", "hasta": "2027-05-03", "prima": 444416.0, "total": 502190.0, "moneda": "CRC", "estado_poliza": "Vigente", "estado_recibo": "Pendiente", "fr": "Anual", "dias_venc": 25, "verif": true, "confirmar": "2026-05-03", "telefonos": "2762-8237 (OFICINA), 8365-9822 (CELULAR)", "correos": "rroman@grupocalinda.com; romeoromansanchez@gmail.com", "ultima_gestion": "SE ENVIO CORREO", "resultado": "No se pudo obtener una confirmación de pago", "proxima_renovacion": "2028-05-03", "mes_origen": "MAYO2026", "tipo": "RENOVACION"}, {"poliza": "01-01-AUT-0319989", "asegurado": "RUIZ BLARD SILVIA ANDREA", "prod": "AUTOMOVILES VOLUNTARIO", "desde": "2026-05-03", "hasta": "2026-11-03", "prima": 303846.0, "total": 343346.0, "moneda": "CRC", "estado_poliza": "Vigente", "estado_recibo": "Pendiente", "fr": "Semestral", "dias_venc": 25, "verif": true, "confirmar": "2026-05-03", "telefonos": "8828-4230", "correos": "syl.srb@hotmail.com", "ultima_gestion": "SE ENVIO CORREO", "resultado": "No se pudo obtener una confirmación de pago", "proxima_renovacion": "2027-05-03", "mes_origen": "MAYO2026", "tipo": "RENOVACION"}, {"poliza": "01-01-AUT-1424673", "asegurado": "ALVARADO GUTIERREZ CAROLINA E", "prod": "AUTOMOVILES VOLUNTARIO", "desde": "2026-05-04", "hasta": "2026-11-04", "prima": 343988.0, "total": 388706.0, "moneda": "CRC", "estado_poliza": "Vigente", "estado_recibo": "Pendiente", "fr": "Semestral", "dias_venc": 26, "verif": true, "confirmar": "2026-05-04", "telefonos": "6059-0097; 2265-1901; 8840-1772", "correos": "carolinagutierrez10@hotmail.com", "ultima_gestion": "SE ENVIO CORREO", "resultado": "No se pudo obtener una confirmación de pago", "proxima_renovacion": "2027-05-04", "mes_origen": "MAYO2026", "tipo": "RENOVACION"}, {"poliza": "02-01-IMR-0005882", "asegurado": "CASA COLONIA VEINTINUEVE S.A.", "prod": "HOGAR COMPRENSIVO", "desde": "2026-05-04", "hasta": "2027-05-04", "prima": 549.0, "total": 620.0, "moneda": "USD", "estado_poliza": "Vigente", "estado_recibo": "Pendiente", "fr": "Anual", "dias_venc": 26, "verif": true, "confirmar": "2026-05-04", "telefonos": "", "correos": "", "ultima_gestion": "SE ENVIO CORREO", "resultado": "No se pudo obtener una confirmación de pago", "proxima_renovacion": "2028-05-04", "mes_origen": "MAYO2026", "tipo": "RENOVACION"}, {"poliza": "01-01-AUT-1802260", "asegurado": "CHAVES CORDERO TRACEE", "prod": "AUTOMOVILES VOLUNTARIO", "desde": "2026-05-04", "hasta": "2026-11-04", "prima": 142502.0, "total": 161027.0, "moneda": "CRC", "estado_poliza": "Vigente", "estado_recibo": "Pendiente", "fr": "Semestral", "dias_venc": 26, "verif": true, "confirmar": "2026-05-04", "telefonos": "8333-0360 (CELULAR)", "correos": "tracee.chaves@gmail.com", "ultima_gestion": "SE ENVIO CORREO", "resultado": "No se pudo obtener una confirmación de pago", "proxima_renovacion": "2027-05-04", "mes_origen": "MAYO2026", "tipo": "RENOVACION"}, {"poliza": "01-01-AUT-2179886", "asegurado": "HSU ALFARO PAUL", "prod": "AUTOMOVILES VOLUNTARIO - ANUAL", "desde": "2026-05-04", "hasta": "2026-08-04", "prima": 192349.0, "total": 217354.0, "moneda": "CRC", "estado_poliza": "Vigente", "estado_recibo": "Pendiente", "fr": "Trimestral", "dias_venc": 26, "verif": true, "confirmar": "2026-05-04", "telefonos": "8735-5949", "correos": "phsuartisan@gmail.com", "ultima_gestion": "SE PROGRAMA ENVIO PARA EL 8-4-2026", "resultado": "No se pudo obtener una confirmación de pago", "proxima_renovacion": "2026-11-04", "mes_origen": "MAYO2026", "tipo": "RENOVACION"}, {"poliza": "01-01-AUT-1087176", "asegurado": "SALAS CHAVARRIA JESSICA", "prod": "AUTOMOVILES VOLUNTARIO", "desde": "2026-05-04", "hasta": "2026-08-04", "prima": 62895.0, "total": 71071.0, "moneda": "CRC", "estado_poliza": "Vigente", "estado_recibo": "Pendiente", "fr": "Trimestral", "dias_venc": 26, "verif": true, "confirmar": "2026-05-04", "telefonos": "8846-8367", "correos": "", "ultima_gestion": "SE PROGRAMA ENVIO PARA 8-4-2026", "resultado": "No se pudo obtener una confirmación de pago", "proxima_renovacion": "2026-11-04", "mes_origen": "MAYO2026", "tipo": "RENOVACION"}, {"poliza": "01-01-AUT-2183442", "asegurado": "FREER WEBER EDWIN MANUEL", "prod": "AUTOMOVILES VOLUNTARIO - ANUAL", "desde": "2026-05-05", "hasta": "2026-11-05", "prima": 211869.0, "total": 239412.0, "moneda": "CRC", "estado_poliza": "Vigente", "estado_recibo": "Pendiente", "fr": "Semestral", "dias_venc": 27, "verif": true, "confirmar": "2026-05-05", "telefonos": "8437-1728 (CELULAR)", "correos": "edwinfreerw@gmail.com", "ultima_gestion": "SE ENVIO CORREO", "resultado": "No se pudo obtener una confirmación de pago", "proxima_renovacion": "2027-05-05", "mes_origen": "MAYO2026", "tipo": "RENOVACION"}, {"poliza": "02-01-IMR-0004999", "asegurado": "IMPORTACIONES SELECTA", "prod": "INCENDIO COMERCIAL", "desde": "2026-05-05", "hasta": "2026-08-05", "prima": 636.0, "total": 719.0, "moneda": "USD", "estado_poliza": "Vigente", "estado_recibo": "Pendiente", "fr": "Trimestral", "dias_venc": 27, "verif": true, "confirmar": "2026-05-05", "telefonos": "8843-8566", "correos": "walid@magnate-inc.com; ahmed@magnate-inc.com; contabilidad@magnate-inc.com; ikram@magnate-inc.com; rawadajab@gmail.com", "ultima_gestion": "SE PROGRAMA ENVIO PARA 8-4-2026", "resultado": "No se pudo obtener una confirmación de pago", "proxima_renovacion": "2026-11-05", "mes_origen": "MAYO2026", "tipo": "RENOVACION"}, {"poliza": "01-01-AUT-1709404", "asegurado": "LORIA GUILLEN REINA ISABEL", "prod": "AUTOMOVILES VOLUNTARIO", "desde": "2026-05-05", "hasta": "2026-08-05", "prima": 34898.0, "total": 39435.0, "moneda": "CRC", "estado_poliza": "Vigente", "estado_recibo": "Pendiente", "fr": "Trimestral", "dias_venc": 27, "verif": true, "confirmar": "2026-05-05", "telefonos": "8314-9537 (CELULAR)", "correos": "isabel.loria.guillen@gmail.com", "ultima_gestion": "SE PRORAMA ENVIO PARA EL 8-4-2026", "resultado": "No se pudo obtener una confirmación de pago", "proxima_renovacion": "2026-11-05", "mes_origen": "MAYO2026", "tipo": "RENOVACION"}, {"poliza": "01-01-AUT-1798957", "asegurado": "MEJIA SALAZAR JEIMY", "prod": "AUTOMOVILES VOLUNTARIO", "desde": "2026-05-05", "hasta": "2026-08-05", "prima": 90006.0, "total": 101707.0, "moneda": "CRC", "estado_poliza": "Vigente", "estado_recibo": "Pendiente", "fr": "Trimestral", "dias_venc": 27, "verif": true, "confirmar": "2026-05-05", "telefonos": "8827-9076", "correos": "jeyms18@gmail.com", "ultima_gestion": "SE PROGRAMA ENVIO 8-4-2026", "resultado": "No se pudo obtener una confirmación de pago", "proxima_renovacion": "2026-11-05", "mes_origen": "MAYO2026", "tipo": "RENOVACION"}, {"poliza": "01-01-AUT-2183445", "asegurado": "RUIZ UMAÑA LUCAS FERNANDO", "prod": "AUTOMOVILES VOLUNTARIO - ANUAL", "desde": "2026-05-05", "hasta": "2027-05-05", "prima": 336517.0, "total": 380264.0, "moneda": "CRC", "estado_poliza": "Vigente", "estado_recibo": "Pendiente", "fr": "Anual", "dias_venc": 27, "verif": true, "confirmar": "2026-05-05", "telefonos": "6111-7715 (CELULAR)", "correos": "lucasru16@outlook.com", "ultima_gestion": "SE ENVIO CORREO", "resultado": "No se pudo obtener una confirmación de pago", "proxima_renovacion": "2028-05-05", "mes_origen": "MAYO2026", "tipo": "RENOVACION"}, {"poliza": "01-21-AUT-0075648", "asegurado": "DEL VALLE CORDERO JOSE PABLO", "prod": "AUTOMOVILES VOLUNTARIO - ANUAL", "desde": "2026-05-06", "hasta": "2026-11-06", "prima": 215183.0, "total": 243157.0, "moneda": "CRC", "estado_poliza": "Vigente", "estado_recibo": "Pendiente", "fr": "Semestral", "dias_venc": 28, "verif": true, "confirmar": "2026-05-06", "telefonos": "", "correos": "", "ultima_gestion": "SE ENVIO CORREO", "resultado": "No se pudo obtener una confirmación de pago", "proxima_renovacion": "2027-05-06", "mes_origen": "MAYO2026", "tipo": "RENOVACION"}, {"poliza": "01-01-AUT-2169060", "asegurado": "HERNANDEZ VEGA GLORIANA", "prod": "AUTOMOVILES VOLUNTARIO - ANUAL", "desde": "2026-05-06", "hasta": "2026-08-06", "prima": 111539.0, "total": 126039.0, "moneda": "CRC", "estado_poliza": "Vigente", "estado_recibo": "Pendiente", "fr": "Trimestral", "dias_venc": 28, "verif": true, "confirmar": "2026-05-06", "telefonos": "6296-7987", "correos": "glorianahernandez902@gmail.com", "ultima_gestion": "SE PROGRAMA ENVIO 8-4-2026", "resultado": "No se pudo obtener una confirmación de pago", "proxima_renovacion": "2026-11-06", "mes_origen": "MAYO2026", "tipo": "RENOVACION"}, {"poliza": "01-01-AUT-2183520", "asegurado": "LEZCANO RAMIREZ ADRIANA VANESSA", "prod": "AUTOMOVILES VOLUNTARIO - ANUAL", "desde": "2026-05-06", "hasta": "2026-11-06", "prima": 297930.0, "total": 336661.0, "moneda": "CRC", "estado_poliza": "Vigente", "estado_recibo": "Pendiente", "fr": "Semestral", "dias_venc": 28, "verif": true, "confirmar": "2026-05-06", "telefonos": "8845-1134 (CELULAR)", "correos": "lezcano.adriana@hotmail.com", "ultima_gestion": "SE ENVIO CORREO", "resultado": "No se pudo obtener una confirmación de pago", "proxima_renovacion": "2027-05-06", "mes_origen": "MAYO2026", "tipo": "RENOVACION"}, {"poliza": "01-01-AUT-2159992", "asegurado": "PALAVICINI ESCALANTE ANDRES EDUARDO", "prod": "AUTOMOVILES VOLUNTARIO - ANUAL", "desde": "2026-05-06", "hasta": "2026-08-06", "prima": 44373.0, "total": 50141.0, "moneda": "CRC", "estado_poliza": "Vigente", "estado_recibo": "Pendiente", "fr": "Trimestral", "dias_venc": 28, "verif": true, "confirmar": "2026-05-06", "telefonos": "8883-1383 (CELULAR), 6040-6029 (CELULAR)", "correos": "aepalesca@gmail.com", "ultima_gestion": "SE ENVIO CORREO", "resultado": "No se pudo obtener una confirmación de pago", "proxima_renovacion": "2026-11-06", "mes_origen": "MAYO2026", "tipo": "RENOVACION"}, {"poliza": "01-01-AUT-1698129", "asegurado": "VILLALOBOS PANIAGUA MELISSA PATRICIA", "prod": "AUTOMOVILES VOLUNTARIO", "desde": "2026-05-06", "hasta": "2026-08-06", "prima": 127510.0, "total": 144086.0, "moneda": "CRC", "estado_poliza": "Vigente", "estado_recibo": "Pendiente", "fr": "Trimestral", "dias_venc": 28, "verif": true, "confirmar": "2026-05-06", "telefonos": "8652-0236 (CELULAR)", "correos": "melissavillalobos18@gmail.com", "ultima_gestion": "SE PROGRAAM ENVIO 8-42026", "resultado": "No se pudo obtener una confirmación de pago", "proxima_renovacion": "2026-11-06", "mes_origen": "MAYO2026", "tipo": "RENOVACION"}, {"poliza": "01-01-ACL-0030375", "asegurado": "AVILA GARCIA SIMON ANTONIO", "prod": "PLAN FAMILIAR AUCOL", "desde": "2026-05-07", "hasta": "2026-08-07", "prima": 187188.0, "total": 211522.0, "moneda": "CRC", "estado_poliza": "Vigente", "estado_recibo": "Pendiente", "fr": "Trimestral", "dias_venc": 29, "verif": true, "confirmar": "2026-05-07", "telefonos": "7230-5022 (CELULAR)", "correos": "saag1@hotmail.com; fulvioavilaherrera@hotmail.com", "ultima_gestion": "SE PROGRAAM ENVIO 8-4-2026", "resultado": "No se pudo obtener una confirmación de pago", "proxima_renovacion": "2026-11-07", "mes_origen": "MAYO2026", "tipo": "RENOVACION"}, {"poliza": "01-09-AUT-0385803", "asegurado": "MURILLO JIMENEZ LAURA GABRIELA", "prod": "AUTOMOVILES VOLUNTARIO - ANUAL", "desde": "2026-05-07", "hasta": "2026-11-07", "prima": 158518.0, "total": 179125.0, "moneda": "CRC", "estado_poliza": "Vigente", "estado_recibo": "Pendiente", "fr": "Semestral", "dias_venc": 29, "verif": true, "confirmar": "", "telefonos": "8718-7574", "correos": "lauragmj@gmail.com", "ultima_gestion": "", "resultado": "", "proxima_renovacion": "2027-05-07", "mes_origen": "MAYO2026", "tipo": "RENOVACION"}, {"poliza": "01-01-AUT-2183552", "asegurado": "SANCHEZ ESPINOZA ELIZABETH MAGALY", "prod": "AUTOMOVILES VOLUNTARIO - ANUAL", "desde": "2026-05-07", "hasta": "2026-08-07", "prima": 92488.0, "total": 104511.0, "moneda": "CRC", "estado_poliza": "Vigente", "estado_recibo": "Pendiente", "fr": "Trimestral", "dias_venc": 29, "verif": true, "confirmar": "", "telefonos": "8650-3920", "correos": "elizabeth.sanchez20@gmail.com", "ultima_gestion": "", "resultado": "", "proxima_renovacion": "2026-11-07", "mes_origen": "MAYO2026", "tipo": "RENOVACION"}, {"poliza": "01-01-AUT-2189772", "asegurado": "ALVAREZ VEGA MICHAEL GERARDO", "prod": "AUTOMOVILES VOLUNTARIO - ANUAL", "desde": "2026-05-08", "hasta": "2026-08-08", "prima": 128948.0, "total": 145711.0, "moneda": "CRC", "estado_poliza": "Vigente", "estado_recibo": "Pendiente", "fr": "Trimestral", "dias_venc": 30, "verif": true, "confirmar": "2026-05-08", "telefonos": "6043-1249 (CELULAR)", "correos": "mike0307@live.com", "ultima_gestion": "SE PROGRAMA ENVIO 8-4-2026", "resultado": "No se pudo obtener una confirmación de pago", "proxima_renovacion": "2026-11-08", "mes_origen": "MAYO2026", "tipo": "RENOVACION"}, {"poliza": "01-01-AUT-1992192", "asegurado": "BONILLA CABANA ESTEFANIE", "prod": "AUTOMOVILES VOLUNTARIO", "desde": "2026-05-08", "hasta": "2026-11-08", "prima": 271232.0, "total": 306492.0, "moneda": "CRC", "estado_poliza": "Vigente", "estado_recibo": "Pendiente", "fr": "Semestral", "dias_venc": 30, "verif": true, "confirmar": "", "telefonos": "8318-6560 (CELULAR)", "correos": "tf12938@gmail.com; educamag83@gmail.com", "ultima_gestion": "", "resultado": "", "proxima_renovacion": "2027-05-08", "mes_origen": "MAYO2026", "tipo": "RENOVACION"}, {"poliza": "01-01-AUT-1992191", "asegurado": "PAREDES URBINA MICHAEL STANLEY", "prod": "AUTOMOVILES VOLUNTARIO - ANUAL", "desde": "2026-05-08", "hasta": "2027-05-08", "prima": 798018.0, "total": 901760.0, "moneda": "CRC", "estado_poliza": "Vigente", "estado_recibo": "Pendiente", "fr": "Anual", "dias_venc": 30, "verif": true, "confirmar": "", "telefonos": "8748-2944 (CELULAR)", "correos": "mstanp@gmail.com", "ultima_gestion": "", "resultado": "", "proxima_renovacion": "2028-05-08", "mes_origen": "MAYO2026", "tipo": "RENOVACION"}, {"poliza": "01-21-EQE-0001402", "asegurado": "SALAZAR SEGURA ANA CECILIA", "prod": "EQUIPO ELECTRONICO", "desde": "2026-05-08", "hasta": "2027-05-08", "prima": 26366.0, "total": 29794.0, "moneda": "CRC", "estado_poliza": "Vigente", "estado_recibo": "Pendiente", "fr": "Anual", "dias_venc": 30, "verif": true, "confirmar": "", "telefonos": "8347-0909 (CELULAR)", "correos": "acsalazar@abogados.or.cr; cecsalazar@hotmail.com", "ultima_gestion": "", "resultado": "", "proxima_renovacion": "2028-05-08", "mes_origen": "MAYO2026", "tipo": "RENOVACION"}, {"poliza": "01-01-AUT-1810596", "asegurado": "ARAYA TAMES CAROLINA", "prod": "AUTOMOVILES VOLUNTARIO", "desde": "2026-05-09", "hasta": "2026-11-09", "prima": 252642.0, "total": 285485.0, "moneda": "CRC", "estado_poliza": "Vigente", "estado_recibo": "Pendiente", "fr": "Semestral", "dias_venc": 31, "verif": true, "confirmar": "", "telefonos": "6097-3586 (CELULAR)", "correos": "carayatames@gmail.com", "ultima_gestion": "", "resultado": "", "proxima_renovacion": "2027-05-09", "mes_origen": "MAYO2026", "tipo": "RENOVACION"}, {"poliza": "01-01-AUT-2003352", "asegurado": "CABALLERO ROJAS CAROL IVONNE", "prod": "AUTOMOVILES VOLUNTARIO", "desde": "2026-05-09", "hasta": "2026-11-09", "prima": 177225.0, "total": 200264.0, "moneda": "CRC", "estado_poliza": "Vigente", "estado_recibo": "Pendiente", "fr": "Semestral", "dias_venc": 31, "verif": true, "confirmar": "", "telefonos": "8586-6488", "correos": "caballerorojascarol@gmail.com", "ultima_gestion": "", "resultado": "", "proxima_renovacion": "2027-05-09", "mes_origen": "MAYO2026", "tipo": "RENOVACION"}, {"poliza": "01-01-AUT-1317174", "asegurado": "CAÑAS RIVAS MARIA ELENA", "prod": "AUTOMOVILES VOLUNTARIO", "desde": "2026-05-09", "hasta": "2026-11-09", "prima": 376249.0, "total": 425161.0, "moneda": "CRC", "estado_poliza": "Vigente", "estado_recibo": "Pendiente", "fr": "Semestral", "dias_venc": 31, "verif": true, "confirmar": "", "telefonos": "8328-7023, 8356-6581", "correos": "malenacanasr@hotmail.com                                                                            ; plutarcohcr@hotmail.com                                                                             ; rinconsalvadoreno@hotmail.com", "ultima_gestion": "", "resultado": "", "proxima_renovacion": "2027-05-09", "mes_origen": "MAYO2026", "tipo": "RENOVACION"}, {"poliza": "01-01-AUT-2183813", "asegurado": "CHAVES ALFARO FELIPE", "prod": "AUTOMOVILES VOLUNTARIO - ANUAL", "desde": "2026-05-09", "hasta": "2026-11-09", "prima": 70496.0, "total": 79660.0, "moneda": "CRC", "estado_poliza": "Vigente", "estado_recibo": "Pendiente", "fr": "Semestral", "dias_venc": 31, "verif": true, "confirmar": "", "telefonos": "8384-1332 (CELULAR)", "correos": "jfchaves@gmail.com", "ultima_gestion": "", "resultado": "", "proxima_renovacion": "2027-05-09", "mes_origen": "MAYO2026", "tipo": "RENOVACION"}, {"poliza": "01-01-AUT-1806512", "asegurado": "DE SIMONE JORGE FIORELLA NOELIA", "prod": "AUTOMOVILES VOLUNTARIO", "desde": "2026-05-09", "hasta": "2026-08-09", "prima": 84235.0, "total": 95186.0, "moneda": "CRC", "estado_poliza": "Vigente", "estado_recibo": "Pendiente", "fr": "Trimestral", "dias_venc": 31, "verif": true, "confirmar": "2026-05-09", "telefonos": "8443-5705", "correos": "fiorelladsj@gmail.com", "ultima_gestion": "SE PROGRAAM ENVIO PARA 8-4-2026", "resultado": "No se pudo obtener una confirmación de pago", "proxima_renovacion": "2026-11-09", "mes_origen": "MAYO2026", "tipo": "RENOVACION"}, {"poliza": "01-21-AUT-0076764", "asegurado": "JARA AVILA MARIELA", "prod": "AUTOMOVILES VOLUNTARIO - ANUAL", "desde": "2026-05-09", "hasta": "2026-08-09", "prima": 102810.0, "total": 116175.0, "moneda": "CRC", "estado_poliza": "Vigente", "estado_recibo": "Pendiente", "fr": "Trimestral", "dias_venc": 31, "verif": true, "confirmar": "2026-05-09", "telefonos": "8407-9829", "correos": "mjara01@hotmail.com", "ultima_gestion": "SE PROGRAMA ENVIO 8-4-2026", "resultado": "No se pudo obtener una confirmación de pago", "proxima_renovacion": "2026-11-09", "mes_origen": "MAYO2026", "tipo": "RENOVACION"}, {"poliza": "01-01-AUT-2201275", "asegurado": "MORALES FLORES PAULA LINETTE", "prod": "AUTOMOVILES VOLUNTARIO - ANUAL", "desde": "2026-05-09", "hasta": "2026-08-09", "prima": 87281.0, "total": 98628.0, "moneda": "CRC", "estado_poliza": "Período gracia", "estado_recibo": "Pendiente", "fr": "Trimestral", "dias_venc": 31, "verif": true, "confirmar": "2026-05-09", "telefonos": "8916-6247", "correos": "paula.moralesflores@hotmail.com", "ultima_gestion": "SE PROGRAMA ENVIO 8-4-2026", "resultado": "No se pudo obtener una confirmación de pago", "proxima_renovacion": "2026-11-09", "mes_origen": "MAYO2026", "tipo": "RENOVACION"}, {"poliza": "01-01-AUT-2183820", "asegurado": "PEREZ JAEN MARCIA MILENA", "prod": "AUTOMOVILES VOLUNTARIO - ANUAL", "desde": "2026-05-09", "hasta": "2026-08-09", "prima": 145804.0, "total": 164759.0, "moneda": "CRC", "estado_poliza": "Vigente", "estado_recibo": "Pendiente", "fr": "Trimestral", "dias_venc": 31, "verif": true, "confirmar": "", "telefonos": "8899-3115 (CELULAR)", "correos": "dra.perezj@gmail.com", "ultima_gestion": "", "resultado": "", "proxima_renovacion": "2026-11-09", "mes_origen": "MAYO2026", "tipo": "RENOVACION"}, {"poliza": "01-01-AUT-2160366", "asegurado": "ARCE AGUILAR LUIS ENRIQUE", "prod": "AUTOMOVILES VOLUNTARIO", "desde": "2026-05-10", "hasta": "2026-11-10", "prima": 272365.0, "total": 307772.0, "moneda": "CRC", "estado_poliza": "Vigente", "estado_recibo": "Pendiente", "fr": "Semestral", "dias_venc": 32, "verif": true, "confirmar": "", "telefonos": "8630-4076 (CELULAR)", "correos": "kikin16@hotmail.es", "ultima_gestion": "", "resultado": "", "proxima_renovacion": "2027-05-10", "mes_origen": "MAYO2026", "tipo": "RENOVACION"}, {"poliza": "01-01-AUT-2201331", "asegurado": "ARCE RAMIREZ JOSE ANTONIO", "prod": "AUTOMOVILES VOLUNTARIO - ANUAL", "desde": "2026-05-10", "hasta": "2026-08-10", "prima": 115393.0, "total": 130394.0, "moneda": "CRC", "estado_poliza": "Período gracia", "estado_recibo": "Pendiente", "fr": "Trimestral", "dias_venc": 32, "verif": true, "confirmar": "2026-05-10", "telefonos": "8301-1994", "correos": "arce.ramirez02@gmail.com", "ultima_gestion": "se programa envio 8-4-2026", "resultado": "No se pudo obtener una confirmación de pago", "proxima_renovacion": "2026-11-10", "mes_origen": "MAYO2026", "tipo": "RENOVACION"}, {"poliza": "01-01-AUT-1992362", "asegurado": "CARMONA SALAZAR DIEGO HUMBERTO", "prod": "AUTOMOVILES VOLUNTARIO", "desde": "2026-05-10", "hasta": "2026-11-10", "prima": 213227.0, "total": 240946.0, "moneda": "CRC", "estado_poliza": "Vigente", "estado_recibo": "Pendiente", "fr": "Semestral", "dias_venc": 32, "verif": true, "confirmar": "", "telefonos": "8349-1077 (CELULAR)", "correos": "dhcarmona@gmail.com", "ultima_gestion": "", "resultado": "", "proxima_renovacion": "2027-05-10", "mes_origen": "MAYO2026", "tipo": "RENOVACION"}, {"poliza": "02-01-MED-0002584", "asegurado": "CENTEN () JAN JOHANNES WILCHELMUS", "prod": "INS MEDICAL SIAS", "desde": "2026-05-10", "hasta": "2026-11-10", "prima": 4742.0, "total": 5358.0, "moneda": "USD", "estado_poliza": "Vigente", "estado_recibo": "Pendiente", "fr": "Semestral", "dias_venc": 32, "verif": true, "confirmar": "", "telefonos": "", "correos": "", "ultima_gestion": "", "resultado": "", "proxima_renovacion": "2027-05-10", "mes_origen": "MAYO2026", "tipo": "RENOVACION"}, {"poliza": "01-12-AUT-0084168", "asegurado": "CTM CORPORACION TECNOLOGIA MAGALLANES S.A.", "prod": "AUTOMOVILES VOLUNTARIO - ANUAL", "desde": "2026-05-10", "hasta": "2026-11-10", "prima": 55382.0, "total": 62582.0, "moneda": "CRC", "estado_poliza": "Vigente", "estado_recibo": "Pendiente", "fr": "Semestral", "dias_venc": 32, "verif": true, "confirmar": "", "telefonos": "", "correos": "pgilberth@ebicr.com; facturacion@ctmcr.com", "ultima_gestion": "", "resultado": "", "proxima_renovacion": "2027-05-10", "mes_origen": "MAYO2026", "tipo": "RENOVACION"}, {"poliza": "01-01-AUT-1810819", "asegurado": "LOPEZ VARGAS JOSUE MIGUEL", "prod": "AUTOMOVILES VOLUNTARIO", "desde": "2026-05-10", "hasta": "2026-11-10", "prima": 78026.0, "total": 88169.0, "moneda": "CRC", "estado_poliza": "Vigente", "estado_recibo": "Pendiente", "fr": "Semestral", "dias_venc": 32, "verif": true, "confirmar": "", "telefonos": "8821-5873 (CELULAR)", "correos": "josue.lopez@live.com", "ultima_gestion": "", "resultado": "", "proxima_renovacion": "2027-05-10", "mes_origen": "MAYO2026", "tipo": "RENOVACION"}, {"poliza": "01-04-AUT-0259802", "asegurado": "MAS GARCIA ANABELLA", "prod": "AUTOMOVILES VOLUNTARIO - ANUAL", "desde": "2026-05-10", "hasta": "2026-11-10", "prima": 265296.0, "total": 299785.0, "moneda": "CRC", "estado_poliza": "Vigente", "estado_recibo": "Pendiente", "fr": "Semestral", "dias_venc": 32, "verif": true, "confirmar": "", "telefonos": "8391-7926", "correos": "anabellamas@yahoo.com", "ultima_gestion": "", "resultado": "", "proxima_renovacion": "2027-05-10", "mes_origen": "MAYO2026", "tipo": "RENOVACION"}, {"poliza": "01-01-CAU-0001697", "asegurado": "HERNANDEZ VARGAS JUAN CARLOS", "prod": "CAUCION", "desde": "2026-05-11", "hasta": "2027-05-11", "prima": 127837.0, "total": 144456.0, "moneda": "CRC", "estado_poliza": "Vigente", "estado_recibo": "Pendiente", "fr": "Anual", "dias_venc": 33, "verif": false, "confirmar": "", "telefonos": "8822-1348", "correos": "", "ultima_gestion": "", "resultado": "", "proxima_renovacion": "2028-05-11", "mes_origen": "MAYO2026", "tipo": "RENOVACION"}, {"poliza": "01-01-AUT-2189835", "asegurado": "HERRERA CONTRERAS JOSE LUIS", "prod": "AUTOMOVILES VOLUNTARIO - ANUAL", "desde": "2026-05-11", "hasta": "2026-08-11", "prima": 104760.0, "total": 118379.0, "moneda": "CRC", "estado_poliza": "Vigente", "estado_recibo": "Pendiente", "fr": "Trimestral", "dias_venc": 33, "verif": true, "confirmar": "2026-05-11", "telefonos": "8990-5267", "correos": "kimberlyherrera88@gmail.com", "ultima_gestion": "SE PROGRAMA ENVIO 8-4-2026", "resultado": "No se pudo obtener una confirmación de pago", "proxima_renovacion": "2026-11-11", "mes_origen": "MAYO2026", "tipo": "RENOVACION"}, {"poliza": "01-01-AUT-1620025", "asegurado": "JL COSTA RICA SPECIALIZED S.A", "prod": "AUTOMOVILES VOLUNTARIO", "desde": "2026-05-11", "hasta": "2026-11-11", "prima": 317873.0, "total": 359196.0, "moneda": "CRC", "estado_poliza": "Vigente", "estado_recibo": "Pendiente", "fr": "Semestral", "dias_venc": 33, "verif": true, "confirmar": "", "telefonos": "", "correos": "", "ultima_gestion": "", "resultado": "", "proxima_renovacion": "2027-05-11", "mes_origen": "MAYO2026", "tipo": "RENOVACION"}, {"poliza": "01-01-AUT-2201453", "asegurado": "BAISOTTI MARIANA", "prod": "AUTOMOVILES VOLUNTARIO - ANUAL", "desde": "2026-05-12", "hasta": "2026-08-12", "prima": 105062.0, "total": 118720.0, "moneda": "CRC", "estado_poliza": "Período gracia", "estado_recibo": "Pendiente", "fr": "Trimestral", "dias_venc": 34, "verif": true, "confirmar": "2026-05-12", "telefonos": "8594-2138", "correos": "marianabfotografa@gmail.com", "ultima_gestion": "SE PROGRAMA ENVIO 8-4-2026", "resultado": "No se pudo obtener una confirmación de pago", "proxima_renovacion": "2026-11-12", "mes_origen": "MAYO2026", "tipo": "RENOVACION"}, {"poliza": "01-01-AUT-1330508", "asegurado": "JARA PHILLIPS HELEN", "prod": "AUTOMOVILES VOLUNTARIO", "desde": "2026-05-12", "hasta": "2026-11-12", "prima": 239073.0, "total": 270152.0, "moneda": "CRC", "estado_poliza": "Vigente", "estado_recibo": "Pendiente", "fr": "Semestral", "dias_venc": 34, "verif": true, "confirmar": "", "telefonos": "", "correos": "", "ultima_gestion": "", "resultado": "", "proxima_renovacion": "2027-05-12", "mes_origen": "MAYO2026", "tipo": "RENOVACION"}, {"poliza": "01-01-AUT-2183850", "asegurado": "LARA VILLAGRAN OSWALDO ANTONIO", "prod": "AUTOMOVILES VOLUNTARIO - ANUAL", "desde": "2026-05-12", "hasta": "2026-08-12", "prima": 169086.0, "total": 191067.0, "moneda": "CRC", "estado_poliza": "Vigente", "estado_recibo": "Pendiente", "fr": "Trimestral", "dias_venc": 34, "verif": true, "confirmar": "", "telefonos": "8377-8791 (CELULAR)", "correos": "ozzie.lara@gmail.com", "ultima_gestion": "", "resultado": "", "proxima_renovacion": "2026-11-12", "mes_origen": "MAYO2026", "tipo": "RENOVACION"}, {"poliza": "01-19-COL-0001833", "asegurado": "MOLINA ULLOA PAMELA", "prod": "PLAN FAMILIAR (COL)", "desde": "2026-05-12", "hasta": "2026-08-12", "prima": 319393.0, "total": 360914.0, "moneda": "CRC", "estado_poliza": "Vigente", "estado_recibo": "Pendiente", "fr": "Trimestral", "dias_venc": 34, "verif": true, "confirmar": "", "telefonos": "", "correos": "pmolina@ins-cr.com; dmolina@iafa.co.cr                                                                                  ; pamelamolinau@gmail.com", "ultima_gestion": "", "resultado": "", "proxima_renovacion": "2026-11-12", "mes_origen": "MAYO2026", "tipo": "RENOVACION"}, {"poliza": "01-01-AUT-1717090", "asegurado": "BOLAÑOS ALCAZAR DAMARIS VERONICA", "prod": "AUTOMOVILES VOLUNTARIO - ANUAL", "desde": "2026-05-13", "hasta": "2027-05-13", "prima": 644494.0, "total": 728278.0, "moneda": "CRC", "estado_poliza": "Vigente", "estado_recibo": "Pendiente", "fr": "Anual", "dias_venc": 35, "verif": true, "confirmar": "", "telefonos": "8886-0993 (CELULAR), 8886-0993 (CELULAR)", "correos": "franzsanram@hotmail.com", "ultima_gestion": "", "resultado": "", "proxima_renovacion": "2028-05-13", "mes_origen": "MAYO2026", "tipo": "RENOVACION"}, {"poliza": "01-01-AUT-2175745", "asegurado": "ESQUIVEL RODRIGUEZ JUAN MANUEL", "prod": "AUTOMOVILES VOLUNTARIO - ANUAL", "desde": "2026-05-13", "hasta": "2026-11-13", "prima": 219627.0, "total": 248178.0, "moneda": "CRC", "estado_poliza": "Vigente", "estado_recibo": "Pendiente", "fr": "Semestral", "dias_venc": 35, "verif": true, "confirmar": "2026-05-13", "telefonos": "8701-8880 (CELULAR)", "correos": "jm.esquivel.rodriguez@gmail.com", "ultima_gestion": "SE PROGRAMA ENVIO 8-4-2026", "resultado": "No se pudo obtener una confirmación de pago", "proxima_renovacion": "2027-05-13", "mes_origen": "MAYO2026", "tipo": "RENOVACION"}, {"poliza": "01-01-AUT-1802561", "asegurado": "PORRAS VARGAS JEISON DE LOS ANGELES", "prod": "AUTOMOVILES VOLUNTARIO", "desde": "2026-05-13", "hasta": "2026-11-13", "prima": 298752.0, "total": 337590.0, "moneda": "CRC", "estado_poliza": "Vigente", "estado_recibo": "Pendiente", "fr": "Semestral", "dias_venc": 35, "verif": true, "confirmar": "", "telefonos": "8639-1685 (CELULAR)", "correos": "jeiporva@hotmail.com", "ultima_gestion": "", "resultado": "", "proxima_renovacion": "2027-05-13", "mes_origen": "MAYO2026", "tipo": "RENOVACION"}, {"poliza": "02-01-IMR-0003189", "asegurado": "RMN MUNDO LIMITADA", "prod": "HOGAR COMPRENSIVO", "desde": "2026-05-13", "hasta": "2027-05-13", "prima": 3449.0, "total": 3897.0, "moneda": "USD", "estado_poliza": "Vigente", "estado_recibo": "Pendiente", "fr": "Anual", "dias_venc": 35, "verif": true, "confirmar": "", "telefonos": "8836-4617 (CELULAR)", "correos": "faltamura@faciolegal.com", "ultima_gestion": "", "resultado": "", "proxima_renovacion": "2028-05-13", "mes_origen": "MAYO2026", "tipo": "RENOVACION"}, {"poliza": "01-01-AUT-2160340", "asegurado": "ANGULO MORALES CAMILA JOSE", "prod": "AUTOMOVILES VOLUNTARIO - ANUAL", "desde": "2026-05-14", "hasta": "2026-11-14", "prima": 242173.0, "total": 273655.0, "moneda": "CRC", "estado_poliza": "Vigente", "estado_recibo": "Pendiente", "fr": "Semestral", "dias_venc": 36, "verif": true, "confirmar": "", "telefonos": "6025-3182 (CELULAR)", "correos": "cami.jam94@gmail.com", "ultima_gestion": "", "resultado": "", "proxima_renovacion": "2027-05-14", "mes_origen": "MAYO2026", "tipo": "RENOVACION"}, {"poliza": "01-21-AUT-0076807", "asegurado": "ARCE DIAZ JONATHAN JESUS", "prod": "AUTOMOVILES VOLUNTARIO - ANUAL", "desde": "2026-05-14", "hasta": "2026-08-14", "prima": 112763.0, "total": 127422.0, "moneda": "CRC", "estado_poliza": "Vigente", "estado_recibo": "Pendiente", "fr": "Trimestral", "dias_venc": 36, "verif": true, "confirmar": "2026-05-14", "telefonos": "8548-6704 (CELULAR)", "correos": "jonarcesolfag@gmail.com", "ultima_gestion": "SE PROGRAMA ENVIO 8-4-2026", "resultado": "No se pudo obtener una confirmación de pago", "proxima_renovacion": "2026-11-14", "mes_origen": "MAYO2026", "tipo": "RENOVACION"}, {"poliza": "01-01-AUT-2005708", "asegurado": "CHACON CHANG LUIS ALFREDO", "prod": "AUTOMOVILES VOLUNTARIO", "desde": "2026-05-14", "hasta": "2026-11-14", "prima": 272365.0, "total": 307772.0, "moneda": "CRC", "estado_poliza": "Vigente", "estado_recibo": "Pendiente", "fr": "Semestral", "dias_venc": 36, "verif": true, "confirmar": "", "telefonos": "8990-7474 (CELULAR)", "correos": "lchaconchang@gmail.com", "ultima_gestion": "", "resultado": "", "proxima_renovacion": "2027-05-14", "mes_origen": "MAYO2026", "tipo": "RENOVACION"}, {"poliza": "01-01-FID-0012611", "asegurado": "HERNANDEZ VARGAS JUAN CARLOS", "prod": "FIDELIDAD", "desde": "2026-05-14", "hasta": "2027-05-14", "prima": 39020.0, "total": 44093.0, "moneda": "CRC", "estado_poliza": "Vigente", "estado_recibo": "Pendiente", "fr": "Anual", "dias_venc": 36, "verif": true, "confirmar": "", "telefonos": "8822-1348", "correos": "", "ultima_gestion": "", "resultado": "", "proxima_renovacion": "2028-05-14", "mes_origen": "MAYO2026", "tipo": "RENOVACION"}, {"poliza": "01-01-AUT-2189933", "asegurado": "JIRON SALAZAR EMMANUEL", "prod": "AUTOMOVILES VOLUNTARIO - ANUAL", "desde": "2026-05-14", "hasta": "2026-08-14", "prima": 94821.0, "total": 107148.0, "moneda": "CRC", "estado_poliza": "Vigente", "estado_recibo": "Pendiente", "fr": "Trimestral", "dias_venc": 36, "verif": true, "confirmar": "2026-05-14", "telefonos": "6067-6060", "correos": "ejiron02@gmail.com", "ultima_gestion": "SE PROGRAAM ENVIO 8-4-2026", "resultado": "No se pudo obtener una confirmación de pago", "proxima_renovacion": "2026-11-14", "mes_origen": "MAYO2026", "tipo": "RENOVACION"}, {"poliza": "01-01-AUT-2005985", "asegurado": "MUÑOZ AGUIRRE ALAN", "prod": "AUTOMOVILES VOLUNTARIO", "desde": "2026-05-14", "hasta": "2026-11-14", "prima": 266701.0, "total": 301372.0, "moneda": "CRC", "estado_poliza": "Vigente", "estado_recibo": "Pendiente", "fr": "Semestral", "dias_venc": 36, "verif": true, "confirmar": "", "telefonos": "8826-8039", "correos": "muaguialan17@gmail.com", "ultima_gestion": "", "resultado": "", "proxima_renovacion": "2027-05-14", "mes_origen": "MAYO2026", "tipo": "RENOVACION"}, {"poliza": "01-01-AUT-2160342", "asegurado": "ORTIZ COTO CARLOS ALBERTO", "prod": "AUTOMOVILES VOLUNTARIO - ANUAL", "desde": "2026-05-14", "hasta": "2026-11-14", "prima": 316630.0, "total": 357792.0, "moneda": "CRC", "estado_poliza": "Vigente", "estado_recibo": "Pendiente", "fr": "Semestral", "dias_venc": 36, "verif": true, "confirmar": "", "telefonos": "8839-5244", "correos": "carlos79ortiz@gmail.com", "ultima_gestion": "", "resultado": "", "proxima_renovacion": "2027-05-14", "mes_origen": "MAYO2026", "tipo": "RENOVACION"}, {"poliza": "01-01-AUT-2005717", "asegurado": "PEREZ RODRIGUEZ ERICK ROLANDO", "prod": "AUTOMOVILES VOLUNTARIO", "desde": "2026-05-14", "hasta": "2026-11-14", "prima": 366145.0, "total": 413744.0, "moneda": "CRC", "estado_poliza": "Vigente", "estado_recibo": "Pendiente", "fr": "Semestral", "dias_venc": 36, "verif": true, "confirmar": "", "telefonos": "8877-5073 (CELULAR)", "correos": "enerpluscredito.sr@gmail.com; milenavqr@gmail.com", "ultima_gestion": "", "resultado": "", "proxima_renovacion": "2027-05-14", "mes_origen": "MAYO2026", "tipo": "RENOVACION"}, {"poliza": "01-01-AUT-2189935", "asegurado": "QUESADA ROJAS DANIELA MILADY", "prod": "AUTOMOVILES VOLUNTARIO - ANUAL", "desde": "2026-05-14", "hasta": "2026-08-14", "prima": 99725.0, "total": 112689.0, "moneda": "CRC", "estado_poliza": "Vigente", "estado_recibo": "Pendiente", "fr": "Trimestral", "dias_venc": 36, "verif": true, "confirmar": "2026-05-14", "telefonos": "8920-4604", "correos": "daniser4@gmail.com", "ultima_gestion": "SE PROGRAMA ENVIO 8-4-2026", "resultado": "No se pudo obtener una confirmación de pago", "proxima_renovacion": "2026-11-14", "mes_origen": "MAYO2026", "tipo": "RENOVACION"}, {"poliza": "01-01-AUT-2160367", "asegurado": "RODRIGUEZ SOTO SUSANNE", "prod": "AUTOMOVILES VOLUNTARIO - ANUAL", "desde": "2026-05-14", "hasta": "2026-11-14", "prima": 341072.0, "total": 385411.0, "moneda": "CRC", "estado_poliza": "Vigente", "estado_recibo": "Pendiente", "fr": "Semestral", "dias_venc": 36, "verif": true, "confirmar": "", "telefonos": "8836-2301 (CELULAR)", "correos": "suderecho.uh@gmail.com", "ultima_gestion": "", "resultado": "", "proxima_renovacion": "2027-05-14", "mes_origen": "MAYO2026", "tipo": "RENOVACION"}, {"poliza": "01-01-AUT-1607001", "asegurado": "TREMINIO SANCHEZ ILKA TREMINIO", "prod": "AUTOMOVILES VOLUNTARIO - ANUAL", "desde": "2026-05-14", "hasta": "2027-05-14", "prima": 428427.0, "total": 484123.0, "moneda": "CRC", "estado_poliza": "Vigente", "estado_recibo": "Pendiente", "fr": "Anual", "dias_venc": 36, "verif": true, "confirmar": "", "telefonos": "", "correos": "", "ultima_gestion": "", "resultado": "", "proxima_renovacion": "2028-05-14", "mes_origen": "MAYO2026", "tipo": "RENOVACION"}, {"poliza": "01-01-AUT-2005787", "asegurado": "CONEJO VARELA LUIS DIEGO", "prod": "AUTOMOVILES VOLUNTARIO - ANUAL", "desde": "2026-05-15", "hasta": "2027-05-15", "prima": 451560.0, "total": 510263.0, "moneda": "CRC", "estado_poliza": "Vigente", "estado_recibo": "Pendiente", "fr": "Anual", "dias_venc": 37, "verif": true, "confirmar": "", "telefonos": "8315-6380 (CELULAR)", "correos": "dconejo@gmail.com", "ultima_gestion": "", "resultado": "", "proxima_renovacion": "2028-05-15", "mes_origen": "MAYO2026", "tipo": "RENOVACION"}, {"poliza": "01-01-ACL-0016290", "asegurado": "MARTINEZ ESQUIVEL ERICKA MARIA", "prod": "PLAN FAMILIAR AUCOL", "desde": "2026-05-15", "hasta": "2026-11-15", "prima": 236573.0, "total": 267328.0, "moneda": "CRC", "estado_poliza": "Vigente", "estado_recibo": "Pendiente", "fr": "Semestral", "dias_venc": 37, "verif": true, "confirmar": "", "telefonos": "6006-6489 (CELULAR)", "correos": "erime89@gmail.com; melena426@yahoo.com", "ultima_gestion": "", "resultado": "", "proxima_renovacion": "2027-05-15", "mes_origen": "MAYO2026", "tipo": "RENOVACION"}, {"poliza": "01-01-AUT-1129888", "asegurado": "MONDOL LOPEZ LENIN", "prod": "AUTOMOVILES VOLUNTARIO", "desde": "2026-05-15", "hasta": "2026-08-15", "prima": 34623.0, "total": 39124.0, "moneda": "CRC", "estado_poliza": "Vigente", "estado_recibo": "Pendiente", "fr": "Trimestral", "dias_venc": 37, "verif": true, "confirmar": "", "telefonos": "", "correos": "", "ultima_gestion": "", "resultado": "", "proxima_renovacion": "2026-11-15", "mes_origen": "MAYO2026", "tipo": "RENOVACION"}, {"poliza": "01-01-AUT-1325016", "asegurado": "ACOSTA VALVERDE JONATHAN DAVID", "prod": "AUTOMOVILES VOLUNTARIO", "desde": "2026-05-16", "hasta": "2026-08-16", "prima": 116119.0, "total": 131214.0, "moneda": "CRC", "estado_poliza": "Vigente", "estado_recibo": "Pendiente", "fr": "Trimestral", "dias_venc": 38, "verif": true, "confirmar": "2026-05-16", "telefonos": "8721-1373, 8507-9122", "correos": "", "ultima_gestion": "SE PROGRAMA ENVIO 8-4-2026", "resultado": "No se pudo obtener una confirmación de pago", "proxima_renovacion": "2026-11-16", "mes_origen": "MAYO2026", "tipo": "RENOVACION"}, {"poliza": "01-01-AUT-1992473", "asegurado": "BERAZA MEDINA JOSE ANGEL", "prod": "AUTOMOVILES VOLUNTARIO", "desde": "2026-05-16", "hasta": "2026-08-16", "prima": 89493.0, "total": 101127.0, "moneda": "CRC", "estado_poliza": "Vigente", "estado_recibo": "Pendiente", "fr": "Trimestral", "dias_venc": 38, "verif": true, "confirmar": "", "telefonos": "8777-0285", "correos": "josjrg05@gmail.com", "ultima_gestion": "", "resultado": "", "proxima_renovacion": "2026-11-16", "mes_origen": "MAYO2026", "tipo": "RENOVACION"}, {"poliza": "UC0120140211380", "asegurado": "CARRANZA ELIZONDO KATHIA", "prod": "VIDA UNIVERSAL PLUS", "desde": "2026-05-16", "hasta": "2026-06-16", "prima": 10250.0, "total": 10250.0, "moneda": "CRC", "estado_poliza": "Vigente", "estado_recibo": "Pendiente", "fr": "Mensual", "dias_venc": 38, "verif": true, "confirmar": "2026-05-16", "telefonos": "", "correos": "", "ultima_gestion": "SE PROGRAMA ENVIO 8-4-2026", "resultado": "No se pudo obtener una confirmación de pago", "proxima_renovacion": "2026-07-16", "mes_origen": "MAYO2026", "tipo": "RENOVACION"}, {"poliza": "01-01-AUT-1509127", "asegurado": "CHINCHILLA ARAYA ANDREA", "prod": "AUTOMOVILES VOLUNTARIO", "desde": "2026-05-16", "hasta": "2026-11-16", "prima": 232074.0, "total": 262244.0, "moneda": "CRC", "estado_poliza": "Vigente", "estado_recibo": "Pendiente", "fr": "Semestral", "dias_venc": 38, "verif": true, "confirmar": "", "telefonos": "8332-5239, 8829-7947 (CELULAR)", "correos": "juan.jose.rubi@gmail.com                                                                            ; andreachinchilla2010@hotmail.com", "ultima_gestion": "", "resultado": "", "proxima_renovacion": "2027-05-16", "mes_origen": "MAYO2026", "tipo": "RENOVACION"}, {"poliza": "01-01-AUT-1717087", "asegurado": "LOPEZ CAMPOS MARIA GUADALUPE", "prod": "AUTOMOVILES VOLUNTARIO", "desde": "2026-05-16", "hasta": "2026-08-16", "prima": 86868.0, "total": 98161.0, "moneda": "CRC", "estado_poliza": "Vigente", "estado_recibo": "Pendiente", "fr": "Trimestral", "dias_venc": 38, "verif": true, "confirmar": "", "telefonos": "8366-8244 (CELULAR)", "correos": "m.lupita98.ll@gmail.com", "ultima_gestion": "", "resultado": "", "proxima_renovacion": "2026-11-16", "mes_origen": "MAYO2026", "tipo": "RENOVACION"}, {"poliza": "01-01-AUT-1997520", "asegurado": "MURILLO BARQUERO MARIA JOSE", "prod": "AUTOMOVILES VOLUNTARIO", "desde": "2026-05-16", "hasta": "2026-08-16", "prima": 113436.0, "total": 128183.0, "moneda": "CRC", "estado_poliza": "Vigente", "estado_recibo": "Pendiente", "fr": "Trimestral", "dias_venc": 38, "verif": true, "confirmar": "2026-05-16", "telefonos": "8706-6565 (CELULAR)", "correos": "mariajosemb15@gmail.com", "ultima_gestion": "SE PROGRAMA ENVIO 8-4-2026", "resultado": "No se pudo obtener una confirmación de pago", "proxima_renovacion": "2026-11-16", "mes_origen": "MAYO2026", "tipo": "RENOVACION"}, {"poliza": "01-01-AUT-1317763", "asegurado": "ZUÑIGA MONTES FELIPE ANTONIO", "prod": "AUTOMOVILES VOLUNTARIO", "desde": "2026-05-16", "hasta": "2026-11-16", "prima": 206640.0, "total": 233503.0, "moneda": "CRC", "estado_poliza": "Vigente", "estado_recibo": "Pendiente", "fr": "Semestral", "dias_venc": 38, "verif": true, "confirmar": "", "telefonos": "8714-3947; 8354-4341", "correos": "dayazuma19@gmail.com", "ultima_gestion": "", "resultado": "", "proxima_renovacion": "2027-05-16", "mes_origen": "MAYO2026", "tipo": "RENOVACION"}, {"poliza": "01-01-AUT-1992505", "asegurado": "AFFARI LEGALI SRL", "prod": "AUTOMOVILES VOLUNTARIO", "desde": "2026-05-17", "hasta": "2026-11-17", "prima": 430326.0, "total": 486268.0, "moneda": "CRC", "estado_poliza": "Vigente", "estado_recibo": "Pendiente", "fr": "Semestral", "dias_venc": 39, "verif": true, "confirmar": "", "telefonos": "", "correos": "federicoaltamura.a@gmail.com; faltamura@faciolegal.com", "ultima_gestion": "", "resultado": "", "proxima_renovacion": "2027-05-17", "mes_origen": "MAYO2026", "tipo": "RENOVACION"}, {"poliza": "02-01-RCG-0000949", "asegurado": "BAJO PITA SOCIEDAD ANONIMA", "prod": "RESPONSABILIDAD CIVIL", "desde": "2026-05-17", "hasta": "2027-05-17", "prima": 415.0, "total": 469.0, "moneda": "USD", "estado_poliza": "Vigente", "estado_recibo": "Pendiente", "fr": "Anual", "dias_venc": 39, "verif": true, "confirmar": "", "telefonos": "", "correos": "", "ultima_gestion": "", "resultado": "", "proxima_renovacion": "2028-05-17", "mes_origen": "MAYO2026", "tipo": "RENOVACION"}, {"poliza": "01-21-IMR-0002382", "asegurado": "CASACOCO DE GUANACASTE S.A.", "prod": "HOGAR COMPRENSIVO", "desde": "2026-05-17", "hasta": "2026-11-17", "prima": 39181.0, "total": 44274.0, "moneda": "CRC", "estado_poliza": "Vigente", "estado_recibo": "Pendiente", "fr": "Semestral", "dias_venc": 39, "verif": true, "confirmar": "2026-05-17", "telefonos": "8383-6350; 2276-3129; 8895-6687", "correos": "brunocarboni@gmail.com; gerencia@koresa.cr; daniela.borrase@gmail.com", "ultima_gestion": "SE PROGRAMA ENVIO 8-4-2026", "resultado": "No se pudo obtener una confirmación de pago", "proxima_renovacion": "2027-05-17", "mes_origen": "MAYO2026", "tipo": "RENOVACION"}, {"poliza": "02-21-IMR-0000020", "asegurado": "RODONURB S.A.", "prod": "HOGAR COMPRENSIVO", "desde": "2026-05-17", "hasta": "2026-11-17", "prima": 115.0, "total": 130.0, "moneda": "USD", "estado_poliza": "Vigente", "estado_recibo": "Pendiente", "fr": "Semestral", "dias_venc": 39, "verif": true, "confirmar": "2026-05-17", "telefonos": "8383-6350; 8895-6687", "correos": "brunocarboni@gmail.com; koresa@racsa.co.cr", "ultima_gestion": "SE PROGRAMA ENVIO 8-4-2026", "resultado": "No se pudo obtener una confirmación de pago", "proxima_renovacion": "2027-05-17", "mes_origen": "MAYO2026", "tipo": "RENOVACION"}, {"poliza": "02-21-IMR-0000023", "asegurado": "RODONURB S.A.", "prod": "HOGAR COMPRENSIVO", "desde": "2026-05-17", "hasta": "2026-11-17", "prima": 219.0, "total": 247.0, "moneda": "USD", "estado_poliza": "Vigente", "estado_recibo": "Pendiente", "fr": "Semestral", "dias_venc": 39, "verif": true, "confirmar": "2026-05-17", "telefonos": "8383-6350; 8895-6687", "correos": "brunocarboni@gmail.com; koresa@racsa.co.cr", "ultima_gestion": "SE PROGRAMA ENVIO 8-4-2026", "resultado": "No se pudo obtener una confirmación de pago", "proxima_renovacion": "2027-05-17", "mes_origen": "MAYO2026", "tipo": "RENOVACION"}, {"poliza": "01-21-AUT-0075791", "asegurado": "VENEGAS MUÑOZ RUTH ELIZABETH", "prod": "AUTOMOVILES VOLUNTARIO - ANUAL", "desde": "2026-05-17", "hasta": "2027-05-17", "prima": 140198.0, "total": 158424.0, "moneda": "CRC", "estado_poliza": "Vigente", "estado_recibo": "Pendiente", "fr": "Anual", "dias_venc": 39, "verif": true, "confirmar": "", "telefonos": "8579-1373 (CELULAR)", "correos": "ladventure1988@gmail.com; tykis1988@yahoo.es", "ultima_gestion": "", "resultado": "", "proxima_renovacion": "2028-05-17", "mes_origen": "MAYO2026", "tipo": "RENOVACION"}, {"poliza": "01-01-AUT-1806751", "asegurado": "BARRANTES RODRIGUEZ KATTIA VANESSA", "prod": "AUTOMOVILES VOLUNTARIO", "desde": "2026-05-18", "hasta": "2026-08-18", "prima": 24040.0, "total": 27165.0, "moneda": "CRC", "estado_poliza": "Vigente", "estado_recibo": "Pendiente", "fr": "Trimestral", "dias_venc": 40, "verif": true, "confirmar": "2026-05-18", "telefonos": "8784-9191 (CELULAR)", "correos": "barrantes.kattia@hotmail.com; car.chinchilla@gmail.com", "ultima_gestion": "SE PROGRAMA ENVIO 8-4-2026", "resultado": "No se pudo obtener una confirmación de pago", "proxima_renovacion": "2026-11-18", "mes_origen": "MAYO2026", "tipo": "RENOVACION"}, {"poliza": "01-19-COL-0001844", "asegurado": "GUIDO ALVARADO DAVID", "prod": "PLAN FAMILIAR (COL)", "desde": "2026-05-18", "hasta": "2026-08-18", "prima": 175000.0, "total": 197750.0, "moneda": "CRC", "estado_poliza": "Vigente", "estado_recibo": "Pendiente", "fr": "Trimestral", "dias_venc": 40, "verif": true, "confirmar": "", "telefonos": "8846-8622, 2661-1939 (CASA), 2661-6718 (OFICINA), 8828-0003 (CELULAR)", "correos": "", "ultima_gestion": "", "resultado": "", "proxima_renovacion": "2026-11-18", "mes_origen": "MAYO2026", "tipo": "RENOVACION"}, {"poliza": "01-01-AUT-1130427", "asegurado": "JARA AVILA OLGA MARTA", "prod": "AUTOMOVILES VOLUNTARIO", "desde": "2026-05-18", "hasta": "2026-11-18", "prima": 190475.0, "total": 215237.0, "moneda": "CRC", "estado_poliza": "Vigente", "estado_recibo": "Pendiente", "fr": "Semestral", "dias_venc": 40, "verif": true, "confirmar": "", "telefonos": "8358-5656; 2215-1320; 2215-0108", "correos": "cotyjara@gmail.com", "ultima_gestion": "", "resultado": "", "proxima_renovacion": "2027-05-18", "mes_origen": "MAYO2026", "tipo": "RENOVACION"}, {"poliza": "01-01-AUT-2169469", "asegurado": "APUY GARCIA ANDREA MARIA", "prod": "AUTOMOVILES VOLUNTARIO - ANUAL", "desde": "2026-05-19", "hasta": "2026-08-19", "prima": 96803.0, "total": 109387.0, "moneda": "CRC", "estado_poliza": "Vigente", "estado_recibo": "Pendiente", "fr": "Trimestral", "dias_venc": 41, "verif": true, "confirmar": "2026-05-19", "telefonos": "8765-3539 (CELULAR)", "correos": "andreaapuy1492@gmail.com", "ultima_gestion": "SE PROGRAMA ENVIO 8-4-2026", "resultado": "No se pudo obtener una confirmación de pago", "proxima_renovacion": "2026-11-19", "mes_origen": "MAYO2026", "tipo": "RENOVACION"}, {"poliza": "01-01-IMR-0002271", "asegurado": "BOLAÑOS CAMPOS WARNER", "prod": "HOGAR COMPRENSIVO", "desde": "2026-05-19", "hasta": "2027-05-19", "prima": 62193.0, "total": 70278.0, "moneda": "CRC", "estado_poliza": "Vigente", "estado_recibo": "Pendiente", "fr": "Anual", "dias_venc": 41, "verif": true, "confirmar": "", "telefonos": "8797-0005, 2245-6817 (CASA)", "correos": "wbolanoscampos@ina.ac.cr                                                                            ; warbolcam@hotmail.com", "ultima_gestion": "", "resultado": "", "proxima_renovacion": "2028-05-19", "mes_origen": "MAYO2026", "tipo": "RENOVACION"}, {"poliza": "01-21-AUT-0076870", "asegurado": "CALDERON GONZALEZ VIVIANA MARIA", "prod": "AUTOMOVILES VOLUNTARIO - ANUAL", "desde": "2026-05-19", "hasta": "2026-08-19", "prima": 103627.0, "total": 117098.0, "moneda": "CRC", "estado_poliza": "Vigente", "estado_recibo": "Pendiente", "fr": "Trimestral", "dias_venc": 41, "verif": true, "confirmar": "2026-05-19", "telefonos": "6118-3011 (CELULAR)", "correos": "vivianacalderon309@gmail.com", "ultima_gestion": "SE PROGRAMA ENVIO 8-4-2026", "resultado": "No se pudo obtener una confirmación de pago", "proxima_renovacion": "2026-11-19", "mes_origen": "MAYO2026", "tipo": "RENOVACION"}, {"poliza": "01-01-AUT-1318033", "asegurado": "GONZALEZ BRENES ANA BEATRIZ", "prod": "AUTOMOVILES VOLUNTARIO", "desde": "2026-05-19", "hasta": "2026-11-19", "prima": 281383.0, "total": 317963.0, "moneda": "CRC", "estado_poliza": "Vigente", "estado_recibo": "Pendiente", "fr": "Semestral", "dias_venc": 41, "verif": true, "confirmar": "", "telefonos": "8306-6602", "correos": "beatrizgb22@hotmail.com; agonzalezb@poder-judicial.go.cr", "ultima_gestion": "", "resultado": "", "proxima_renovacion": "2027-05-19", "mes_origen": "MAYO2026", "tipo": "RENOVACION"}, {"poliza": "01-01-VTR-0003648", "asegurado": "HERNANDEZ VARGAS LUIS FERNANDO", "prod": "VALORES EN TRANSITO", "desde": "2026-05-19", "hasta": "2026-08-19", "prima": 28179.0, "total": 31842.0, "moneda": "CRC", "estado_poliza": "Vigente", "estado_recibo": "Pendiente", "fr": "Trimestral", "dias_venc": 41, "verif": true, "confirmar": "2026-05-19", "telefonos": "2296-4504 (OFICINA), 8526-3532 (CELULAR)", "correos": "", "ultima_gestion": "SE PROGRAMA ENVIO 8-4-2026", "resultado": "No se pudo obtener una confirmación de pago", "proxima_renovacion": "2026-11-19", "mes_origen": "MAYO2026", "tipo": "RENOVACION"}, {"poliza": "01-01-AUT-1718603", "asegurado": "ROSENBERG JOAN ILENE", "prod": "AUTOMOVILES VOLUNTARIO - ANUAL", "desde": "2026-05-19", "hasta": "2027-05-19", "prima": 581958.0, "total": 657613.0, "moneda": "CRC", "estado_poliza": "Vigente", "estado_recibo": "Pendiente", "fr": "Anual", "dias_venc": 41, "verif": true, "confirmar": "", "telefonos": "", "correos": "joanroze@aol.com", "ultima_gestion": "", "resultado": "", "proxima_renovacion": "2028-05-19", "mes_origen": "MAYO2026", "tipo": "RENOVACION"}, {"poliza": "01-01-AUT-1992571", "asegurado": "SUAREZ VILLEGAS FABIOLA", "prod": "AUTOMOVILES VOLUNTARIO", "desde": "2026-05-19", "hasta": "2026-11-19", "prima": 221397.0, "total": 250179.0, "moneda": "CRC", "estado_poliza": "Vigente", "estado_recibo": "Pendiente", "fr": "Semestral", "dias_venc": 41, "verif": true, "confirmar": "", "telefonos": "8463-5194 (CELULAR)", "correos": "fsvillegas094@gmail.com", "ultima_gestion": "", "resultado": "", "proxima_renovacion": "2027-05-19", "mes_origen": "MAYO2026", "tipo": "RENOVACION"}, {"poliza": "01-01-AUT-2190056", "asegurado": "VARGAS RODRIGUEZ LAURA CAROLINA", "prod": "AUTOMOVILES VOLUNTARIO - ANUAL", "desde": "2026-05-19", "hasta": "2026-08-19", "prima": 104168.0, "total": 117710.0, "moneda": "CRC", "estado_poliza": "Vigente", "estado_recibo": "Pendiente", "fr": "Trimestral", "dias_venc": 41, "verif": true, "confirmar": "2026-05-19", "telefonos": "8971-2305", "correos": "lauca16@hotmail.com", "ultima_gestion": "SE PROGRAMA ENVIO 8-4-2026", "resultado": "No se pudo obtener una confirmación de pago", "proxima_renovacion": "2026-11-19", "mes_origen": "MAYO2026", "tipo": "RENOVACION"}, {"poliza": "01-01-AUT-1879712", "asegurado": "ALFONSO RUIZ EDDY", "prod": "AUTOMOVILES VOLUNTARIO", "desde": "2026-05-20", "hasta": "2026-11-20", "prima": 238427.0, "total": 269422.0, "moneda": "CRC", "estado_poliza": "Vigente", "estado_recibo": "Pendiente", "fr": "Semestral", "dias_venc": 42, "verif": true, "confirmar": "", "telefonos": "6088-9214 (CELULAR)", "correos": "eddalfru@gmail.com", "ultima_gestion": "", "resultado": "", "proxima_renovacion": "2027-05-20", "mes_origen": "MAYO2026", "tipo": "RENOVACION"}, {"poliza": "01-01-AUT-2184083", "asegurado": "ECHEVERRIA RIVAS DENNIS ELIAS", "prod": "AUTOMOVILES VOLUNTARIO - ANUAL", "desde": "2026-05-20", "hasta": "2026-11-20", "prima": 162119.0, "total": 183195.0, "moneda": "CRC", "estado_poliza": "Vigente", "estado_recibo": "Pendiente", "fr": "Semestral", "dias_venc": 42, "verif": false, "confirmar": "", "telefonos": "6148-9089 (CELULAR)", "correos": "d.echerivas@gmail.com", "ultima_gestion": "", "resultado": "", "proxima_renovacion": "2027-05-20", "mes_origen": "MAYO2026", "tipo": "RENOVACION"}, {"poliza": "01-01-AUT-1802794", "asegurado": "EMPRESAS ACROPOLIS S.A.", "prod": "AUTOMOVILES VOLUNTARIO", "desde": "2026-05-20", "hasta": "2026-11-20", "prima": 374927.0, "total": 423667.0, "moneda": "CRC", "estado_poliza": "Vigente", "estado_recibo": "Pendiente", "fr": "Semestral", "dias_venc": 42, "verif": true, "confirmar": "", "telefonos": "8314-1212", "correos": "aeloriac@gmail.com", "ultima_gestion": "", "resultado": "", "proxima_renovacion": "2027-05-20", "mes_origen": "MAYO2026", "tipo": "RENOVACION"}, {"poliza": "01-01-AUT-2184069", "asegurado": "FLORES CASTRO MARCO ANTONIO", "prod": "AUTOMOVILES VOLUNTARIO - ANUAL", "desde": "2026-05-20", "hasta": "2026-11-20", "prima": 191554.0, "total": 216456.0, "moneda": "CRC", "estado_poliza": "Vigente", "estado_recibo": "Pendiente", "fr": "Semestral", "dias_venc": 42, "verif": true, "confirmar": "", "telefonos": "8333-8108 (CELULAR)", "correos": "mflores0288@gmail.com", "ultima_gestion": "", "resultado": "", "proxima_renovacion": "2027-05-20", "mes_origen": "MAYO2026", "tipo": "RENOVACION"}, {"poliza": "01-01-IMR-0002272", "asegurado": "FREER PANIAGUA DYLANA MARIA", "prod": "HOGAR COMPRENSIVO", "desde": "2026-05-20", "hasta": "2027-05-20", "prima": 414620.0, "total": 468521.0, "moneda": "CRC", "estado_poliza": "Vigente", "estado_recibo": "Pendiente", "fr": "Anual", "dias_venc": 42, "verif": true, "confirmar": "", "telefonos": "8911-3140; 8843-4633", "correos": "dylanafreerpaniagua@gmail.com", "ultima_gestion": "", "resultado": "", "proxima_renovacion": "2028-05-20", "mes_origen": "MAYO2026", "tipo": "RENOVACION"}, {"poliza": "01-01-AUT-0344063", "asegurado": "GRAHAM WILLIS WARREN", "prod": "AUTOMOVILES VOLUNTARIO", "desde": "2026-05-20", "hasta": "2026-11-20", "prima": 213146.0, "total": 240855.0, "moneda": "CRC", "estado_poliza": "Vigente", "estado_recibo": "Pendiente", "fr": "Semestral", "dias_venc": 42, "verif": true, "confirmar": "", "telefonos": "2295-6699 (OFICINA), 2211-1519 (OFICINA), 2640-0279 (OFICINA), 8812-7605 (CELULAR)", "correos": "", "ultima_gestion": "", "resultado": "", "proxima_renovacion": "2027-05-20", "mes_origen": "MAYO2026", "tipo": "RENOVACION"}, {"poliza": "01-01-AUT-2176046", "asegurado": "JIMENEZ MEZA BEATRIZ LUCIA", "prod": "AUTOMOVILES VOLUNTARIO - ANUAL", "desde": "2026-05-20", "hasta": "2026-11-20", "prima": 291619.0, "total": 329529.0, "moneda": "CRC", "estado_poliza": "Vigente", "estado_recibo": "Pendiente", "fr": "Semestral", "dias_venc": 42, "verif": true, "confirmar": "2026-05-20", "telefonos": "8886-1869 (CELULAR)", "correos": "beatrizjm20@gmail.com", "ultima_gestion": "SE PROGRAMA ENVIO 8-4-2026", "resultado": "No se pudo obtener una confirmación de pago", "proxima_renovacion": "2027-05-20", "mes_origen": "MAYO2026", "tipo": "RENOVACION"}, {"poliza": "01-21-AUT-0075805", "asegurado": "MENDEZ RAMIREZ LUIS JOSE", "prod": "AUTOMOVILES VOLUNTARIO - ANUAL", "desde": "2026-05-20", "hasta": "2026-11-20", "prima": 147112.0, "total": 166236.0, "moneda": "CRC", "estado_poliza": "Vigente", "estado_recibo": "Pendiente", "fr": "Semestral", "dias_venc": 42, "verif": true, "confirmar": "", "telefonos": "8824-2679 (CELULAR)", "correos": "luijomendezr@gmail.com", "ultima_gestion": "", "resultado": "", "proxima_renovacion": "2027-05-20", "mes_origen": "MAYO2026", "tipo": "RENOVACION"}, {"poliza": "01-01-AUT-2193386", "asegurado": "ROJAS VARGAS MARIA CAROLINA", "prod": "AUTOMOVILES VOLUNTARIO - ANUAL", "desde": "2026-05-20", "hasta": "2026-08-20", "prima": 111460.0, "total": 125950.0, "moneda": "CRC", "estado_poliza": "Vigente", "estado_recibo": "Pendiente", "fr": "Trimestral", "dias_venc": 42, "verif": true, "confirmar": "2026-05-20", "telefonos": "8602-4532", "correos": "mcrvargas@gmail.com", "ultima_gestion": "SE PROGRAMA ENVIO 8-4-2026", "resultado": "No se pudo obtener una confirmación de pago", "proxima_renovacion": "2026-11-20", "mes_origen": "MAYO2026", "tipo": "RENOVACION"}, {"poliza": "01-01-AUT-2184081", "asegurado": "SOTO FONSECA MICHELLE TATIANA", "prod": "AUTOMOVILES VOLUNTARIO - ANUAL", "desde": "2026-05-20", "hasta": "2027-05-20", "prima": 426776.0, "total": 482257.0, "moneda": "CRC", "estado_poliza": "Vigente", "estado_recibo": "Pendiente", "fr": "Anual", "dias_venc": 42, "verif": true, "confirmar": "", "telefonos": "8319-3294 (CELULAR)", "correos": "sofomichelle@gmail.com", "ultima_gestion": "", "resultado": "", "proxima_renovacion": "2028-05-20", "mes_origen": "MAYO2026", "tipo": "RENOVACION"}, {"poliza": "01-01-AUT-2184113", "asegurado": "MENESES QUIROS MARIA LUISA", "prod": "AUTOMOVILES VOLUNTARIO - ANUAL", "desde": "2026-05-21", "hasta": "2027-05-21", "prima": 320679.0, "total": 362367.0, "moneda": "CRC", "estado_poliza": "Vigente", "estado_recibo": "Pendiente", "fr": "Anual", "dias_venc": 43, "verif": true, "confirmar": "", "telefonos": "8878-7122, 8398-8951, 2551-1717 (CASA)", "correos": "", "ultima_gestion": "", "resultado": "", "proxima_renovacion": "2028-05-21", "mes_origen": "MAYO2026", "tipo": "RENOVACION"}, {"poliza": "01-01-AUT-1514744", "asegurado": "ASOCIACION HOGAR DULCE HOGAR", "prod": "AUTOMOVILES VOLUNTARIO", "desde": "2026-05-22", "hasta": "2026-08-22", "prima": 257937.0, "total": 291469.0, "moneda": "CRC", "estado_poliza": "Vigente", "estado_recibo": "Pendiente", "fr": "Trimestral", "dias_venc": 44, "verif": true, "confirmar": "2026-05-22", "telefonos": "8694-1170", "correos": "santarosacentrodiurno@hotmail.com; cd_santamarta@jps.go.cr", "ultima_gestion": "SE PROGRAMA ENVIO PARA 8-4-2026", "resultado": "No se pudo obtener una confirmación de pago", "proxima_renovacion": "2026-11-22", "mes_origen": "MAYO2026", "tipo": "RENOVACION"}, {"poliza": "01-19-AUT-0122199", "asegurado": "ESPINOZA JIMENEZ CRISTIAN", "prod": "AUTOMOVILES VOLUNTARIO", "desde": "2026-05-22", "hasta": "2026-11-22", "prima": 181888.0, "total": 205533.0, "moneda": "CRC", "estado_poliza": "Vigente", "estado_recibo": "Pendiente", "fr": "Semestral", "dias_venc": 44, "verif": true, "confirmar": "", "telefonos": "", "correos": "", "ultima_gestion": "", "resultado": "", "proxima_renovacion": "2027-05-22", "mes_origen": "MAYO2026", "tipo": "RENOVACION"}, {"poliza": "01-19-AUT-0122191", "asegurado": "ESPINOZA JIMENEZ LUIS ALEXANDER", "prod": "AUTOMOVILES VOLUNTARIO", "desde": "2026-05-22", "hasta": "2026-11-22", "prima": 271061.0, "total": 306299.0, "moneda": "CRC", "estado_poliza": "Vigente", "estado_recibo": "Pendiente", "fr": "Semestral", "dias_venc": 44, "verif": true, "confirmar": "", "telefonos": "8990-3608", "correos": "", "ultima_gestion": "", "resultado": "", "proxima_renovacion": "2027-05-22", "mes_origen": "MAYO2026", "tipo": "RENOVACION"}, {"poliza": "02-01-MED-0013954", "asegurado": "LORIA CAMPOS ANA EUGENIA", "prod": "INS MEDICAL SIAS", "desde": "2026-05-22", "hasta": "2026-08-22", "prima": 1303.0, "total": 1472.0, "moneda": "USD", "estado_poliza": "Vigente", "estado_recibo": "Pendiente", "fr": "Trimestral", "dias_venc": 44, "verif": true, "confirmar": "", "telefonos": "8881-5016; 2239-2191; 8314-1212", "correos": "aeloriac@gmail.com", "ultima_gestion": "", "resultado": "", "proxima_renovacion": "2026-11-22", "mes_origen": "MAYO2026", "tipo": "RENOVACION"}, {"poliza": "01-01-AUT-2184168", "asegurado": "MERU LIMITADA", "prod": "AUTOMOVILES VOLUNTARIO - ANUAL", "desde": "2026-05-22", "hasta": "2027-05-22", "prima": 498619.0, "total": 563440.0, "moneda": "CRC", "estado_poliza": "Vigente", "estado_recibo": "Pendiente", "fr": "Anual", "dias_venc": 44, "verif": true, "confirmar": "", "telefonos": "8881-5469 (CELULAR)", "correos": "mariajoserojas5@gmail.com", "ultima_gestion": "", "resultado": "", "proxima_renovacion": "2028-05-22", "mes_origen": "MAYO2026", "tipo": "RENOVACION"}, {"poliza": "01-01-AUT-1992656", "asegurado": "RODRIGUEZ JARQUIN SEBASTIAN JOSE", "prod": "AUTOMOVILES VOLUNTARIO", "desde": "2026-05-22", "hasta": "2026-11-22", "prima": 72247.0, "total": 81639.0, "moneda": "CRC", "estado_poliza": "Vigente", "estado_recibo": "Pendiente", "fr": "Semestral", "dias_venc": 44, "verif": true, "confirmar": "", "telefonos": "8326-2585 (CELULAR), 8873-7755 (CELULAR)", "correos": "ejarquin@ice.go.cr; sebasrodjar12@hotmail.com", "ultima_gestion": "", "resultado": "", "proxima_renovacion": "2027-05-22", "mes_origen": "MAYO2026", "tipo": "RENOVACION"}, {"poliza": "01-01-AUT-2190200", "asegurado": "ROSS GUEVARA GLORIANA", "prod": "AUTOMOVILES VOLUNTARIO - ANUAL", "desde": "2026-05-22", "hasta": "2026-08-22", "prima": 128307.0, "total": 144987.0, "moneda": "CRC", "estado_poliza": "Vigente", "estado_recibo": "Pendiente", "fr": "Trimestral", "dias_venc": 44, "verif": true, "confirmar": "2026-05-22", "telefonos": "8419-2809", "correos": "glorianaross@gmail.com", "ultima_gestion": "SE PROGRAMA ENVIO 8-4-2026", "resultado": "No se pudo obtener una confirmación de pago", "proxima_renovacion": "2026-11-22", "mes_origen": "MAYO2026", "tipo": "RENOVACION"}, {"poliza": "01-01-AUT-1992735", "asegurado": "ARIAS SANDOVAL MARIA TERESA DE LAS PIEDADES", "prod": "AUTOMOVILES VOLUNTARIO - ANUAL", "desde": "2026-05-23", "hasta": "2027-05-23", "prima": 404750.0, "total": 457367.0, "moneda": "CRC", "estado_poliza": "Vigente", "estado_recibo": "Pendiente", "fr": "Anual", "dias_venc": 45, "verif": true, "confirmar": "", "telefonos": "8922-7599 (CELULAR), 8831-7694 (CELULAR)", "correos": "contrerasgazo@gmail.com", "ultima_gestion": "", "resultado": "", "proxima_renovacion": "2028-05-23", "mes_origen": "MAYO2026", "tipo": "RENOVACION"}, {"poliza": "01-01-AUT-2201803", "asegurado": "ASTORGA GOMEZ PABLO CESAR", "prod": "AUTOMOVILES VOLUNTARIO - ANUAL", "desde": "2026-05-23", "hasta": "2026-08-23", "prima": 95055.0, "total": 107412.0, "moneda": "CRC", "estado_poliza": "Vigente", "estado_recibo": "Pendiente", "fr": "Trimestral", "dias_venc": 45, "verif": true, "confirmar": "2026-05-23", "telefonos": "8304-6636", "correos": "pcastorga@hotmail.com", "ultima_gestion": "SE PROGRAMA ENVIO 8-4-2026", "resultado": "No se pudo obtener una confirmación de pago", "proxima_renovacion": "2026-11-23", "mes_origen": "MAYO2026", "tipo": "RENOVACION"}, {"poliza": "01-01-AUT-1414426", "asegurado": "CAMACHO DE LA O ANA LORENA DEL CARMEN", "prod": "AUTOMOVILES VOLUNTARIO", "desde": "2026-05-23", "hasta": "2026-11-23", "prima": 243914.0, "total": 275623.0, "moneda": "CRC", "estado_poliza": "Vigente", "estado_recibo": "Pendiente", "fr": "Semestral", "dias_venc": 45, "verif": true, "confirmar": "", "telefonos": "8333-9701 (CELULAR)", "correos": "loredelao@gmail.com", "ultima_gestion": "", "resultado": "", "proxima_renovacion": "2027-05-23", "mes_origen": "MAYO2026", "tipo": "RENOVACION"}, {"poliza": "01-01-AUT-1894168", "asegurado": "CHEMTICA NATURAL S.A.", "prod": "AUTOMOVILES VOLUNTARIO", "desde": "2026-05-23", "hasta": "2026-11-23", "prima": 476681.0, "total": 538650.0, "moneda": "CRC", "estado_poliza": "Vigente", "estado_recibo": "Pendiente", "fr": "Semestral", "dias_venc": 45, "verif": true, "confirmar": "", "telefonos": "", "correos": "", "ultima_gestion": "", "resultado": "", "proxima_renovacion": "2027-05-23", "mes_origen": "MAYO2026", "tipo": "RENOVACION"}, {"poliza": "01-01-AUT-1989527", "asegurado": "HUTT FERNANDEZ RANDALL JAVIER", "prod": "AUTOMOVILES VOLUNTARIO", "desde": "2026-05-23", "hasta": "2026-08-23", "prima": 139879.0, "total": 158063.0, "moneda": "CRC", "estado_poliza": "Vigente", "estado_recibo": "Pendiente", "fr": "Trimestral", "dias_venc": 45, "verif": true, "confirmar": "2026-05-23", "telefonos": "8313-0132", "correos": "javierhutt@gmail.com", "ultima_gestion": "SE PROGRAMA ENVIO 8-4-2026", "resultado": "No se pudo obtener una confirmación de pago", "proxima_renovacion": "2026-11-23", "mes_origen": "MAYO2026", "tipo": "RENOVACION"}, {"poliza": "01-01-AUT-2011499", "asegurado": "KNUTER BRIAN LEE", "prod": "AUTOMOVILES VOLUNTARIO", "desde": "2026-05-23", "hasta": "2026-11-23", "prima": 374300.0, "total": 422959.0, "moneda": "CRC", "estado_poliza": "Vigente", "estado_recibo": "Pendiente", "fr": "Semestral", "dias_venc": 45, "verif": true, "confirmar": "", "telefonos": "8705-8735 (CELULAR)", "correos": "blknuter@gmail.com; blknuter@gmail.com", "ultima_gestion": "", "resultado": "", "proxima_renovacion": "2027-05-23", "mes_origen": "MAYO2026", "tipo": "RENOVACION"}, {"poliza": "01-01-AUT-2009814", "asegurado": "MADRIGAL HERRERA MARIA MAGDALENA", "prod": "AUTOMOVILES VOLUNTARIO", "desde": "2026-05-23", "hasta": "2026-11-23", "prima": 268973.0, "total": 303940.0, "moneda": "CRC", "estado_poliza": "Vigente", "estado_recibo": "Pendiente", "fr": "Semestral", "dias_venc": 45, "verif": true, "confirmar": "", "telefonos": "8338-2999 (CELULAR)", "correos": "magmhcr@gmail.com", "ultima_gestion": "", "resultado": "", "proxima_renovacion": "2027-05-23", "mes_origen": "MAYO2026", "tipo": "RENOVACION"}, {"poliza": "01-01-AUT-2201754", "asegurado": "PRENDAS TORRES ABNER CALEB", "prod": "AUTOMOVILES VOLUNTARIO - ANUAL", "desde": "2026-05-23", "hasta": "2026-08-23", "prima": 91881.0, "total": 103826.0, "moneda": "CRC", "estado_poliza": "Período gracia", "estado_recibo": "Pendiente", "fr": "Trimestral", "dias_venc": 45, "verif": true, "confirmar": "2026-05-23", "telefonos": "8594-8750", "correos": "calebprendas@gmail.com", "ultima_gestion": "SE PROGRAMA ENVIO 8-4-2026", "resultado": "No se pudo obtener una confirmación de pago", "proxima_renovacion": "2026-11-23", "mes_origen": "MAYO2026", "tipo": "RENOVACION"}, {"poliza": "01-01-AUT-1992732", "asegurado": "QUESADA CESPEDES ANDREA", "prod": "AUTOMOVILES VOLUNTARIO", "desde": "2026-05-23", "hasta": "2026-11-23", "prima": 178482.0, "total": 201685.0, "moneda": "CRC", "estado_poliza": "Vigente", "estado_recibo": "Pendiente", "fr": "Semestral", "dias_venc": 45, "verif": false, "confirmar": "", "telefonos": "7110-4095 (CELULAR)", "correos": "andreaqcespedes@gmail.com", "ultima_gestion": "", "resultado": "", "proxima_renovacion": "2027-05-23", "mes_origen": "MAYO2026", "tipo": "RENOVACION"}, {"poliza": "01-01-AUT-2009821", "asegurado": "WIMMER ALFARO HEIKE", "prod": "AUTOMOVILES VOLUNTARIO", "desde": "2026-05-23", "hasta": "2026-11-23", "prima": 198754.0, "total": 224592.0, "moneda": "CRC", "estado_poliza": "Vigente", "estado_recibo": "Pendiente", "fr": "Semestral", "dias_venc": 45, "verif": true, "confirmar": "", "telefonos": "8866-6092 (CELULAR)", "correos": "heikeloewalfaro@gmail.com", "ultima_gestion": "", "resultado": "", "proxima_renovacion": "2027-05-23", "mes_origen": "MAYO2026", "tipo": "RENOVACION"}, {"poliza": "01-01-AUT-1721045", "asegurado": "ARAYA SUAREZ MARIA GABRIELA", "prod": "AUTOMOVILES VOLUNTARIO", "desde": "2026-05-24", "hasta": "2026-11-24", "prima": 280557.0, "total": 317029.0, "moneda": "CRC", "estado_poliza": "Vigente", "estado_recibo": "Pendiente", "fr": "Semestral", "dias_venc": 46, "verif": true, "confirmar": "", "telefonos": "6063-1027 (CELULAR)", "correos": "gaby.araya27@gmail.com", "ultima_gestion": "", "resultado": "", "proxima_renovacion": "2027-05-24", "mes_origen": "MAYO2026", "tipo": "RENOVACION"}, {"poliza": "01-21-AUT-0075884", "asegurado": "BONILLA HIDALGO VALERIA DE LOS ANGELES", "prod": "AUTOMOVILES VOLUNTARIO - ANUAL", "desde": "2026-05-24", "hasta": "2026-11-24", "prima": 163304.0, "total": 184534.0, "moneda": "CRC", "estado_poliza": "Vigente", "estado_recibo": "Pendiente", "fr": "Semestral", "dias_venc": 46, "verif": true, "confirmar": "", "telefonos": "8504-5898 (CELULAR)", "correos": "vale200160@gmail.com", "ultima_gestion": "", "resultado": "", "proxima_renovacion": "2027-05-24", "mes_origen": "MAYO2026", "tipo": "RENOVACION"}, {"poliza": "01-01-AUT-1720428", "asegurado": "CHEMTICA NATURAL S.A.", "prod": "AUTOMOVILES VOLUNTARIO", "desde": "2026-05-24", "hasta": "2026-11-24", "prima": 383273.0, "total": 433099.0, "moneda": "CRC", "estado_poliza": "Vigente", "estado_recibo": "Pendiente", "fr": "Semestral", "dias_venc": 46, "verif": true, "confirmar": "", "telefonos": "", "correos": "", "ultima_gestion": "", "resultado": "", "proxima_renovacion": "2027-05-24", "mes_origen": "MAYO2026", "tipo": "RENOVACION"}, {"poliza": "01-01-AUT-1709991", "asegurado": "DIAZ BADILLA EMILY NATASHA", "prod": "AUTOMOVILES VOLUNTARIO", "desde": "2026-05-24", "hasta": "2026-08-24", "prima": 108406.0, "total": 122499.0, "moneda": "CRC", "estado_poliza": "Vigente", "estado_recibo": "Pendiente", "fr": "Trimestral", "dias_venc": 46, "verif": true, "confirmar": "2026-05-24", "telefonos": "6058-3031 (CELULAR), 8401-6595 (CELULAR)", "correos": "natashadb08@gmail.com", "ultima_gestion": "SE PROGRAMA ENVIO 8-4-2026", "resultado": "No se pudo obtener una confirmación de pago", "proxima_renovacion": "2026-11-24", "mes_origen": "MAYO2026", "tipo": "RENOVACION"}, {"poliza": "01-01-AUT-2160796", "asegurado": "HERRA GONZALEZ ADRIANA MARIA", "prod": "AUTOMOVILES VOLUNTARIO - ANUAL", "desde": "2026-05-24", "hasta": "2026-11-24", "prima": 296591.0, "total": 335148.0, "moneda": "CRC", "estado_poliza": "Vigente", "estado_recibo": "Pendiente", "fr": "Semestral", "dias_venc": 46, "verif": true, "confirmar": "", "telefonos": "8713-0260 (CELULAR), 8383-8541 (CELULAR)", "correos": "adiherra1975@gmail.com; elsiegh@gmail.com", "ultima_gestion": "", "resultado": "", "proxima_renovacion": "2027-05-24", "mes_origen": "MAYO2026", "tipo": "RENOVACION"}, {"poliza": "01-01-AUT-2180469", "asegurado": "MADRIGAL BERMUDEZ OLGA MAYELA", "prod": "AUTOMOVILES VOLUNTARIO - ANUAL", "desde": "2026-05-24", "hasta": "2026-08-24", "prima": 86710.0, "total": 97982.0, "moneda": "CRC", "estado_poliza": "Vigente", "estado_recibo": "Pendiente", "fr": "Trimestral", "dias_venc": 46, "verif": true, "confirmar": "2026-05-24", "telefonos": "8842-3747", "correos": "lamisma@gmail.com", "ultima_gestion": "SE PROGRAMA ENVIO 8-4-2026", "resultado": "No se pudo obtener una confirmación de pago", "proxima_renovacion": "2026-11-24", "mes_origen": "MAYO2026", "tipo": "RENOVACION"}, {"poliza": "01-01-AUT-2193876", "asegurado": "ROJAS ABRAHAMS CATALINA", "prod": "AUTOMOVILES VOLUNTARIO - ANUAL", "desde": "2026-05-24", "hasta": "2026-08-24", "prima": 113684.0, "total": 128463.0, "moneda": "CRC", "estado_poliza": "Vigente", "estado_recibo": "Pendiente", "fr": "Trimestral", "dias_venc": 46, "verif": true, "confirmar": "2026-05-24", "telefonos": "8874-1863", "correos": "catyrojas17@gmail.com", "ultima_gestion": "SE PROGRAMA ENVIO 8-4-2026", "resultado": "No se pudo obtener una confirmación de pago", "proxima_renovacion": "2026-11-24", "mes_origen": "MAYO2026", "tipo": "RENOVACION"}, {"poliza": "01-21-AUT-0067878", "asegurado": "TREJOS JIMENEZ YOLANDA", "prod": "AUTOMOVILES VOLUNTARIO - ANUAL", "desde": "2026-05-24", "hasta": "2026-11-24", "prima": 162123.0, "total": 183199.0, "moneda": "CRC", "estado_poliza": "Vigente", "estado_recibo": "Pendiente", "fr": "Semestral", "dias_venc": 46, "verif": true, "confirmar": "", "telefonos": "8310-2830", "correos": "yolandatrejos12@gmail.com", "ultima_gestion": "", "resultado": "", "proxima_renovacion": "2027-05-24", "mes_origen": "MAYO2026", "tipo": "RENOVACION"}, {"poliza": "01-01-AUT-0348875", "asegurado": "CASTRO UGALDE SONIA", "prod": "AUTOMOVILES VOLUNTARIO", "desde": "2026-05-25", "hasta": "2026-08-25", "prima": 89942.0, "total": 101634.0, "moneda": "CRC", "estado_poliza": "Vigente", "estado_recibo": "Pendiente", "fr": "Trimestral", "dias_venc": 47, "verif": true, "confirmar": "2026-05-25", "telefonos": "", "correos": "pielangel13@hotmail.com                                                                             ; saragundi13@gmail.com", "ultima_gestion": "SE PROGRAMA ENVIO 8-4-2026", "resultado": "No se pudo obtener una confirmación de pago", "proxima_renovacion": "2026-11-25", "mes_origen": "MAYO2026", "tipo": "RENOVACION"}, {"poliza": "01-01-AUT-2172779", "asegurado": "DEL RIO FABRES SOFIA", "prod": "AUTOMOVILES VOLUNTARIO - ANUAL", "desde": "2026-05-25", "hasta": "2026-06-25", "prima": 137499.0, "total": 155374.0, "moneda": "CRC", "estado_poliza": "Vigente", "estado_recibo": "Pendiente", "fr": "Mensual", "dias_venc": 47, "verif": true, "confirmar": "2026-05-25", "telefonos": "8855-9078 (CELULAR)", "correos": "sofia@delrio.com; federico@mutuolegal.com", "ultima_gestion": "SE PROGRAAM ENVIO 8-4-2026", "resultado": "No se pudo obtener una confirmación de pago", "proxima_renovacion": "2026-07-25", "mes_origen": "MAYO2026", "tipo": "RENOVACION"}, {"poliza": "01-01-AUT-1997770", "asegurado": "OBANDO ARAYA ALLAN GUSTAVO", "prod": "AUTOMOVILES VOLUNTARIO", "desde": "2026-05-25", "hasta": "2026-08-25", "prima": 207580.0, "total": 234565.0, "moneda": "CRC", "estado_poliza": "Vigente", "estado_recibo": "Pendiente", "fr": "Trimestral", "dias_venc": 47, "verif": true, "confirmar": "2026-05-25", "telefonos": "8825-7092 (CELULAR)", "correos": "allan.obando.araya@gmail.com", "ultima_gestion": "SE PROGRAMA ENVIO 8-4-2026", "resultado": "No se pudo obtener una confirmación de pago", "proxima_renovacion": "2026-11-25", "mes_origen": "MAYO2026", "tipo": "RENOVACION"}, {"poliza": "01-01-AUT-1814242", "asegurado": "ORTEGA CHAVARRIA JESUS NEHEMIAS", "prod": "AUTOMOVILES VOLUNTARIO", "desde": "2026-05-25", "hasta": "2026-11-25", "prima": 404023.0, "total": 456546.0, "moneda": "CRC", "estado_poliza": "Vigente", "estado_recibo": "Pendiente", "fr": "Semestral", "dias_venc": 47, "verif": true, "confirmar": "", "telefonos": "8881-4961 (CELULAR)", "correos": "nehemiaschus@gmail.com", "ultima_gestion": "", "resultado": "", "proxima_renovacion": "2027-05-25", "mes_origen": "MAYO2026", "tipo": "RENOVACION"}, {"poliza": "01-01-AUT-2183981", "asegurado": "PADILLA RIVERA GABRIEL ANTONIO", "prod": "AUTOMOVILES VOLUNTARIO - ANUAL", "desde": "2026-05-25", "hasta": "2027-05-25", "prima": 460973.0, "total": 520899.0, "moneda": "CRC", "estado_poliza": "Vigente", "estado_recibo": "Pendiente", "fr": "Anual", "dias_venc": 47, "verif": true, "confirmar": "", "telefonos": "8932-9148 (CELULAR)", "correos": "padillarivera.gabriel@gmail.com", "ultima_gestion": "", "resultado": "", "proxima_renovacion": "2028-05-25", "mes_origen": "MAYO2026", "tipo": "RENOVACION"}, {"poliza": "01-01-AUT-1414648", "asegurado": "ZUÑIGA CALDERON MARIA PATRICIA DE LA TRINIDAD", "prod": "AUTOMOVILES VOLUNTARIO", "desde": "2026-05-25", "hasta": "2026-11-25", "prima": 188177.0, "total": 212640.0, "moneda": "CRC", "estado_poliza": "Vigente", "estado_recibo": "Pendiente", "fr": "Semestral", "dias_venc": 47, "verif": true, "confirmar": "", "telefonos": "8372-8516 (CELULAR)", "correos": "p-zuniga-c@hotmail.com", "ultima_gestion": "", "resultado": "", "proxima_renovacion": "2027-05-25", "mes_origen": "MAYO2026", "tipo": "RENOVACION"}, {"poliza": "01-01-AUT-2184256", "asegurado": "ALFARO SANCHEZ ANGELICA", "prod": "AUTOMOVILES VOLUNTARIO - ANUAL", "desde": "2026-05-26", "hasta": "2027-05-26", "prima": 356956.0, "total": 403360.0, "moneda": "CRC", "estado_poliza": "Vigente", "estado_recibo": "Pendiente", "fr": "Anual", "dias_venc": 48, "verif": true, "confirmar": "", "telefonos": "8762-3764 (CELULAR)", "correos": "aalfaro_s@hotmail.com", "ultima_gestion": "", "resultado": "", "proxima_renovacion": "2028-05-26", "mes_origen": "MAYO2026", "tipo": "RENOVACION"}, {"poliza": "01-01-AUT-1721374", "asegurado": "JUNCO LOPEZ XIOMARA", "prod": "AUTOMOVILES VOLUNTARIO", "desde": "2026-05-26", "hasta": "2026-08-26", "prima": 73519.0, "total": 83077.0, "moneda": "CRC", "estado_poliza": "Vigente", "estado_recibo": "Pendiente", "fr": "Trimestral", "dias_venc": 48, "verif": true, "confirmar": "", "telefonos": "8847-9717 (CELULAR)", "correos": "xiomarajunco@hotmail.com", "ultima_gestion": "", "resultado": "", "proxima_renovacion": "2026-11-26", "mes_origen": "MAYO2026", "tipo": "RENOVACION"}, {"poliza": "01-01-AUT-1880338", "asegurado": "NAVARRO VILLALOBOS ISMAEL ANTONIO", "prod": "AUTOMOVILES VOLUNTARIO", "desde": "2026-05-26", "hasta": "2026-08-26", "prima": 161374.0, "total": 182353.0, "moneda": "CRC", "estado_poliza": "Vigente", "estado_recibo": "Pendiente", "fr": "Trimestral", "dias_venc": 48, "verif": true, "confirmar": "", "telefonos": "8338-4588", "correos": "ismaelnavarrov@gmail.com", "ultima_gestion": "", "resultado": "", "proxima_renovacion": "2026-11-26", "mes_origen": "MAYO2026", "tipo": "RENOVACION"}, {"poliza": "01-21-AUT-0076966", "asegurado": "SOLANO MORA MERY LEONOR", "prod": "AUTOMOVILES VOLUNTARIO - ANUAL", "desde": "2026-05-26", "hasta": "2026-08-26", "prima": 143917.0, "total": 162626.0, "moneda": "CRC", "estado_poliza": "Vigente", "estado_recibo": "Pendiente", "fr": "Trimestral", "dias_venc": 48, "verif": true, "confirmar": "2026-05-26", "telefonos": "8825-5694 (CELULAR)", "correos": "jsolanoal@gmail.com", "ultima_gestion": "SE EPROGRAMA ENVIO 8-4-2026", "resultado": "No se pudo obtener una confirmación de pago", "proxima_renovacion": "2026-11-26", "mes_origen": "MAYO2026", "tipo": "RENOVACION"}, {"poliza": "01-01-AUT-2011501", "asegurado": "HERNANDEZ WRAY SONIA ESTER", "prod": "AUTOMOVILES VOLUNTARIO", "desde": "2026-05-27", "hasta": "2026-11-27", "prima": 284399.0, "total": 321371.0, "moneda": "CRC", "estado_poliza": "Vigente", "estado_recibo": "Pendiente", "fr": "Semestral", "dias_venc": 49, "verif": true, "confirmar": "", "telefonos": "8997-7783 (CELULAR)", "correos": "sonia.hernandezw@gmail.com", "ultima_gestion": "", "resultado": "", "proxima_renovacion": "2027-05-27", "mes_origen": "MAYO2026", "tipo": "RENOVACION"}, {"poliza": "01-01-AUT-1803514", "asegurado": "MEDINA VARGAS FELIPE", "prod": "AUTOMOVILES VOLUNTARIO", "desde": "2026-05-27", "hasta": "2026-08-27", "prima": 83054.0, "total": 93851.0, "moneda": "CRC", "estado_poliza": "Vigente", "estado_recibo": "Pendiente", "fr": "Trimestral", "dias_venc": 49, "verif": true, "confirmar": "", "telefonos": "8394-1759", "correos": "pipe_7007@hotmail.com", "ultima_gestion": "", "resultado": "", "proxima_renovacion": "2026-11-27", "mes_origen": "MAYO2026", "tipo": "RENOVACION"}, {"poliza": "01-01-AUT-2184359", "asegurado": "MENESES QUIROS NATALIA", "prod": "AUTOMOVILES VOLUNTARIO - ANUAL", "desde": "2026-05-27", "hasta": "2027-05-27", "prima": 391435.0, "total": 442321.0, "moneda": "CRC", "estado_poliza": "Vigente", "estado_recibo": "Pendiente", "fr": "Anual", "dias_venc": 49, "verif": true, "confirmar": "", "telefonos": "", "correos": "", "ultima_gestion": "", "resultado": "", "proxima_renovacion": "2028-05-27", "mes_origen": "MAYO2026", "tipo": "RENOVACION"}, {"poliza": "01-01-IMR-0028090", "asegurado": "MORA GRANADOS KARLA PATRICIA", "prod": "HOGAR COMPRENSIVO", "desde": "2026-05-27", "hasta": "2027-05-27", "prima": 50851.0, "total": 57462.0, "moneda": "CRC", "estado_poliza": "Vigente", "estado_recibo": "Pendiente", "fr": "Anual", "dias_venc": 49, "verif": true, "confirmar": "", "telefonos": "2271-6096; 8897-8435; 8822-0124", "correos": "kpmorag@yahoo.com; c.maroto@teletica.com", "ultima_gestion": "", "resultado": "", "proxima_renovacion": "2028-05-27", "mes_origen": "MAYO2026", "tipo": "RENOVACION"}, {"poliza": "01-01-AUT-2176245", "asegurado": "RAMOS BARRIENTOS ALLAN", "prod": "AUTOMOVILES VOLUNTARIO - ANUAL", "desde": "2026-05-27", "hasta": "2026-08-27", "prima": 208559.0, "total": 235672.0, "moneda": "CRC", "estado_poliza": "Vigente", "estado_recibo": "Pendiente", "fr": "Trimestral", "dias_venc": 49, "verif": true, "confirmar": "2026-05-27", "telefonos": "8920-8265", "correos": "allanram@ice.co.cr", "ultima_gestion": "SE PROGRAMA ENVIO 8-4-2026", "resultado": "No se pudo obtener una confirmación de pago", "proxima_renovacion": "2026-11-27", "mes_origen": "MAYO2026", "tipo": "RENOVACION"}, {"poliza": "01-01-AUT-2160809", "asegurado": "VILLALOBOS ALVARADO ALEXIS", "prod": "AUTOMOVILES VOLUNTARIO - ANUAL", "desde": "2026-05-27", "hasta": "2026-11-27", "prima": 294277.0, "total": 332533.0, "moneda": "CRC", "estado_poliza": "Vigente", "estado_recibo": "Pendiente", "fr": "Semestral", "dias_venc": 49, "verif": true, "confirmar": "", "telefonos": "8322-6367 (CELULAR)", "correos": "baluca26@gmail.com", "ultima_gestion": "", "resultado": "", "proxima_renovacion": "2027-05-27", "mes_origen": "MAYO2026", "tipo": "RENOVACION"}, {"poliza": "01-01-AUT-1884887", "asegurado": "GARCIA RODRIGUEZ CRISTOPHER DAVID", "prod": "AUTOMOVILES VOLUNTARIO", "desde": "2026-05-28", "hasta": "2026-08-28", "prima": 174020.0, "total": 196643.0, "moneda": "CRC", "estado_poliza": "Vigente", "estado_recibo": "Pendiente", "fr": "Trimestral", "dias_venc": 50, "verif": true, "confirmar": "2026-05-28", "telefonos": "8817-7501", "correos": "crisgarod2509@gmail.com", "ultima_gestion": "SE PROGRAMA ENVIO 8-4-2026", "resultado": "No se pudo obtener una confirmación de pago", "proxima_renovacion": "2026-11-28", "mes_origen": "MAYO2026", "tipo": "RENOVACION"}, {"poliza": "01-01-AUT-0321062", "asegurado": "GONZALEZ MIRANDA LILLIANA", "prod": "AUTOMOVILES VOLUNTARIO", "desde": "2026-05-28", "hasta": "2026-08-28", "prima": 103150.0, "total": 116560.0, "moneda": "CRC", "estado_poliza": "Vigente", "estado_recibo": "Pendiente", "fr": "Trimestral", "dias_venc": 50, "verif": true, "confirmar": "", "telefonos": "", "correos": "", "ultima_gestion": "", "resultado": "", "proxima_renovacion": "2026-11-28", "mes_origen": "MAYO2026", "tipo": "RENOVACION"}, {"poliza": "01-01-AUT-1710073", "asegurado": "LIZANO QUIROS NANCY MARIA", "prod": "AUTOMOVILES VOLUNTARIO", "desde": "2026-05-28", "hasta": "2026-08-28", "prima": 201126.0, "total": 227272.0, "moneda": "CRC", "estado_poliza": "Vigente", "estado_recibo": "Pendiente", "fr": "Trimestral", "dias_venc": 50, "verif": true, "confirmar": "2026-05-28", "telefonos": "2494-7070, 2494-4749 (CASA), 2494-4308 (OFICINA), 8313-5292 (CELULAR), 8710-7143 (CELULAR)", "correos": "", "ultima_gestion": "SE PROGRAMA ENVIO 8-4-2026", "resultado": "No se pudo obtener una confirmación de pago", "proxima_renovacion": "2026-11-28", "mes_origen": "MAYO2026", "tipo": "RENOVACION"}, {"poliza": "01-01-AUT-1523890", "asegurado": "MARTINEZ DIAZ GUSTAVO ADOLFO", "prod": "AUTOMOVILES VOLUNTARIO", "desde": "2026-05-28", "hasta": "2026-08-28", "prima": 108419.0, "total": 122514.0, "moneda": "CRC", "estado_poliza": "Vigente", "estado_recibo": "Pendiente", "fr": "Trimestral", "dias_venc": 50, "verif": true, "confirmar": "", "telefonos": "8455-9435 (CELULAR)", "correos": "g1marti@hotmail.com", "ultima_gestion": "", "resultado": "", "proxima_renovacion": "2026-11-28", "mes_origen": "MAYO2026", "tipo": "RENOVACION"}, {"poliza": "01-01-AUT-2160840", "asegurado": "MORALES MORALES SUNNY", "prod": "AUTOMOVILES VOLUNTARIO - ANUAL", "desde": "2026-05-28", "hasta": "2026-08-28", "prima": 123266.0, "total": 139291.0, "moneda": "CRC", "estado_poliza": "Vigente", "estado_recibo": "Pendiente", "fr": "Trimestral", "dias_venc": 50, "verif": true, "confirmar": "", "telefonos": "8707-2950", "correos": "turinat@gmail.com", "ultima_gestion": "", "resultado": "", "proxima_renovacion": "2026-11-28", "mes_origen": "MAYO2026", "tipo": "RENOVACION"}, {"poliza": "01-01-AUT-1884942", "asegurado": "NAVARRO MONGE MARTA MARIA", "prod": "AUTOMOVILES VOLUNTARIO", "desde": "2026-05-28", "hasta": "2026-08-28", "prima": 151546.0, "total": 171247.0, "moneda": "CRC", "estado_poliza": "Vigente", "estado_recibo": "Pendiente", "fr": "Trimestral", "dias_venc": 50, "verif": true, "confirmar": "2026-05-28", "telefonos": "8330-3692", "correos": "navarro.monge.marta@gmail.com", "ultima_gestion": "SE PROGRAAMA ENVIO 8-4-2026", "resultado": "No se pudo obtener una confirmación de pago", "proxima_renovacion": "2026-11-28", "mes_origen": "MAYO2026", "tipo": "RENOVACION"}, {"poliza": "01-01-AUT-1612371", "asegurado": "RODRIGUEZ JENKINS OLGER", "prod": "AUTOMOVILES VOLUNTARIO", "desde": "2026-05-28", "hasta": "2026-08-28", "prima": 232601.0, "total": 262839.0, "moneda": "CRC", "estado_poliza": "Vigente", "estado_recibo": "Pendiente", "fr": "Trimestral", "dias_venc": 50, "verif": true, "confirmar": "2026-05-28", "telefonos": "8846-5264 (CELULAR)", "correos": "olgerrj@gmail.com", "ultima_gestion": "SE PROGRAMA ENVIO 8-4-2026", "resultado": "No se pudo obtener una confirmación de pago", "proxima_renovacion": "2026-11-28", "mes_origen": "MAYO2026", "tipo": "RENOVACION"}, {"poliza": "01-01-AUT-1993042", "asegurado": "SIBAJA HERNANDEZ RUTH MARY", "prod": "AUTOMOVILES VOLUNTARIO", "desde": "2026-05-28", "hasta": "2026-08-28", "prima": 81907.0, "total": 92555.0, "moneda": "CRC", "estado_poliza": "Vigente", "estado_recibo": "Pendiente", "fr": "Trimestral", "dias_venc": 50, "verif": true, "confirmar": "", "telefonos": "8854-3136 (CELULAR)", "correos": "sibajaruth1104@gmail.com", "ultima_gestion": "", "resultado": "", "proxima_renovacion": "2026-11-28", "mes_origen": "MAYO2026", "tipo": "RENOVACION"}, {"poliza": "01-01-IMR-0001612", "asegurado": "THE BROW COMPANY COSTA RICA SRL", "prod": "INCENDIO COMERCIAL", "desde": "2026-05-28", "hasta": "2027-05-28", "prima": 49446.0, "total": 55874.0, "moneda": "CRC", "estado_poliza": "Vigente", "estado_recibo": "Pendiente", "fr": "Anual", "dias_venc": 50, "verif": true, "confirmar": "", "telefonos": "6295-9898; 6223-6893", "correos": "yeririveros@hotmail.com; admin@browologycr.com", "ultima_gestion": "", "resultado": "", "proxima_renovacion": "2028-05-28", "mes_origen": "MAYO2026", "tipo": "RENOVACION"}, {"poliza": "01-01-AUT-2160844", "asegurado": "VARELA RAMIREZ MIGUEL ADOLFO", "prod": "AUTOMOVILES VOLUNTARIO - ANUAL", "desde": "2026-05-28", "hasta": "2027-05-28", "prima": 559959.0, "total": 632754.0, "moneda": "CRC", "estado_poliza": "Vigente", "estado_recibo": "Pendiente", "fr": "Anual", "dias_venc": 50, "verif": true, "confirmar": "", "telefonos": "", "correos": "", "ultima_gestion": "", "resultado": "", "proxima_renovacion": "2028-05-28", "mes_origen": "MAYO2026", "tipo": "RENOVACION"}, {"poliza": "01-19-ROB-0000533", "asegurado": "ESPECIALISTAS EN ESTERILIZACION Y ENVASE DE C R", "prod": "ROBO COMERCIAL", "desde": "2026-05-29", "hasta": "2027-05-29", "prima": 3086977.0, "total": 3488284.0, "moneda": "CRC", "estado_poliza": "Vigente", "estado_recibo": "Pendiente", "fr": "Anual", "dias_venc": 51, "verif": true, "confirmar": "", "telefonos": "2239-6464, 2239-7271, 2239-6863", "correos": "", "ultima_gestion": "", "resultado": "", "proxima_renovacion": "2028-05-29", "mes_origen": "MAYO2026", "tipo": "RENOVACION"}, {"poliza": "01-01-AUT-2160908", "asegurado": "MOGOLLON GAMBOA GIOVANNY", "prod": "AUTOMOVILES VOLUNTARIO - ANUAL", "desde": "2026-05-29", "hasta": "2027-05-29", "prima": 294355.0, "total": 332621.0, "moneda": "CRC", "estado_poliza": "Vigente", "estado_recibo": "Pendiente", "fr": "Anual", "dias_venc": 51, "verif": true, "confirmar": "", "telefonos": "7016-9198 (CELULAR), 6421-1179 (CELULAR)", "correos": "giovanny.mogollon@hotmail.com; jbastardo@ebicr.com", "ultima_gestion": "", "resultado": "", "proxima_renovacion": "2028-05-29", "mes_origen": "MAYO2026", "tipo": "RENOVACION"}, {"poliza": "01-01-AUT-1338359", "asegurado": "RODRIGUEZ VINDAS MIRIAM", "prod": "AUTOMOVILES VOLUNTARIO", "desde": "2026-05-29", "hasta": "2026-11-29", "prima": 338077.0, "total": 382027.0, "moneda": "CRC", "estado_poliza": "Vigente", "estado_recibo": "Pendiente", "fr": "Semestral", "dias_venc": 51, "verif": true, "confirmar": "", "telefonos": "8353-8109, 8834-2792", "correos": "", "ultima_gestion": "", "resultado": "", "proxima_renovacion": "2027-05-29", "mes_origen": "MAYO2026", "tipo": "RENOVACION"}, {"poliza": "01-01-AUT-1436685", "asegurado": "GOMEZ CHACON FREDDY MIGUEL", "prod": "AUTOMOVILES VOLUNTARIO - ANUAL", "desde": "2026-05-30", "hasta": "2027-05-30", "prima": 529596.0, "total": 598444.0, "moneda": "CRC", "estado_poliza": "Vigente", "estado_recibo": "Pendiente", "fr": "Anual", "dias_venc": 52, "verif": true, "confirmar": "", "telefonos": "8899-2901 (CELULAR)", "correos": "freddygoch@hotmail.com", "ultima_gestion": "", "resultado": "", "proxima_renovacion": "2028-05-30", "mes_origen": "MAYO2026", "tipo": "RENOVACION"}, {"poliza": "01-01-AUT-1880441", "asegurado": "SPENCER SPENCER PATRICIA", "prod": "AUTOMOVILES VOLUNTARIO", "desde": "2026-05-30", "hasta": "2026-11-30", "prima": 279129.0, "total": 315416.0, "moneda": "CRC", "estado_poliza": "Vigente", "estado_recibo": "Pendiente", "fr": "Semestral", "dias_venc": 52, "verif": true, "confirmar": "", "telefonos": "8320-3254 (CELULAR)", "correos": "patci25052016@gmail.com", "ultima_gestion": "", "resultado": "", "proxima_renovacion": "2027-05-30", "mes_origen": "MAYO2026", "tipo": "RENOVACION"}, {"poliza": "02-01-IMR-0003108", "asegurado": "GONZALEZ MIRANDA LILLIANA", "prod": "HOGAR COMPRENSIVO", "desde": "2026-05-31", "hasta": "2027-05-31", "prima": 519.0, "total": 586.0, "moneda": "USD", "estado_poliza": "Vigente", "estado_recibo": "Pendiente", "fr": "Anual", "dias_venc": 53, "verif": true, "confirmar": "", "telefonos": "", "correos": "", "ultima_gestion": "", "resultado": "", "proxima_renovacion": "2028-05-31", "mes_origen": "MAYO2026", "tipo": "RENOVACION"}];
+
+// ══════════════════════════════════════════════════════
+// PLANTILLAS
+// ══════════════════════════════════════════════════════
+const PLT_SUBJECT_DEF = 'Aviso de Vencimiento — Póliza {poliza}';
+const PLT_BODY_DEF = `Estimado/a <b>{nombre}</b>,
+
+Le informamos que su póliza <b>N° {poliza}</b> — <b>{producto}</b> vence el <b>{vence}</b>.
+
+<b>Frecuencia de pago:</b> {frecuencia}<br>
+<b>Monto a cancelar:</b> {moneda} <b>{total}</b>
+
+<table width="100%" cellpadding="0" cellspacing="0" style="margin:14px 0 6px;border-top:2px solid #1a3a5c">
+<tr><td style="padding:8px 0 2px;font-size:15px;font-weight:700;color:#1a3a5c">🏦 OPCIONES DE PAGO</td></tr>
+</table>
+<table width="100%" cellpadding="0" cellspacing="8" style="margin-bottom:10px">
+<tr valign="top">
+<td width="48%" style="background:#f0f4f8;border-radius:8px;padding:14px;border-left:4px solid #1a3a5c">
+<div style="font-weight:700;color:#1a3a5c;margin-bottom:8px">🇨🇷 COLONES (CRC)</div>
+<div style="font-size:13px;line-height:1.8">🏛 <b>BCR</b><br>Cta: 001-0000296-8<br>IBAN: CR55015201001000029681<br><br>🏛 <b>Banco Nacional</b><br>Cta: 100-01-000-007722-2<br>IBAN: CR12015100010010077221</div>
+</td>
+<td width="4%"></td>
+<td width="48%" style="background:#f0f4f8;border-radius:8px;padding:14px;border-left:4px solid #2d6a2d">
+<div style="font-weight:700;color:#2d6a2d;margin-bottom:8px">🇺🇸 DÓLARES (USD)</div>
+<div style="font-size:13px;line-height:1.8">🏛 <b>BCR</b><br>Cta: 001-0202691-0<br>IBAN: CR02015201001020269103<br><br>🏛 <b>Banco Nacional</b><br>Cta: 100-02-000-060455-3<br>IBAN: CR27015100010020604555</div>
+</td>
+</tr>
+</table>
+<div style="background:#e8f0fe;border-radius:8px;padding:12px 16px;margin:8px 0;border-left:4px solid #4285f4">
+📱 <b>SINPE Móvil:</b> 8992-8228<br>
+🌐 <a href="https://insenlinea.grupoins.com/" style="color:#1a3a5c;font-weight:600">https://insenlinea.grupoins.com/</a>
+</div>
+📌 Si paga con depósito o SINPE, envíenos el comprobante de pago.<br><br>
+Atentamente,<br><b>Juan Carlos Hernández Vargas</b><br>Agente de Seguros — Licencia 08-1318 · INS`;
+
+const WA_DEF = `Estimado/a {nombre}, le informamos que su póliza N° {poliza} — {producto} vence el {vence}.
+
+Frecuencia: {frecuencia}
+Monto: {moneda} {total}
+
+📱 SINPE Móvil: 8992-8228
+🌐 https://insenlinea.grupoins.com/
+
+Envíe comprobante de pago al cancelar.
+Juan Carlos Hernández Vargas · Lic. 08-1318`;
+
+// ══════════════════════════════════════════════════════
+// COBROS STATE
+// ══════════════════════════════════════════════════════
+let _cobData = [], _cobFiltered = [], _cobPage = 1, _cobTab = 'all';
+let _cobFiltNowa = false, _cobFiltNoEmail = false;
+let _pagadosCache = {}, _waCache = {};
+let _selectedCob = new Set();
+let _xls_pending = null, _currentWaIdx = null;
+let gmailToken = null, gmailUser = null, sendingActive = false;
+let _mesActivo = '';
+let _crResults = [], _crPage = 1;
+const COB_PAGE = 25;
+const GMAIL_CID = '537940931884-nrg6uinkr02nt3q9s1tcjn17f4q6qr9j.apps.googleusercontent.com';
+
+// ══════════════════════════════════════════════════════
+// UTILS COBROS
+// ══════════════════════════════════════════════════════
+const parseEmails = v => {
+  if(!v||String(v).trim()===''||String(v).trim()==='NaN') return [];
+  return String(v).split(/[;,]/).map(e=>e.trim()).filter(e=>e.includes('@'));
+};
+const parsePhone = v => {
+  if(!v||String(v).trim()===''||String(v).trim()==='NaN') return '';
+  const raw=String(v).trim().split(/[;,]/)[0].trim();
+  const digits=raw.replace(/\([^)]*\)/g,'').replace(/[^0-9+]/g,'').trim();
+  if(!digits) return '';
+  if(digits.startsWith('+')) return digits;
+  if(digits.startsWith('506')) return '+'+digits;
+  return '+506'+digits;
+};
+const interpol = (tpl,r) => {
+  const n=parseFloat(String(r.total||'0').replace(/,/g,'.'));
+  const total=isNaN(n)?String(r.total||''):n.toLocaleString('es-CR');
+  const sym=r.moneda==='USD'?'USD $':'CRC ₡';
+  return (tpl||'')
+    .replace(/{nombre}/g,r.asegurado||'').replace(/{poliza}/g,r.poliza||'')
+    .replace(/{producto}/g,r.prod||'').replace(/{vence}/g,fmtDate(r.hasta))
+    .replace(/{frecuencia}/g,r.fr||'').replace(/{total}/g,total).replace(/{moneda}/g,sym);
+};
+const rowKey = r => ((r.poliza||'')+'__'+(r.desde||'')).replace(/[^a-zA-Z0-9_]/g,'_').slice(0,500);
+const isPagado = r => !!_pagadosCache[rowKey(r)];
+
+// Load estados (pagado + WA) from Firebase
+async function loadEstadosCobros() {
+  try {
+    const [ps,ws] = await Promise.all([
+      getDocs(collection(db,'pagados')),
+      getDocs(collection(db,'wa_envios'))
+    ]);
+    _pagadosCache = {}; ps.forEach(d=>{_pagadosCache[d.id]=true;});
+    _waCache = {}; ws.forEach(d=>{_waCache[d.id]=d.data().count||0;});
+  } catch(e) { console.warn('loadEstados error',e); }
+}
+
+// Augment loadAll to also load estados
+const _origLoadAll = window.loadAll;
+window.loadAll = async function() {
+  await _origLoadAll();
+  await loadEstadosCobros();
+  populateSQProd();
+  renderMesesList();
+  if(_mesActivo) setCobData();
+  loadPlt();
+};
+
+// ══════════════════════════════════════════════════════
+// BUSCADOR CARTERA
+// ══════════════════════════════════════════════════════
+function populateSQProd() {
+  const sel=document.getElementById('sq-prod-sel'); if(!sel) return;
+  sel.innerHTML='<option value="">Todos los productos</option>';
+  const prods=[...new Set(window._POLIZAS.map(r=>r.prod).filter(Boolean))].sort();
+  prods.forEach(p=>{const o=document.createElement('option');o.value=p;o.textContent=p;sel.appendChild(o);});
+}
+
+window.buscarC = function() {
+  const pol=(document.getElementById('sq-pol').value||'').trim().toLowerCase();
+  const nom=(document.getElementById('sq-nom').value||'').trim().toLowerCase();
+  const ced=(document.getElementById('sq-ced').value||'').trim().toLowerCase();
+  const prod=document.getElementById('sq-prod-sel').value;
+  const est=document.getElementById('sq-est').value;
+  const mon=document.getElementById('sq-mon').value;
+  if(!pol&&!nom&&!ced&&!prod&&!est&&!mon){showToast('Ingrese al menos un criterio','w');return;}
+  _crResults=window._POLIZAS.filter(r=>{
+    if(pol&&!(r.poliza||'').toLowerCase().includes(pol)) return false;
+    if(nom&&!(r.asegurado||'').toLowerCase().includes(nom)) return false;
+    if(ced&&!((r.cedula||r.poliza||'')+' '+(r.telefonos||'')).toLowerCase().includes(ced)) return false;
+    if(prod&&r.prod!==prod) return false;
+    if(est&&r.estado_poliza!==est) return false;
+    if(mon&&r.moneda!==mon) return false;
+    return true;
+  });
+  _crPage=1;
+  sortCR();
+  document.getElementById('cart-empty').style.display='none';
+  document.getElementById('cart-results').style.display='block';
+  document.getElementById('sq-hint').textContent=`${_crResults.length} resultado${_crResults.length!==1?'s':''}`;
+};
+
+window.limpiarC = function() {
+  ['sq-pol','sq-nom','sq-ced'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
+  ['sq-prod-sel','sq-est','sq-mon'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
+  _crResults=[];
+  document.getElementById('cart-results').style.display='none';
+  document.getElementById('cart-empty').style.display='block';
+  document.getElementById('sq-hint').textContent='Ingrese al menos un criterio de búsqueda';
+};
+
+window.sortCR = function() {
+  const k=document.getElementById('cr-sort').value;
+  if(k==='az') _crResults.sort((a,b)=>(a.asegurado||'').localeCompare(b.asegurado||''));
+  else if(k==='tdesc') _crResults.sort((a,b)=>(b.total||0)-(a.total||0));
+  else _crResults.sort((a,b)=>(a.dias_venc||0)-(b.dias_venc||0));
+  renderCRTable();
+};
+
+function renderCRTable() {
+  const total=_crResults.length, pages=Math.max(1,Math.ceil(total/COB_PAGE));
+  if(_crPage>pages)_crPage=1;
+  const start=(_crPage-1)*COB_PAGE;
+  const rows=_crResults.slice(start,start+COB_PAGE);
+  document.getElementById('cr-count').textContent=`${total} resultado${total!==1?'s':''}`;
+  document.getElementById('tbody-cr').innerHTML=rows.length?rows.map(r=>{
+    const dv=r.dias_venc||0,dc=dv<=25?'dh':dv<=35?'dm':'dok';
+    const sym=r.moneda==='CRC'?'₡':'$',tc=r.moneda==='CRC'?'crc-t':'usd-t';
+    const ep=r.estado_poliza==='Período gracia'?'<span class="pill py">⚠ Gracia</span>':r.estado_poliza==='Cancelada'?'<span class="pill pr">✕</span>':'<span class="pill pg">● Vigente</span>';
+    return `<tr onclick="openDet('${r._id}')">
+      <td style="color:${r.verif?'var(--green)':'var(--muted)'};font-weight:800">${r.verif?'✓':'–'}</td>
+      <td><span class="db ${dc}">${dv}d</span></td>
+      <td class="nm" title="${r.asegurado||''}">${trunc(r.asegurado||'',26)}</td>
+      <td class="mn">${trunc(r.poliza||'',20)}</td>
+      <td>${trunc(r.prod||'',24)}</td>
+      <td class="mn">${fmtDate(r.desde)}</td>
+      <td class="mn">${fmtDate(r.hasta)}</td>
+      <td class="rvc">${fmtDate(r.proxima_renovacion)}</td>
+      <td><span class="pill pgr">${r.fr||'—'}</span></td>
+      <td class="am ${tc}">${sym}${fmt(r.total||0)}</td>
+      <td><span class="${tc}" style="font-size:10px;font-weight:700">${r.moneda||''}</span></td>
+      <td>${ep}</td>
+    </tr>`;
+  }).join(''):'<tr><td colspan="12" style="text-align:center;padding:30px;color:var(--muted)">Sin resultados para los criterios ingresados</td></tr>';
+  let btns='';
+  const sp=Math.max(1,_crPage-3),ep=Math.min(pages,sp+6);
+  if(sp>1)btns+=`<button class="pgb" onclick="_crGo(1)">1</button>${sp>2?'<span style="color:var(--muted)">…</span>':''}`;
+  for(let i=sp;i<=ep;i++)btns+=`<button class="pgb ${i===_crPage?'active':''}" onclick="_crGo(${i})">${i}</button>`;
+  if(ep<pages)btns+=`${ep<pages-1?'<span style="color:var(--muted)">…</span>':''}<button class="pgb" onclick="_crGo(${pages})">${pages}</button>`;
+  document.getElementById('pag-cr').innerHTML=`${btns}<span class="pi">${start+1}–${Math.min(start+COB_PAGE,total)} de ${total}</span>`;
+}
+window._crGo = p=>{_crPage=p;renderCRTable();};
+
+// ══════════════════════════════════════════════════════
+// COBROS — MESES
+// ══════════════════════════════════════════════════════
+window.renderMesesList = function() {
+  const meses=[...new Set(window._POLIZAS.map(r=>r.mes_origen).filter(Boolean))].sort();
+  const list=document.getElementById('meses-list');
+  const sel=document.getElementById('mes-activo-sel');
+  if(!list||!sel) return;
+  sel.innerHTML='<option value="">— Seleccionar mes —</option>';
+  if(!meses.length){list.innerHTML='<span style="color:var(--yellow)">⚠ Sin meses. Importe Mayo 2026.</span>';return;}
+  list.innerHTML=meses.map(m=>{
+    const cnt=window._POLIZAS.filter(r=>r.mes_origen===m).length;
+    return `<span class="mes-chip ${m===_mesActivo?'mes-active':''}">✓ <strong>${m}</strong> <span style="color:var(--muted)">(${cnt})</span></span>`;
+  }).join('');
+  meses.forEach(m=>{const o=document.createElement('option');o.value=m;o.textContent=m+(m===_mesActivo?' ← activo':'');sel.appendChild(o);});
+  if(_mesActivo)sel.value=_mesActivo;
+};
+
+window.setMesActivo = function(mes){
+  _mesActivo=mes; setCobData(); renderMesesList();
+};
+
+function setCobData(){
+  _cobData=_mesActivo?window._POLIZAS.filter(r=>r.mes_origen===_mesActivo):[];
+  _selectedCob=new Set();
+  buildCobProdFilter(); renderCobros(); updateCobStats();
+}
+
+function buildCobProdFilter(){
+  const sel=document.getElementById('cob-prod-sel'); if(!sel) return;
+  sel.innerHTML='<option value="">Todos los productos</option>';
+  [...new Set(_cobData.map(r=>r.prod).filter(Boolean))].sort().forEach(p=>{
+    const o=document.createElement('option');o.value=p;o.textContent=p;sel.appendChild(o);
+  });
+}
+
+// ══════════════════════════════════════════════════════
+// COBROS — FILTROS Y TABLA
+// ══════════════════════════════════════════════════════
+window.setCobTab = function(t,el){
+  _cobTab=t; _cobPage=1;
+  document.querySelectorAll('#cob-chips .cob-chip').forEach(c=>c.classList.remove('on','gon','yon','ron'));
+  if(t==='pagado')el.classList.add('gon');
+  else if(t==='Pendiente')el.classList.add('yon');
+  else if(t==='Período gracia')el.classList.add('ron');
+  else el.classList.add('on');
+  renderCobros();
+};
+
+window.toggleCobF = function(f){
+  if(f==='nowa'){_cobFiltNowa=!_cobFiltNowa;document.getElementById('chip-nowa-cob').classList.toggle('on',_cobFiltNowa);}
+  else{_cobFiltNoEmail=!_cobFiltNoEmail;document.getElementById('chip-noemail-cob').classList.toggle('on',_cobFiltNoEmail);}
+  renderCobros();
+};
+
+window.renderCobros = function(){
+  const q=(document.getElementById('cob-search')||{}).value||'';
+  const prod=(document.getElementById('cob-prod-sel')||{}).value||'';
+  const fr=(document.getElementById('cob-fr-sel')||{}).value||'';
+  let data=_cobData.filter(r=>{
+    const pag=isPagado(r);
+    if(_cobTab==='pagado'&&!pag) return false;
+    if(_cobTab==='Pendiente'&&(pag||r.estado_poliza!=='Vigente')) return false;
+    if(_cobTab==='Período gracia'&&(pag||r.estado_poliza!=='Período gracia')) return false;
+    if(_cobFiltNowa&&(_waCache[rowKey(r)]||0)>0) return false;
+    if(_cobFiltNowa&&!parsePhone(r.telefonos)) return false;
+    if(_cobFiltNoEmail&&parseEmails(r.correos).length>0) return false;
+    if(prod&&r.prod!==prod) return false;
+    if(fr&&r.fr!==fr) return false;
+    if(q){const n=(r.asegurado||'').toLowerCase(),p=(r.poliza||'').toLowerCase();if(!n.includes(q.toLowerCase())&&!p.includes(q.toLowerCase()))return false;}
+    return true;
+  });
+  data.sort((a,b)=>(a.dias_venc||0)-(b.dias_venc||0));
+  _cobFiltered=data;
+  const total=data.length, pages=Math.max(1,Math.ceil(total/COB_PAGE));
+  if(_cobPage>pages)_cobPage=1;
+  const start=(_cobPage-1)*COB_PAGE;
+  const rows=data.slice(start,start+COB_PAGE);
+  const cnt=document.getElementById('cob-count'); if(cnt)cnt.textContent=`${total} registro${total!==1?'s':''}`;
+  const tbody=document.getElementById('tbody-cobros'); if(!tbody)return;
+  if(!_cobData.length){
+    tbody.innerHTML='<tr><td colspan="11" style="text-align:center;padding:40px;color:var(--muted);">Seleccione un mes activo en el panel izquierdo</td></tr>';
+    const pc=document.getElementById('pag-cobros');if(pc)pc.innerHTML='';return;
+  }
+  tbody.innerHTML=rows.map(r=>{
+    const pag=isPagado(r),wa=_waCache[rowKey(r)]||0;
+    const emails=parseEmails(r.correos),hasPhone=!!parsePhone(r.telefonos);
+    const sym=r.moneda==='CRC'?'₡':'$',tc=r.moneda==='CRC'?'crc-t':'usd-t';
+    const emailCell=emails.length
+      ?`<span style="font-size:10px;color:var(--green);font-family:var(--mono);">${emails[0]}${emails.length>1?'…':''}</span>`
+      :'<span style="font-size:10px;color:var(--red);">sin correo</span>';
+    const waCell=!hasPhone?'<span style="font-size:10px;color:var(--muted);">sin tel.</span>':
+      wa>0?`<div style="display:flex;align-items:center;gap:4px;"><button onclick="abrirWa('${r._id}')" style="background:#25d366;color:#fff;border:none;padding:2px 7px;border-radius:6px;font-size:10px;cursor:pointer;">WA</button><span onclick="resetWa('${r._id}')" style="font-size:10px;background:#fff;color:#000;padding:1px 5px;border-radius:10px;font-family:var(--mono);cursor:pointer;" title="Enviado ${wa}x · clic para desmarcar">✓${wa}</span></div>`:
+      `<button onclick="abrirWa('${r._id}')" style="background:#25d366;color:#fff;border:none;padding:2px 8px;border-radius:6px;font-size:10px;cursor:pointer;">📱 WA</button>`;
+    const pagBtn=`<button class="pag-btn ${pag?'is-pag':'no-pag'}" onclick="togglePagado('${r._id}')">${pag?'✅ Pagado':'○ Pend.'}</button>`;
+    return `<tr>
+      <td><input type="checkbox" ${_selectedCob.has(r._id)?'checked':''} onchange="toggleSelCob('${r._id}',this)" style="cursor:pointer"></td>
+      <td class="mn" title="${r.poliza||''}">${trunc(r.poliza||'',18)}</td>
+      <td class="nm" title="${r.asegurado||''}">${trunc(r.asegurado||'',22)}</td>
+      <td style="font-size:11px;color:var(--yellow);">${trunc(r.prod||'',20)}</td>
+      <td class="mn">${fmtDate(r.hasta)}</td>
+      <td><span class="pill pgr">${r.fr||'—'}</span></td>
+      <td class="am ${tc}">${sym}${fmt(r.total||0)}</td>
+      <td>${emailCell}</td>
+      <td>${waCell}</td>
+      <td>${pagBtn}</td>
+      <td><button class="btn-ghost" style="font-size:10px;padding:2px 7px;" onclick="openDet('${r._id}')">✏️</button></td>
+    </tr>`;
+  }).join('')||'<tr><td colspan="11" style="text-align:center;padding:30px;color:var(--muted)">Sin registros para los filtros</td></tr>';
+  const chkAll=document.getElementById('chk-all-cob');
+  if(chkAll)chkAll.checked=rows.length>0&&rows.every(r=>_selectedCob.has(r._id));
+  let btns='';
+  const sp=Math.max(1,_cobPage-3),ep2=Math.min(pages,sp+6);
+  if(sp>1)btns+=`<button class="pgb" onclick="_cobGo(1)">1</button>${sp>2?'<span style="color:var(--muted)">…</span>':''}`;
+  for(let i=sp;i<=ep2;i++)btns+=`<button class="pgb ${i===_cobPage?'active':''}" onclick="_cobGo(${i})">${i}</button>`;
+  if(ep2<pages)btns+=`${ep2<pages-1?'<span style="color:var(--muted)">…</span>':''}<button class="pgb" onclick="_cobGo(${pages})">${pages}</button>`;
+  const pc=document.getElementById('pag-cobros');
+  if(pc)pc.innerHTML=`${btns}<span class="pi">${start+1}–${Math.min(start+COB_PAGE,total)} de ${total}</span>`;
+};
+
+window._cobGo = p=>{_cobPage=p;window.renderCobros();};
+window.toggleSelCob = (id,el)=>{if(el.checked)_selectedCob.add(id);else _selectedCob.delete(id);};
+window.toggleAllCob = el=>{if(el.checked)_cobFiltered.forEach(r=>_selectedCob.add(r._id));else _cobFiltered.forEach(r=>_selectedCob.delete(r._id));window.renderCobros();};
+
+window.updateCobStats = function(){
+  const D=_cobData;
+  const s=id=>{const e=document.getElementById(id);if(e)e.textContent=0;};
+  if(!D.length){['cs-total','cs-pend','cs-venc','cs-pag','cs-wa'].forEach(s);return;}
+  const g=id=>document.getElementById(id);
+  if(g('cs-total'))g('cs-total').textContent=D.length;
+  if(g('cs-pend'))g('cs-pend').textContent=D.filter(r=>!isPagado(r)&&r.estado_poliza==='Vigente').length;
+  if(g('cs-venc'))g('cs-venc').textContent=D.filter(r=>!isPagado(r)&&r.estado_poliza==='Período gracia').length;
+  if(g('cs-pag'))g('cs-pag').textContent=D.filter(r=>isPagado(r)).length;
+  if(g('cs-wa'))g('cs-wa').textContent=D.filter(r=>(_waCache[rowKey(r)]||0)>0).length;
+};
+
+// ══════════════════════════════════════════════════════
+// PAGADO TOGGLE
+// ══════════════════════════════════════════════════════
+window.togglePagado = async function(id){
+  const r=window._POLIZAS.find(x=>x._id===id); if(!r) return;
+  const k=rowKey(r);
+  if(_pagadosCache[k]){
+    if(!confirm('¿Desmarcar como pagado?')) return;
+    delete _pagadosCache[k];
+    try{await deleteDoc(doc(db,'pagados',k));}catch(e){}
+    showToast('Vuelto a pendiente','w');
+  } else {
+    _pagadosCache[k]=true;
+    try{await setDoc(doc(db,'pagados',k),{pol:r.poliza,nom:r.asegurado,ts:new Date().toISOString()});}catch(e){}
+    showToast('Marcado como pagado ✓');
+  }
+  window.renderCobros(); window.updateCobStats();
+};
+
+// ══════════════════════════════════════════════════════
+// WHATSAPP
+// ══════════════════════════════════════════════════════
+window.abrirWa = function(id){
+  const r=window._POLIZAS.find(x=>x._id===id); if(!r) return;
+  _currentWaIdx=id;
+  const phone=parsePhone(r.telefonos||'').replace('+506','');
+  const tpl=localStorage.getItem('sasins_wa_tpl')||WA_DEF;
+  document.getElementById('wa-modal-sub').textContent=r.asegurado||'';
+  document.getElementById('wa-phone').value=phone;
+  document.getElementById('wa-msg').value=interpol(tpl,r);
+  document.getElementById('modal-wa').classList.add('open');
+};
+
+window.confirmarWa = async function(){
+  const phone=document.getElementById('wa-phone').value.trim().replace(/[^0-9]/g,'');
+  const msg=document.getElementById('wa-msg').value.trim();
+  if(!phone){showToast('Ingrese un número','e');return;}
+  window.open(`https://wa.me/506${phone}?text=${encodeURIComponent(msg)}`,'_blank');
+  closeModal('modal-wa');
+  if(_currentWaIdx){
+    const r=window._POLIZAS.find(x=>x._id===_currentWaIdx); if(!r) return;
+    const k=rowKey(r),next=(_waCache[k]||0)+1; _waCache[k]=next;
+    try{await setDoc(doc(db,'wa_envios',k),{count:next});}catch(e){}
+    window.renderCobros(); window.updateCobStats(); showToast('WhatsApp abierto ✓');
+  }
+};
+
+window.resetWa = async function(id){
+  const r=window._POLIZAS.find(x=>x._id===id); if(!r) return;
+  if(!confirm('¿Desmarcar WA de esta póliza?')) return;
+  const k=rowKey(r); delete _waCache[k];
+  try{await deleteDoc(doc(db,'wa_envios',k));}catch(e){}
+  window.renderCobros(); window.updateCobStats(); showToast('WA desmarcado');
+};
+
+window.abrirWaMasivo = function(){
+  const sel=_cobFiltered.filter(r=>_selectedCob.has(r._id)&&parsePhone(r.telefonos));
+  if(!sel.length){showToast('Seleccione pólizas con teléfono','e');return;}
+  const tpl=localStorage.getItem('sasins_wa_tpl')||WA_DEF;
+  let i=0;
+  const next=()=>{
+    if(i>=sel.length)return;
+    const r=sel[i++];
+    const phone=parsePhone(r.telefonos).replace('+506','');
+    window.open(`https://wa.me/506${phone}?text=${encodeURIComponent(interpol(tpl,r))}`,'_blank');
+    if(i<sel.length)setTimeout(next,1500);
+  };
+  next(); showToast(`Abriendo ${sel.length} chats de WhatsApp…`,'i');
+};
+
+// ══════════════════════════════════════════════════════
+// GMAIL
+// ══════════════════════════════════════════════════════
+window.gmailLogin = function(){
+  if(typeof google==='undefined'||!google.accounts){showToast('Cargando Google…','i');return;}
+  const client=google.accounts.oauth2.initTokenClient({
+    client_id:GMAIL_CID,scope:'https://www.googleapis.com/auth/gmail.send',
+    callback:async resp=>{
+      if(resp.error){showToast('Error Gmail: '+resp.error,'e');return;}
+      gmailToken=resp.access_token;
+      setTimeout(()=>{try{google.accounts.oauth2.initTokenClient({client_id:GMAIL_CID,scope:'https://www.googleapis.com/auth/gmail.send',prompt:'none',callback:r=>{if(!r.error)gmailToken=r.access_token;}}).requestAccessToken({prompt:'none'});}catch(e){}},55*60*1000);
+      try{const info=await fetch('https://www.googleapis.com/oauth2/v3/userinfo',{headers:{Authorization:'Bearer '+gmailToken}}).then(r=>r.json());gmailUser=info.email;}catch(e){}
+      updateGmailUI(true); showToast('Gmail conectado: '+(gmailUser||'✓'));
+    }
+  });
+  client.requestAccessToken();
+};
+window.gmailLogout = function(){gmailToken=null;gmailUser=null;updateGmailUI(false);showToast('Gmail desconectado');};
+function updateGmailUI(ok){
+  const dot=document.getElementById('gmail-dot'),st=document.getElementById('gmail-status'),gu=document.getElementById('gmail-user-lbl');
+  if(dot)dot.style.background=ok?'var(--green)':'var(--red)';
+  if(st){st.textContent=ok?'Gmail conectado':'Gmail no conectado';st.style.color=ok?'var(--green)':'';}
+  if(gu)gu.textContent=ok&&gmailUser?'Enviando desde: '+gmailUser:'';
+  const bl=document.getElementById('btn-gm-login'),bol=document.getElementById('btn-gm-logout');
+  if(bl)bl.style.display=ok?'none':'inline-block';
+  if(bol)bol.style.display=ok?'inline-block':'none';
+}
+
+// ══════════════════════════════════════════════════════
+// ENVÍO CORREOS MASIVO
+// ══════════════════════════════════════════════════════
+window.enviarCorreos = function(){
+  if(!gmailToken){showToast('Primero conecta tu Gmail','e');return;}
+  const conEmail=_cobFiltered.filter(r=>_selectedCob.has(r._id)&&parseEmails(r.correos).length>0);
+  if(!conEmail.length){showToast('Ningún seleccionado tiene correo','e');return;}
+  if(!confirm(`Enviar ${conEmail.length} correos desde ${gmailUser}?`)) return;
+  sendingActive=true;
+  const box=document.getElementById('send-prog-box');if(box)box.style.display='block';
+  const log=document.getElementById('send-log');if(log)log.innerHTML='';
+  const sf=document.getElementById('send-fill');if(sf)sf.style.width='0%';
+  const subj=document.getElementById('plt-subject').value||PLT_SUBJECT_DEF;
+  const body=document.getElementById('plt-body-text').value||PLT_BODY_DEF;
+  procesarEnvio(conEmail,subj,body,0);
+};
+
+async function procesarEnvio(queue,subj,body,idx){
+  if(!sendingActive||idx>=queue.length){
+    if(sendingActive){const sl=document.getElementById('send-lbl');if(sl)sl.textContent=`✓ ${queue.length} correos enviados`;showToast(`✓ ${queue.length} correos enviados`);}
+    const box=document.getElementById('send-prog-box');if(box)box.style.display='none';
+    sendingActive=false;return;
+  }
+  const r=queue[idx],emails=parseEmails(r.correos),to=emails.join(', ');
+  const pct=Math.round(idx/queue.length*100);
+  const sf=document.getElementById('send-fill');if(sf)sf.style.width=pct+'%';
+  const sl=document.getElementById('send-lbl');if(sl)sl.textContent=`Enviando ${idx+1}/${queue.length}: ${trunc(r.asegurado||'',25)}`;
+  const sc=document.getElementById('send-cnt');if(sc)sc.textContent=`${idx+1}/${queue.length}`;
+  try{await sendGmailRaw(to,subj,body,r);logSendLine(idx,r.asegurado,to,true,'');}
+  catch(e){logSendLine(idx,r.asegurado,to,false,e.message.slice(0,60));}
+  setTimeout(()=>procesarEnvio(queue,subj,body,idx+1),650);
+}
+
+async function sendGmailRaw(to,subj,body,r){
+  const htmlBody=interpol(body,r);const subjFmt=interpol(subj,r);const plain=htmlBody.replace(/<[^>]+>/g,'');
+  const full=`<!DOCTYPE html><html><head><meta charset="UTF-8"></head><body style="margin:0;padding:0;background:#f0f2f5;font-family:Arial,sans-serif"><table width="100%" cellpadding="0" cellspacing="0" style="background:#f0f2f5;padding:24px 0"><tr><td align="center"><table width="580" cellpadding="0" cellspacing="0" style="background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,.1)"><tr><td style="background:#1a3a5c;padding:24px 32px 20px;text-align:center"><div style="font-size:18px;font-weight:700;color:#fff">Juan Carlos Hernández Vargas</div><div style="font-size:12px;color:#a0c4e8;margin-top:2px">Agente de Seguros | Licencia 08-1318 | INS</div></td></tr><tr><td style="padding:30px 32px"><div style="font-size:14px;color:#1a1a1a;line-height:1.8">${htmlBody}</div></td></tr><tr><td style="background:#f8f9fa;padding:14px 32px;border-top:1px solid #e9ecef;text-align:center"><div style="font-size:11px;color:#6c757d">SASINS · Sistema de Administración de Seguros</div></td></tr></table></td></tr></table></body></html>`;
+  const bnd='b'+Date.now();
+  const raw=[`From: ${gmailUser}`,`To: ${to}`,`Subject: =?UTF-8?B?${btoa(unescape(encodeURIComponent(subjFmt)))}?=`,'MIME-Version: 1.0',`Content-Type: multipart/alternative; boundary="${bnd}"`,``,`--${bnd}`,'Content-Type: text/plain; charset=UTF-8','Content-Transfer-Encoding: base64','',btoa(unescape(encodeURIComponent(plain))),``,`--${bnd}`,'Content-Type: text/html; charset=UTF-8','Content-Transfer-Encoding: base64','',btoa(unescape(encodeURIComponent(full))),``,`--${bnd}--`].join('\r\n');
+  const encoded=btoa(unescape(encodeURIComponent(raw))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+  const resp=await fetch('https://gmail.googleapis.com/gmail/v1/users/me/messages/send',{method:'POST',headers:{Authorization:'Bearer '+gmailToken,'Content-Type':'application/json'},body:JSON.stringify({raw:encoded})});
+  if(!resp.ok){const err=await resp.json();throw new Error(err.error?.message||resp.statusText);}
+}
+
+function logSendLine(idx,nom,to,ok,err){
+  const log=document.getElementById('send-log');if(!log)return;
+  log.innerHTML+=`<div style="color:${ok?'var(--green)':'var(--red)'}">${ok?'✓':'✗'} [${idx+1}] ${trunc(nom||'',25)} → ${trunc(to,30)}${err?' — '+err:''}</div>`;
+  log.scrollTop=log.scrollHeight;
+}
+
+// ══════════════════════════════════════════════════════
+// PLANTILLA CORREO
+// ══════════════════════════════════════════════════════
+window.togglePlt = function(){
+  const b=document.getElementById('plt-body'),a=document.getElementById('plt-arrow'),t=document.getElementById('plt-toggle');
+  const open=!b.classList.contains('open');
+  b.classList.toggle('open',open);t.classList.toggle('open',open);
+  a.textContent=open?'▲ Cerrar':'▼ Editar';
+};
+window.loadPlt = async function(){
+  try{
+    const snap=await getDoc(doc(db,'config','plantilla'));
+    if(snap.exists()){const d=snap.data();document.getElementById('plt-subject').value=d.subject||PLT_SUBJECT_DEF;document.getElementById('plt-body-text').value=d.body||PLT_BODY_DEF;document.getElementById('plt-saved').style.display='inline';return;}
+  }catch(e){}
+  document.getElementById('plt-subject').value=PLT_SUBJECT_DEF;
+  document.getElementById('plt-body-text').value=PLT_BODY_DEF;
+};
+window.savePlt = async function(){
+  try{await setDoc(doc(db,'config','plantilla'),{subject:document.getElementById('plt-subject').value,body:document.getElementById('plt-body-text').value,ts:new Date().toISOString()});document.getElementById('plt-saved').style.display='inline';}catch(e){}
+  window.togglePlt(); showToast('Plantilla guardada ✓');
+};
+window.resetPlt = function(){document.getElementById('plt-subject').value=PLT_SUBJECT_DEF;document.getElementById('plt-body-text').value=PLT_BODY_DEF;showToast('Plantilla restaurada');};
+
+// ══════════════════════════════════════════════════════
+// IMPORTAR XLS
+// ══════════════════════════════════════════════════════
+window.handleXLS = function(file){
+  if(!file)return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    try{
+      const wb=XLSX.read(e.target.result,{type:'binary'});
+      const ws=wb.Sheets[wb.SheetNames[0]];
+      const rows=XLSX.utils.sheet_to_json(ws,{defval:''});
+      if(!rows.length){showToast('Archivo vacío','e');return;}
+      const MM={jan:0,ene:0,feb:1,mar:2,apr:3,abr:3,may:4,jun:5,jul:6,aug:7,ago:7,sep:8,set:8,oct:9,nov:10,dec:11,dic:11};
+      const parseD=v=>{if(!v)return'';const s=String(v).trim();const m=s.match(/^(\d{1,2})[\-\/]([a-zA-Z]{3})[\-\/](\d{2,4})$/);if(m){const mo=MM[m[2].toLowerCase()];if(mo!==undefined){const yr=parseInt(m[3])+(m[3].length===2?2000:0);return new Date(yr,mo,parseInt(m[1])).toISOString().split('T')[0];}}return s;};
+      const gv=(row,...ks)=>{for(const k of ks){const v=row[k];if(v!==undefined&&v!==''&&v!==null)return v;}return '';};
+      const mesNom=file.name.replace(/\.[^.]+$/,'').toUpperCase().replace(/\s/g,'');
+      const records=rows.map(row=>{
+        const monRaw=String(gv(row,'moneda','Moneda','')).toUpperCase();
+        const moneda=monRaw.includes('COLONES')||monRaw==='CRC'?'CRC':'USD';
+        const fr=String(gv(row,'fr','Fr','')).trim();
+        const hasta=parseD(gv(row,'hasta','Hasta',''));
+        const desde=parseD(gv(row,'desde','Desde',''));
+        return{poliza:String(gv(row,'número_póliza','poliza','')),asegurado:String(gv(row,'asegurado','')),prod:String(gv(row,'prod','producto','')),desde,hasta,fr,prima:parseFloat(gv(row,'prima',0))||0,total:parseFloat(gv(row,'total',0))||0,moneda,estado_poliza:String(gv(row,'estado_póliza','estado_poliza','Vigente'))||'Vigente',estado_recibo:'Pendiente',dias_venc:parseInt(gv(row,'días_venc','dias_venc',calcDias(hasta)))||calcDias(hasta),verif:!!gv(row,'verif',''),confirmar:parseD(gv(row,'confirmar','')),telefonos:String(gv(row,'teléfonos_asegurado','telefonos','')),correos:String(gv(row,'correos_asegurado','correos','')).trim(),ultima_gestion:String(gv(row,'ultima_gestión','ultima_gestion','')),resultado:String(gv(row,'resultado_última_gestión','resultado','')),proxima_renovacion:calcProx(hasta,fr),tipo:String(gv(row,'tipo','')),mes_origen:mesNom};
+      }).filter(r=>r.poliza&&r.asegurado);
+      _xls_pending=records;
+      const crc=records.filter(r=>r.moneda==='CRC').reduce((s,r)=>s+r.total,0);
+      const usd=records.filter(r=>r.moneda==='USD').reduce((s,r)=>s+r.total,0);
+      document.getElementById('xls-prev-title').textContent=mesNom+' — '+records.length+' pólizas';
+      document.getElementById('xls-prev-stats').textContent=`₡${fmt(crc)} · $${fmt(usd)}`;
+      document.getElementById('xls-prev').style.display='block';
+      document.getElementById('drop-xls').classList.add('loaded');
+    }catch(err){showToast('Error leyendo archivo: '+err.message,'e');}
+  };
+  reader.readAsBinaryString(file);
+};
+
+window.confirmXLS = async function(){
+  if(!_xls_pending||!_xls_pending.length){showToast('No hay datos','e');return;}
+  const mes=_xls_pending[0].mes_origen;
+  const existing=window._POLIZAS.filter(r=>r.mes_origen===mes);
+  if(existing.length>0){showToast(`"${mes}" ya tiene ${existing.length} pólizas. Limpie primero.`,'w');return;}
+  document.getElementById('xls-pg-wrap').style.display='block';
+  const fill=document.getElementById('xls-fill'),ptxt=document.getElementById('xls-ptxt');
+  let n=0;
+  for(const r of _xls_pending){
+    await addDoc(collection(db,'polizas'),{...r,creado:serverTimestamp(),actualizado:serverTimestamp()});
+    n++;fill.style.width=Math.round(n/_xls_pending.length*100)+'%';ptxt.textContent=`${n}/${_xls_pending.length}…`;
+  }
+  showToast(`✅ ${n} pólizas de ${mes} importadas`);
+  _xls_pending=null;
+  document.getElementById('xls-prev').style.display='none';
+  document.getElementById('xls-pg-wrap').style.display='none';
+  document.getElementById('drop-xls').classList.remove('loaded');
+  document.getElementById('xls-file').value='';
+  window.loadAll();
+};
+window.cancelXLS = function(){
+  _xls_pending=null;
+  document.getElementById('xls-prev').style.display='none';
+  document.getElementById('drop-xls').classList.remove('loaded');
+  document.getElementById('xls-file').value='';
+};
+
+// ══════════════════════════════════════════════════════
+// MAYO 2026 CARGAR
+// ══════════════════════════════════════════════════════
+window.loadMayo = async function(){
+  const existing=window._POLIZAS.filter(r=>r.mes_origen==='MAYO2026');
+  if(existing.length>0){showToast(`Mayo 2026 ya tiene ${existing.length} pólizas. Use "Limpiar" primero si quiere recargar.`,'w');return;}
+  const btn=document.getElementById('btn-mayo');btn.disabled=true;btn.textContent='Cargando…';
+  document.getElementById('mayo-prog').style.display='block';
+  const fill=document.getElementById('mayo-fill'),ptxt=document.getElementById('mayo-ptxt');
+  let n=0;
+  for(const r of MAYO_DATA){
+    await addDoc(collection(db,'polizas'),{...r,estado_recibo:'Pendiente',creado:serverTimestamp(),actualizado:serverTimestamp()});
+    n++;fill.style.width=Math.round(n/MAYO_DATA.length*100)+'%';ptxt.textContent=`${n}/${MAYO_DATA.length}…`;
+  }
+  showToast(`✅ ${n} pólizas de Mayo 2026 cargadas`);
+  btn.textContent=`✓ Cargado (${n})`;
+  document.getElementById('mayo-prog').style.display='none';
+  window.loadAll();
+};
+
+// ══════════════════════════════════════════════════════
+// LIMPIAR COLECCIÓN
+// ══════════════════════════════════════════════════════
+window.confirmLimpiar = async function(){
+  const snap=await getDocs(collection(db,'polizas'));
+  document.getElementById('limp-count').textContent=snap.size;
+  document.getElementById('limp-input').value='';
+  document.getElementById('btn-limp-ok').disabled=true;
+  document.getElementById('modal-limpiar').classList.add('open');
+};
+window.ejecutarLimpiar = async function(){
+  closeModal('modal-limpiar');
+  showToast('Eliminando…','w');
+  const snap=await getDocs(collection(db,'polizas'));
+  const docs=snap.docs; let deleted=0;
+  for(let i=0;i<docs.length;i+=499){
+    const batch=writeBatch(db);
+    docs.slice(i,i+499).forEach(d=>batch.delete(d.ref));
+    await batch.commit();deleted+=Math.min(499,docs.length-i);
+  }
+  showToast(`🗑 ${deleted} pólizas eliminadas`);
+  const mb=document.getElementById('btn-mayo');if(mb){mb.disabled=false;mb.textContent='📥 Cargar Mayo 2026';}
+  window.loadAll();
+};
+
+// ══════════════════════════════════════════════════════
+// PATCH showView: add cobros handling
+// ══════════════════════════════════════════════════════
+const _origShowView = window.showView;
+window.showView = (v,btn) => {
+  _origShowView(v,btn);
+  if(v==='cobros'){window.renderCobros();window.updateCobStats();}
+};
+
+// Drag & drop XLS
+const dzEl=document.getElementById('drop-xls');
+if(dzEl){
+  dzEl.addEventListener('dragover',e=>{e.preventDefault();dzEl.classList.add('drag-over');});
+  dzEl.addEventListener('dragleave',()=>dzEl.classList.remove('drag-over'));
+  dzEl.addEventListener('drop',e=>{e.preventDefault();dzEl.classList.remove('drag-over');const f=e.dataTransfer.files[0];if(f)window.handleXLS(f);});
+}
 
 // ── INICIAR ───────────────────────────────────────────────────
 loadAll();
