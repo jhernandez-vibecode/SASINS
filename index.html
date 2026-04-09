@@ -269,7 +269,7 @@ textarea.fi{resize:vertical;min-height:58px;}
     <button class="nb" onclick="showView('cobros',this)">Cobros</button>
     <button class="nb" onclick="showView('importar',this)" style="font-size:10px;opacity:.5;" title="Temporal — primer año">📥 Import</button>
     <button class="nb" onclick="showView('clientes',this)">Clientes</button>
-    <button class="nb" onclick="showView('productos',this)">Productos</button>
+    <button class="nb" onclick="showView('productos',this)">Administrativo</button>
     <button class="nb" onclick="showView('dashboard',this)">Dashboard</button>
   </nav>
   <div class="hdr-right">
@@ -331,43 +331,7 @@ textarea.fi{resize:vertical;min-height:58px;}
     </div>
   </div>
 
-  <div class="tabs" style="display:none;">
-    <div class="tab active" onclick="setTab('todos',this)">Todos</div>
-    <div class="tab" onclick="setTab('sinconf',this)">Sin confirmar</div>
-    <div class="tab" onclick="setTab('gracia',this)">Período gracia</div>
-    <div class="tab" onclick="setTab('crc',this)">Colones</div>
-    <div class="tab" onclick="setTab('usd',this)">Dólares</div>
-    <div class="tab" onclick="setTab('prox',this)">≤30 días</div>
-  </div>
-  <div class="toolbar">
-    <div class="sw"><span class="si">⌕</span>
-      <input type="text" id="search-input" placeholder="Buscar asegurado, póliza, producto…" oninput="currentPage=1;renderTable()">
-    </div>
-    <select class="fsel" id="filter-prod" onchange="currentPage=1;renderTable()"><option value="">Todos los productos</option></select>
-    <select class="fsel" id="filter-fr" onchange="currentPage=1;renderTable()">
-      <option value="">Todas las frec.</option>
-      <option>Mensual</option><option>Trimestral</option><option>Semestral</option><option>Anual</option>
-    </select>
-    <select class="fsel" id="sort-sel" onchange="currentPage=1;renderTable()">
-      <option value="dias">Días venc. ↑</option>
-      <option value="az">Nombre A→Z</option>
-      <option value="tdesc">Total mayor→menor</option>
-    </select>
-    <span class="cbadge" id="count-badge">—</span>
-    <button class="btn-ghost" style="font-size:11px;padding:5px 10px" onclick="loadAll()">↻ Sync</button>
-  </div>
-  <div class="tw">
-    <table>
-      <thead><tr>
-        <th>✓</th><th>Días</th><th>Asegurado</th><th>Póliza</th>
-        <th>Producto</th><th>Desde</th><th>Hasta</th>
-        <th>Prox.Renov.</th><th>Fr</th>
-        <th style="text-align:right">Total</th><th>Mon.</th><th>Estado</th>
-      </tr></thead>
-      <tbody id="tbody"></tbody>
-    </table>
-    <div class="pag" id="pag"></div>
-  </div>
+
 </div>
 
 <!-- ══ IMPORTAR MES ══ -->
@@ -463,16 +427,82 @@ textarea.fi{resize:vertical;min-height:58px;}
 
 <!-- ══ PRODUCTOS ══ -->
 <div id="view-productos" class="view">
-  <div style="display:flex;align-items:center;gap:11px;margin-bottom:14px;">
-    <h2 style="font-family:var(--fh);font-size:17px;font-weight:800;">Productos &amp; Comisiones</h2>
-    <span class="cbadge" id="prod-count">—</span>
-    <button class="btn-p" style="margin-left:auto" onclick="openProdModal(null)">+ Nuevo Producto</button>
+  <h2 style="font-family:var(--fh);font-size:17px;font-weight:800;margin-bottom:18px;">⚙️ Administrativo</h2>
+
+  <!-- TABS internos -->
+  <div style="display:flex;gap:2px;border-bottom:1px solid var(--bdr);margin-bottom:18px;">
+    <div class="tab2 active" id="adm-tab-prod" onclick="setAdmTab('prod',this)">📦 Productos &amp; Comisiones</div>
+    <div class="tab2" id="adm-tab-email" onclick="setAdmTab('email',this)">✉️ Plantilla Email</div>
+    <div class="tab2" id="adm-tab-wa" onclick="setAdmTab('wa',this)">📱 Plantilla WhatsApp</div>
   </div>
-  <div class="tw">
-    <table class="prod-table">
-      <thead><tr><th>Código</th><th>Nombre del Producto</th><th>Ramo</th><th>Moneda</th><th>% Com. Agente</th><th>% Com. INS ref.</th><th>Activo</th><th></th></tr></thead>
-      <tbody id="prod-tbody"></tbody>
-    </table>
+
+  <!-- PRODUCTOS -->
+  <div id="adm-prod" class="adm-panel">
+    <div style="display:flex;align-items:center;gap:11px;margin-bottom:14px;">
+      <span class="cbadge" id="prod-count">—</span>
+      <button class="btn-p" style="margin-left:auto" onclick="openProdModal(null)">+ Nuevo Producto</button>
+    </div>
+    <div class="tw">
+      <table class="prod-table">
+        <thead><tr><th>Código</th><th>Nombre del Producto</th><th>Ramo</th><th>Moneda</th><th>% Com. Agente</th><th>% Com. INS ref.</th><th>Activo</th><th></th></tr></thead>
+        <tbody id="prod-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- EDITOR PLANTILLA EMAIL -->
+  <div id="adm-email" class="adm-panel" style="display:none;">
+    <div style="background:var(--surf2);border:1px solid var(--bdr);border-radius:9px;padding:14px;margin-bottom:14px;">
+      <div style="font-size:11px;color:var(--muted);line-height:1.9;margin-bottom:10px;">
+        <strong style="color:var(--text);">Variables disponibles:</strong>
+        <code style="background:var(--surf3);padding:1px 5px;border-radius:3px;margin:0 2px;">{nombre}</code>
+        <code style="background:var(--surf3);padding:1px 5px;border-radius:3px;margin:0 2px;">{poliza}</code>
+        <code style="background:var(--surf3);padding:1px 5px;border-radius:3px;margin:0 2px;">{producto}</code>
+        <code style="background:var(--surf3);padding:1px 5px;border-radius:3px;margin:0 2px;">{vence}</code>
+        <code style="background:var(--surf3);padding:1px 5px;border-radius:3px;margin:0 2px;">{frecuencia}</code>
+        <code style="background:var(--surf3);padding:1px 5px;border-radius:3px;margin:0 2px;">{total}</code>
+        <code style="background:var(--surf3);padding:1px 5px;border-radius:3px;margin:0 2px;">{moneda}</code>
+      </div>
+    </div>
+    <div class="fg" style="margin-bottom:12px;">
+      <label class="fl">Asunto del correo</label>
+      <input class="fi" id="adm-email-subject" type="text" placeholder="Aviso de Vencimiento — Póliza {poliza}">
+    </div>
+    <div class="fg" style="margin-bottom:14px;">
+      <label class="fl">Cuerpo del correo (HTML permitido)</label>
+      <textarea class="fi" id="adm-email-body" rows="18" style="font-size:11px;line-height:1.6;font-family:var(--mono);resize:vertical;"></textarea>
+    </div>
+    <div style="display:flex;gap:9px;align-items:center;">
+      <button onclick="saveAdmEmail()" class="bs" style="padding:8px 20px;">💾 Guardar plantilla de correo</button>
+      <button onclick="resetAdmEmail()" class="bc" style="font-size:12px;">↺ Restaurar original</button>
+      <span id="adm-email-saved" style="font-size:11px;color:var(--green);display:none;">✓ Guardada en Firebase</span>
+    </div>
+  </div>
+
+  <!-- EDITOR PLANTILLA WHATSAPP -->
+  <div id="adm-wa" class="adm-panel" style="display:none;">
+    <div style="background:var(--surf2);border:1px solid var(--bdr);border-radius:9px;padding:14px;margin-bottom:14px;">
+      <div style="font-size:11px;color:var(--muted);line-height:1.9;margin-bottom:6px;">
+        <strong style="color:var(--text);">Variables disponibles:</strong>
+        <code style="background:var(--surf3);padding:1px 5px;border-radius:3px;margin:0 2px;">{nombre}</code>
+        <code style="background:var(--surf3);padding:1px 5px;border-radius:3px;margin:0 2px;">{poliza}</code>
+        <code style="background:var(--surf3);padding:1px 5px;border-radius:3px;margin:0 2px;">{producto}</code>
+        <code style="background:var(--surf3);padding:1px 5px;border-radius:3px;margin:0 2px;">{vence}</code>
+        <code style="background:var(--surf3);padding:1px 5px;border-radius:3px;margin:0 2px;">{frecuencia}</code>
+        <code style="background:var(--surf3);padding:1px 5px;border-radius:3px;margin:0 2px;">{total}</code>
+        <code style="background:var(--surf3);padding:1px 5px;border-radius:3px;margin:0 2px;">{moneda}</code>
+      </div>
+      <div style="font-size:10px;color:var(--yellow);">⚠ WhatsApp no soporta HTML — solo texto plano con emojis y saltos de línea</div>
+    </div>
+    <div class="fg" style="margin-bottom:14px;">
+      <label class="fl">Mensaje de WhatsApp</label>
+      <textarea class="fi" id="adm-wa-body" rows="14" style="font-size:12px;line-height:1.7;font-family:var(--mono);resize:vertical;"></textarea>
+    </div>
+    <div style="display:flex;gap:9px;align-items:center;">
+      <button onclick="saveAdmWa()" class="bs" style="padding:8px 20px;">💾 Guardar plantilla WhatsApp</button>
+      <button onclick="resetAdmWa()" class="bc" style="font-size:12px;">↺ Restaurar original</button>
+      <span id="adm-wa-saved" style="font-size:11px;color:var(--green);display:none;">✓ Guardada</span>
+    </div>
   </div>
 </div>
 
@@ -1466,7 +1496,7 @@ window.showView = (v,btn) => {
   document.querySelectorAll('.nb').forEach(x=>x.classList.remove('active'));
   if(btn)btn.classList.add('active');
   if(v==='dashboard')window.renderDashboard();
-  if(v==='productos')window.renderProductos();
+  if(v==='productos'){window.renderProductos();document.querySelectorAll('.adm-panel').forEach((p,i)=>p.style.display=i===0?'block':'none');document.querySelectorAll('.tab2').forEach((t,i)=>{t.classList.toggle('active',i===0);});}
   if(v==='clientes')window.renderClientes();
 };
 window.closeModal = id => document.getElementById(id).classList.remove('open');
@@ -2146,6 +2176,89 @@ if(dzEl){
   dzEl.addEventListener('dragleave',()=>dzEl.classList.remove('drag-over'));
   dzEl.addEventListener('drop',e=>{e.preventDefault();dzEl.classList.remove('drag-over');const f=e.dataTransfer.files[0];if(f)window.handleXLS(f);});
 }
+
+
+// ══════════════════════════════════════════════════════
+// ADMINISTRATIVO — tabs + editors
+// ══════════════════════════════════════════════════════
+window.setAdmTab = function(tab, el) {
+  document.querySelectorAll('.adm-panel').forEach(p=>p.style.display='none');
+  document.querySelectorAll('.tab2').forEach(t=>t.classList.remove('active'));
+  document.getElementById('adm-'+tab).style.display='block';
+  el.classList.add('active');
+  if(tab==='email') loadAdmEmail();
+  if(tab==='wa') loadAdmWa();
+};
+
+async function loadAdmEmail() {
+  try {
+    const snap=await getDoc(doc(db,'config','plantilla'));
+    if(snap.exists()){
+      const d=snap.data();
+      document.getElementById('adm-email-subject').value=d.subject||PLT_SUBJECT_DEF;
+      document.getElementById('adm-email-body').value=d.body||PLT_BODY_DEF;
+      return;
+    }
+  } catch(e){}
+  document.getElementById('adm-email-subject').value=PLT_SUBJECT_DEF;
+  document.getElementById('adm-email-body').value=PLT_BODY_DEF;
+}
+
+async function loadAdmWa() {
+  try {
+    const snap=await getDoc(doc(db,'config','plantilla_wa'));
+    if(snap.exists()){
+      document.getElementById('adm-wa-body').value=snap.data().body||WA_DEF;
+      return;
+    }
+  } catch(e){}
+  const local=localStorage.getItem('sasins_wa_tpl');
+  document.getElementById('adm-wa-body').value=local||WA_DEF;
+}
+
+window.saveAdmEmail = async function() {
+  const subj=document.getElementById('adm-email-subject').value.trim();
+  const body=document.getElementById('adm-email-body').value.trim();
+  if(!subj||!body){showToast('Complete asunto y cuerpo','e');return;}
+  try {
+    await setDoc(doc(db,'config','plantilla'),{subject:subj,body,ts:new Date().toISOString()});
+    // Sync to cobros plantilla fields if open
+    const ps=document.getElementById('plt-subject');
+    const pb=document.getElementById('plt-body-text');
+    if(ps)ps.value=subj;
+    if(pb)pb.value=body;
+    const saved=document.getElementById('adm-email-saved');
+    if(saved){saved.style.display='inline';setTimeout(()=>saved.style.display='none',3000);}
+    showToast('Plantilla de correo guardada ✓');
+  } catch(e){showToast('Error: '+e.message,'e');}
+};
+
+window.resetAdmEmail = async function() {
+  if(!confirm('¿Restaurar la plantilla original de correo?')) return;
+  try{await deleteDoc(doc(db,'config','plantilla'));}catch(e){}
+  document.getElementById('adm-email-subject').value=PLT_SUBJECT_DEF;
+  document.getElementById('adm-email-body').value=PLT_BODY_DEF;
+  showToast('Plantilla de correo restaurada');
+};
+
+window.saveAdmWa = async function() {
+  const body=document.getElementById('adm-wa-body').value.trim();
+  if(!body){showToast('Ingrese el mensaje de WhatsApp','e');return;}
+  localStorage.setItem('sasins_wa_tpl',body);
+  try {
+    await setDoc(doc(db,'config','plantilla_wa'),{body,ts:new Date().toISOString()});
+  } catch(e){}
+  const saved=document.getElementById('adm-wa-saved');
+  if(saved){saved.style.display='inline';setTimeout(()=>saved.style.display='none',3000);}
+  showToast('Plantilla WhatsApp guardada ✓');
+};
+
+window.resetAdmWa = function() {
+  if(!confirm('¿Restaurar la plantilla original de WhatsApp?')) return;
+  document.getElementById('adm-wa-body').value=WA_DEF;
+  localStorage.removeItem('sasins_wa_tpl');
+  showToast('Plantilla WhatsApp restaurada');
+};
 
 // ── INICIAR ───────────────────────────────────────────────────
 loadAll();
