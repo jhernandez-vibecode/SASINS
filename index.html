@@ -1,0 +1,1307 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>S.A.I.S. · segurosdelins.com</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Mulish:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<!-- ═══════════════════════════════════════════
+     MÓDULO 0: FIREBASE SDK
+═══════════════════════════════════════════ -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import {
+  getFirestore, collection, doc, addDoc, setDoc, updateDoc, deleteDoc,
+  getDocs, getDoc, query, orderBy, onSnapshot, serverTimestamp, where
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+// ── CONFIG ──────────────────────────────────
+const firebaseConfig = {
+  apiKey: "AIzaSyBgbnth2YSSgX2-DJqbms_SdNTZYDdH5UI",
+  authDomain: "sistema-seguros-vencimientos.firebaseapp.com",
+  projectId: "sistema-seguros-vencimientos",
+  storageBucket: "sistema-seguros-vencimientos.firebasestorage.app",
+  messagingSenderId: "446215450096",
+  appId: "1:446215450096:web:871b241b2eab7864f78135"
+};
+
+const app = initializeApp(firebaseConfig);
+const db  = getFirestore(app);
+
+// ── MAYO 2026 SEED DATA ──────────────────────
+const MAYO_DATA = [
+  {poliza:"0312378",asegurado:"COSTA FIT S.A.",prod:"RIESGOS DEL TRABAJO",desde:"2026-05-01",hasta:"2027-04-30",prima:932886,total:932886,moneda:"CRC",estado_poliza:"Vigente",fr:"Anual",telefonos:"",correos:"acerdas@performiacr.com; randaldrm@gmail.com",ultima_gestion:"SE PROGRAMA ENVIO 1-4-2026",resultado:"No se pudo obtener confirmación de pago",dias_venc:23,verif:true,confirmar:"2026-05-01",tipo_cliente:"juridica"},
+  {poliza:"0319355",asegurado:"EDUCACION MBE S.A.",prod:"RIESGOS DEL TRABAJO",desde:"2026-05-01",hasta:"2026-07-31",prima:33350,total:33350,moneda:"CRC",estado_poliza:"Vigente",fr:"Trimestral",telefonos:"",correos:"mariella@newworldcr.com",ultima_gestion:"AUTORIZA HACER EL CARGO POR CORREO",resultado:"Se obtuvo confirmación de pago",dias_venc:23,verif:true,confirmar:"",tipo_cliente:"juridica"},
+  {poliza:"0309011",asegurado:"HERNANDEZ VARGAS LUIS FERNANDO",prod:"RIESGOS DEL TRABAJO",desde:"2026-05-01",hasta:"2027-04-30",prima:33350,total:33350,moneda:"CRC",estado_poliza:"Vigente",fr:"Anual",telefonos:"2296-4504 (OFICINA), 8526-3532 (CELULAR)",correos:"",ultima_gestion:"SE PROGRAMA ENVIO PARA EL 1 DE ABRIL",resultado:"No se pudo obtener confirmación de pago",dias_venc:23,verif:true,confirmar:"2026-05-01",tipo_cliente:"fisica"},
+  {poliza:"9260156",asegurado:"IMPORTACIONES SELECTA",prod:"RIESGOS DEL TRABAJO",desde:"2026-05-01",hasta:"2027-04-30",prima:335333,total:335333,moneda:"CRC",estado_poliza:"Vigente",fr:"Anual",telefonos:"8843-8566",correos:"walid@magnate-inc.com",ultima_gestion:"SE PROGRAMA PARA EL 1-4-2026",resultado:"No se pudo obtener confirmación de pago",dias_venc:23,verif:true,confirmar:"2026-05-01",tipo_cliente:"juridica"},
+  {poliza:"8450838",asegurado:"NAVARRO VARGAS JOSE RAMON",prod:"RIESGOS DEL TRABAJO",desde:"2026-05-01",hasta:"2026-07-31",prima:712899,total:712899,moneda:"CRC",estado_poliza:"Vigente",fr:"Trimestral",telefonos:"2439-6371; 8822-4559",correos:"josepelon07@hotmail.com",ultima_gestion:"SE PROGRAMA ENVIO 1 4 2026",resultado:"No se pudo obtener confirmación de pago",dias_venc:23,verif:true,confirmar:"2026-05-01",tipo_cliente:"fisica"},
+  {poliza:"0312442",asegurado:"NOVALASER S.A.",prod:"RIESGOS DEL TRABAJO",desde:"2026-05-01",hasta:"2027-04-30",prima:2788382,total:2788382,moneda:"CRC",estado_poliza:"Vigente",fr:"Anual",telefonos:"8840-6380 (CELULAR)",correos:"contabilidadesyauditorias01@yahoo.com.mx",ultima_gestion:"SE PROGRAMA ENVIO 1-4-2026",resultado:"No se pudo obtener confirmación de pago",dias_venc:23,verif:true,confirmar:"2026-05-01",tipo_cliente:"juridica"},
+  {poliza:"0341740",asegurado:"PARRA PACHECO HELIANA",prod:"RIESGOS DEL TRABAJO",desde:"2026-05-01",hasta:"2027-04-30",prima:117354,total:117354,moneda:"CRC",estado_poliza:"Vigente",fr:"Anual",telefonos:"6223-6893 (CELULAR)",correos:"helianap@hotmail.com",ultima_gestion:"SE PROGRAMA ENVIO 1-4-2026",resultado:"No se pudo obtener confirmación de pago",dias_venc:23,verif:true,confirmar:"2026-05-01",tipo_cliente:"fisica"},
+  {poliza:"01-01-AUT-1991782",asegurado:"JIMENEZ GOMEZ CHRISTIAN FERNANDO",prod:"AUTOMOVILES VOLUNTARIO - ANUAL",desde:"2026-05-02",hasta:"2027-05-02",prima:604425,total:683000,moneda:"CRC",estado_poliza:"Vigente",fr:"Anual",telefonos:"8308-0182 (CELULAR)",correos:"cj.cr.me@gmail.com",ultima_gestion:"SE PROGRAMA ENVIO 7-4-2026",resultado:"No se pudo obtener confirmación de pago",dias_venc:24,verif:true,confirmar:"2026-05-02",tipo_cliente:"fisica"},
+  {poliza:"02-01-RCU-0000431",asegurado:"JL COSTA RICA SPECIALIZED S.A",prod:"RESP. CIVIL UMBRELLA",desde:"2026-05-02",hasta:"2026-11-02",prima:2225,total:2514,moneda:"USD",estado_poliza:"Vigente",fr:"Semestral",telefonos:"",correos:"",ultima_gestion:"SE PROGRAMA ENVIO PARA EL 8-04-2026",resultado:"No se pudo obtener confirmación de pago",dias_venc:24,verif:true,confirmar:"2026-05-02",tipo_cliente:"juridica"},
+  {poliza:"01-01-AUT-2183408",asegurado:"LAZO ZUÑIGA VALERY",prod:"AUTOMOVILES VOLUNTARIO - ANUAL",desde:"2026-05-02",hasta:"2026-08-02",prima:83562,total:94425,moneda:"CRC",estado_poliza:"Vigente",fr:"Trimestral",telefonos:"8515-3846 (CELULAR)",correos:"valelazo2242@hotmail.com",ultima_gestion:"SE PROGRAMA ENVIO 8-4-2026",resultado:"No se pudo obtener confirmación de pago",dias_venc:24,verif:true,confirmar:"2026-05-02",tipo_cliente:"fisica"},
+  {poliza:"01-01-AUT-1424673",asegurado:"ALVARADO GUTIERREZ CAROLINA E",prod:"AUTOMOVILES VOLUNTARIO",desde:"2026-05-04",hasta:"2026-11-04",prima:343988,total:388706,moneda:"CRC",estado_poliza:"Vigente",fr:"Semestral",telefonos:"6059-0097; 8840-1772",correos:"carolinagutierrez10@hotmail.com",ultima_gestion:"SE ENVIO CORREO",resultado:"No se pudo obtener confirmación de pago",dias_venc:26,verif:true,confirmar:"2026-05-04",tipo_cliente:"fisica"},
+  {poliza:"01-01-AUT-1802260",asegurado:"CHAVES CORDERO TRACEE",prod:"AUTOMOVILES VOLUNTARIO",desde:"2026-05-04",hasta:"2026-11-04",prima:142502,total:161027,moneda:"CRC",estado_poliza:"Vigente",fr:"Semestral",telefonos:"8333-0360 (CELULAR)",correos:"tracee.chaves@gmail.com",ultima_gestion:"SE ENVIO CORREO",resultado:"No se pudo obtener confirmación de pago",dias_venc:26,verif:true,confirmar:"2026-05-04",tipo_cliente:"fisica"},
+  {poliza:"01-01-AUT-2183442",asegurado:"FREER WEBER EDWIN MANUEL",prod:"AUTOMOVILES VOLUNTARIO - ANUAL",desde:"2026-05-05",hasta:"2026-11-05",prima:211869,total:239412,moneda:"CRC",estado_poliza:"Vigente",fr:"Semestral",telefonos:"8437-1728 (CELULAR)",correos:"edwinfreerw@gmail.com",ultima_gestion:"SE ENVIO CORREO",resultado:"No se pudo obtener confirmación de pago",dias_venc:27,verif:true,confirmar:"2026-05-05",tipo_cliente:"fisica"},
+  {poliza:"01-01-AUT-1709404",asegurado:"LORIA GUILLEN REINA ISABEL",prod:"AUTOMOVILES VOLUNTARIO",desde:"2026-05-05",hasta:"2026-08-05",prima:34898,total:39435,moneda:"CRC",estado_poliza:"Vigente",fr:"Trimestral",telefonos:"8314-9537 (CELULAR)",correos:"isabel.loria.guillen@gmail.com",ultima_gestion:"SE PROGRAMA ENVIO PARA EL 8-4-2026",resultado:"No se pudo obtener confirmación de pago",dias_venc:27,verif:true,confirmar:"2026-05-05",tipo_cliente:"fisica"},
+  {poliza:"01-01-AUT-2183445",asegurado:"RUIZ UMAÑA LUCAS FERNANDO",prod:"AUTOMOVILES VOLUNTARIO - ANUAL",desde:"2026-05-05",hasta:"2027-05-05",prima:336517,total:380264,moneda:"CRC",estado_poliza:"Vigente",fr:"Anual",telefonos:"6111-7715 (CELULAR)",correos:"lucasru16@outlook.com",ultima_gestion:"SE ENVIO CORREO",resultado:"No se pudo obtener confirmación de pago",dias_venc:27,verif:true,confirmar:"2026-05-05",tipo_cliente:"fisica"},
+  {poliza:"01-01-AUT-2169060",asegurado:"HERNANDEZ VEGA GLORIANA",prod:"AUTOMOVILES VOLUNTARIO - ANUAL",desde:"2026-05-06",hasta:"2026-08-06",prima:111539,total:126039,moneda:"CRC",estado_poliza:"Vigente",fr:"Trimestral",telefonos:"6296-7987",correos:"glorianahernandez902@gmail.com",ultima_gestion:"SE PROGRAMA ENVIO 8-4-2026",resultado:"No se pudo obtener confirmación de pago",dias_venc:28,verif:true,confirmar:"2026-05-06",tipo_cliente:"fisica"},
+  {poliza:"01-01-AUT-2183520",asegurado:"LEZCANO RAMIREZ ADRIANA VANESSA",prod:"AUTOMOVILES VOLUNTARIO - ANUAL",desde:"2026-05-06",hasta:"2026-11-06",prima:297930,total:336661,moneda:"CRC",estado_poliza:"Vigente",fr:"Semestral",telefonos:"8845-1134 (CELULAR)",correos:"lezcano.adriana@hotmail.com",ultima_gestion:"SE ENVIO CORREO",resultado:"No se pudo obtener confirmación de pago",dias_venc:28,verif:true,confirmar:"2026-05-06",tipo_cliente:"fisica"},
+  {poliza:"01-01-ACL-0030375",asegurado:"AVILA GARCIA SIMON ANTONIO",prod:"PLAN FAMILIAR AUCOL",desde:"2026-05-07",hasta:"2026-08-07",prima:187188,total:211522,moneda:"CRC",estado_poliza:"Vigente",fr:"Trimestral",telefonos:"7230-5022 (CELULAR)",correos:"saag1@hotmail.com",ultima_gestion:"SE PROGRAMA ENVIO 8-4-2026",resultado:"No se pudo obtener confirmación de pago",dias_venc:29,verif:true,confirmar:"2026-05-07",tipo_cliente:"fisica"},
+  {poliza:"01-01-AUT-2189772",asegurado:"ALVAREZ VEGA MICHAEL GERARDO",prod:"AUTOMOVILES VOLUNTARIO - ANUAL",desde:"2026-05-08",hasta:"2026-08-08",prima:128948,total:145711,moneda:"CRC",estado_poliza:"Vigente",fr:"Trimestral",telefonos:"6043-1249 (CELULAR)",correos:"mike0307@live.com",ultima_gestion:"SE PROGRAMA ENVIO 8-4-2026",resultado:"No se pudo obtener confirmación de pago",dias_venc:30,verif:true,confirmar:"2026-05-08",tipo_cliente:"fisica"},
+  {poliza:"01-01-AUT-1992191",asegurado:"PAREDES URBINA MICHAEL STANLEY",prod:"AUTOMOVILES VOLUNTARIO - ANUAL",desde:"2026-05-08",hasta:"2027-05-08",prima:798018,total:901760,moneda:"CRC",estado_poliza:"Vigente",fr:"Anual",telefonos:"8748-2944 (CELULAR)",correos:"mstanp@gmail.com",ultima_gestion:"",resultado:"",dias_venc:30,verif:true,confirmar:"",tipo_cliente:"fisica"},
+  {poliza:"01-01-AUT-2201275",asegurado:"MORALES FLORES PAULA LINETTE",prod:"AUTOMOVILES VOLUNTARIO - ANUAL",desde:"2026-05-09",hasta:"2026-08-09",prima:87281,total:98628,moneda:"CRC",estado_poliza:"Período gracia",fr:"Trimestral",telefonos:"8916-6247",correos:"paula.moralesflores@hotmail.com",ultima_gestion:"SE PROGRAMA ENVIO 8-4-2026",resultado:"No se pudo obtener confirmación de pago",dias_venc:31,verif:true,confirmar:"2026-05-09",tipo_cliente:"fisica"},
+  {poliza:"01-01-AUT-2201331",asegurado:"ARCE RAMIREZ JOSE ANTONIO",prod:"AUTOMOVILES VOLUNTARIO - ANUAL",desde:"2026-05-10",hasta:"2026-08-10",prima:115393,total:130394,moneda:"CRC",estado_poliza:"Período gracia",fr:"Trimestral",telefonos:"8301-1994",correos:"arce.ramirez02@gmail.com",ultima_gestion:"se programa envio 8-4-2026",resultado:"No se pudo obtener confirmación de pago",dias_venc:32,verif:true,confirmar:"2026-05-10",tipo_cliente:"fisica"},
+  {poliza:"02-01-MED-0002584",asegurado:"CENTEN JAN JOHANNES WILCHELMUS",prod:"INS MEDICAL SIAS",desde:"2026-05-10",hasta:"2026-11-10",prima:4742,total:5358,moneda:"USD",estado_poliza:"Vigente",fr:"Semestral",telefonos:"",correos:"",ultima_gestion:"",resultado:"",dias_venc:32,verif:true,confirmar:"",tipo_cliente:"fisica"},
+  {poliza:"01-01-CAU-0001697",asegurado:"HERNANDEZ VARGAS JUAN CARLOS",prod:"CAUCION",desde:"2026-05-11",hasta:"2027-05-11",prima:127837,total:144456,moneda:"CRC",estado_poliza:"Vigente",fr:"Anual",telefonos:"8822-1348",correos:"",ultima_gestion:"",resultado:"",dias_venc:33,verif:false,confirmar:"",tipo_cliente:"fisica"},
+  {poliza:"01-01-AUT-2201453",asegurado:"BAISOTTI MARIANA",prod:"AUTOMOVILES VOLUNTARIO - ANUAL",desde:"2026-05-12",hasta:"2026-08-12",prima:105062,total:118720,moneda:"CRC",estado_poliza:"Período gracia",fr:"Trimestral",telefonos:"8594-2138",correos:"marianabfotografa@gmail.com",ultima_gestion:"SE PROGRAMA ENVIO 8-4-2026",resultado:"No se pudo obtener confirmación de pago",dias_venc:34,verif:true,confirmar:"2026-05-12",tipo_cliente:"fisica"},
+  {poliza:"01-01-AUT-1717090",asegurado:"BOLAÑOS ALCAZAR DAMARIS VERONICA",prod:"AUTOMOVILES VOLUNTARIO - ANUAL",desde:"2026-05-13",hasta:"2027-05-13",prima:644494,total:728278,moneda:"CRC",estado_poliza:"Vigente",fr:"Anual",telefonos:"8886-0993 (CELULAR)",correos:"franzsanram@hotmail.com",ultima_gestion:"",resultado:"",dias_venc:35,verif:true,confirmar:"",tipo_cliente:"fisica"},
+  {poliza:"01-01-AUT-2175745",asegurado:"ESQUIVEL RODRIGUEZ JUAN MANUEL",prod:"AUTOMOVILES VOLUNTARIO - ANUAL",desde:"2026-05-13",hasta:"2026-11-13",prima:219627,total:248178,moneda:"CRC",estado_poliza:"Vigente",fr:"Semestral",telefonos:"8701-8880 (CELULAR)",correos:"jm.esquivel.rodriguez@gmail.com",ultima_gestion:"SE PROGRAMA ENVIO 8-4-2026",resultado:"No se pudo obtener confirmación de pago",dias_venc:35,verif:true,confirmar:"2026-05-13",tipo_cliente:"fisica"},
+  {poliza:"01-01-FID-0012611",asegurado:"HERNANDEZ VARGAS JUAN CARLOS",prod:"FIDELIDAD",desde:"2026-05-14",hasta:"2027-05-14",prima:39020,total:44093,moneda:"CRC",estado_poliza:"Vigente",fr:"Anual",telefonos:"8822-1348",correos:"",ultima_gestion:"",resultado:"",dias_venc:36,verif:true,confirmar:"",tipo_cliente:"fisica"},
+  {poliza:"01-01-AUT-2005787",asegurado:"CONEJO VARELA LUIS DIEGO",prod:"AUTOMOVILES VOLUNTARIO - ANUAL",desde:"2026-05-15",hasta:"2027-05-15",prima:451560,total:510263,moneda:"CRC",estado_poliza:"Vigente",fr:"Anual",telefonos:"8315-6380 (CELULAR)",correos:"dconejo@gmail.com",ultima_gestion:"",resultado:"",dias_venc:37,verif:true,confirmar:"",tipo_cliente:"fisica"},
+  {poliza:"01-01-ACL-0016290",asegurado:"MARTINEZ ESQUIVEL ERICKA MARIA",prod:"PLAN FAMILIAR AUCOL",desde:"2026-05-15",hasta:"2026-11-15",prima:236573,total:267328,moneda:"CRC",estado_poliza:"Vigente",fr:"Semestral",telefonos:"6006-6489 (CELULAR)",correos:"erime89@gmail.com",ultima_gestion:"",resultado:"",dias_venc:37,verif:true,confirmar:"",tipo_cliente:"fisica"},
+  {poliza:"01-01-AUT-1325016",asegurado:"ACOSTA VALVERDE JONATHAN DAVID",prod:"AUTOMOVILES VOLUNTARIO",desde:"2026-05-16",hasta:"2026-08-16",prima:116119,total:131214,moneda:"CRC",estado_poliza:"Vigente",fr:"Trimestral",telefonos:"8721-1373, 8507-9122",correos:"",ultima_gestion:"SE PROGRAMA ENVIO 8-4-2026",resultado:"No se pudo obtener confirmación de pago",dias_venc:38,verif:true,confirmar:"2026-05-16",tipo_cliente:"fisica"},
+  {poliza:"UC0120140211380",asegurado:"CARRANZA ELIZONDO KATHIA",prod:"VIDA UNIVERSAL PLUS",desde:"2026-05-16",hasta:"2026-06-16",prima:10250,total:10250,moneda:"CRC",estado_poliza:"Vigente",fr:"Mensual",telefonos:"",correos:"",ultima_gestion:"SE PROGRAMA ENVIO 8-4-2026",resultado:"No se pudo obtener confirmación de pago",dias_venc:38,verif:true,confirmar:"2026-05-16",tipo_cliente:"fisica"},
+  {poliza:"01-01-AUT-1997520",asegurado:"MURILLO BARQUERO MARIA JOSE",prod:"AUTOMOVILES VOLUNTARIO",desde:"2026-05-16",hasta:"2026-08-16",prima:113436,total:128183,moneda:"CRC",estado_poliza:"Vigente",fr:"Trimestral",telefonos:"8706-6565 (CELULAR)",correos:"mariajosemb15@gmail.com",ultima_gestion:"SE PROGRAMA ENVIO 8-4-2026",resultado:"No se pudo obtener confirmación de pago",dias_venc:38,verif:true,confirmar:"2026-05-16",tipo_cliente:"fisica"},
+  {poliza:"01-01-AUT-1992505",asegurado:"AFFARI LEGALI SRL",prod:"AUTOMOVILES VOLUNTARIO",desde:"2026-05-17",hasta:"2026-11-17",prima:430326,total:486268,moneda:"CRC",estado_poliza:"Vigente",fr:"Semestral",telefonos:"",correos:"federicoaltamura.a@gmail.com",ultima_gestion:"",resultado:"",dias_venc:39,verif:true,confirmar:"",tipo_cliente:"juridica"},
+  {poliza:"01-21-IMR-0002382",asegurado:"CASACOCO DE GUANACASTE S.A.",prod:"HOGAR COMPRENSIVO",desde:"2026-05-17",hasta:"2026-11-17",prima:39181,total:44274,moneda:"CRC",estado_poliza:"Vigente",fr:"Semestral",telefonos:"8383-6350; 2276-3129",correos:"brunocarboni@gmail.com",ultima_gestion:"SE PROGRAMA ENVIO 8-4-2026",resultado:"No se pudo obtener confirmación de pago",dias_venc:39,verif:true,confirmar:"2026-05-17",tipo_cliente:"juridica"},
+  {poliza:"01-01-AUT-1806751",asegurado:"BARRANTES RODRIGUEZ KATTIA VANESSA",prod:"AUTOMOVILES VOLUNTARIO",desde:"2026-05-18",hasta:"2026-08-18",prima:24040,total:27165,moneda:"CRC",estado_poliza:"Vigente",fr:"Trimestral",telefonos:"8784-9191 (CELULAR)",correos:"barrantes.kattia@hotmail.com",ultima_gestion:"SE PROGRAMA ENVIO 8-4-2026",resultado:"No se pudo obtener confirmación de pago",dias_venc:40,verif:true,confirmar:"2026-05-18",tipo_cliente:"fisica"},
+  {poliza:"01-01-AUT-2169469",asegurado:"APUY GARCIA ANDREA MARIA",prod:"AUTOMOVILES VOLUNTARIO - ANUAL",desde:"2026-05-19",hasta:"2026-08-19",prima:96803,total:109387,moneda:"CRC",estado_poliza:"Vigente",fr:"Trimestral",telefonos:"8765-3539 (CELULAR)",correos:"andreaapuy1492@gmail.com",ultima_gestion:"SE PROGRAMA ENVIO 8-4-2026",resultado:"No se pudo obtener confirmación de pago",dias_venc:41,verif:true,confirmar:"2026-05-19",tipo_cliente:"fisica"},
+  {poliza:"01-01-AUT-1718603",asegurado:"ROSENBERG JOAN ILENE",prod:"AUTOMOVILES VOLUNTARIO - ANUAL",desde:"2026-05-19",hasta:"2027-05-19",prima:581958,total:657613,moneda:"CRC",estado_poliza:"Vigente",fr:"Anual",telefonos:"",correos:"joanroze@aol.com",ultima_gestion:"",resultado:"",dias_venc:41,verif:true,confirmar:"",tipo_cliente:"fisica"},
+  {poliza:"01-01-AUT-1879712",asegurado:"ALFONSO RUIZ EDDY",prod:"AUTOMOVILES VOLUNTARIO",desde:"2026-05-20",hasta:"2026-11-20",prima:238427,total:269422,moneda:"CRC",estado_poliza:"Vigente",fr:"Semestral",telefonos:"6088-9214 (CELULAR)",correos:"eddalfru@gmail.com",ultima_gestion:"",resultado:"",dias_venc:42,verif:true,confirmar:"",tipo_cliente:"fisica"},
+  {poliza:"01-01-IMR-0002272",asegurado:"FREER PANIAGUA DYLANA MARIA",prod:"HOGAR COMPRENSIVO",desde:"2026-05-20",hasta:"2027-05-20",prima:414620,total:468521,moneda:"CRC",estado_poliza:"Vigente",fr:"Anual",telefonos:"8911-3140; 8843-4633",correos:"dylanafreerpaniagua@gmail.com",ultima_gestion:"",resultado:"",dias_venc:42,verif:true,confirmar:"",tipo_cliente:"fisica"},
+  {poliza:"01-01-AUT-2176046",asegurado:"JIMENEZ MEZA BEATRIZ LUCIA",prod:"AUTOMOVILES VOLUNTARIO - ANUAL",desde:"2026-05-20",hasta:"2026-11-20",prima:291619,total:329529,moneda:"CRC",estado_poliza:"Vigente",fr:"Semestral",telefonos:"8886-1869 (CELULAR)",correos:"beatrizjm20@gmail.com",ultima_gestion:"SE PROGRAMA ENVIO 8-4-2026",resultado:"No se pudo obtener confirmación de pago",dias_venc:42,verif:true,confirmar:"2026-05-20",tipo_cliente:"fisica"},
+  {poliza:"01-01-AUT-2184081",asegurado:"SOTO FONSECA MICHELLE TATIANA",prod:"AUTOMOVILES VOLUNTARIO - ANUAL",desde:"2026-05-20",hasta:"2027-05-20",prima:426776,total:482257,moneda:"CRC",estado_poliza:"Vigente",fr:"Anual",telefonos:"8319-3294 (CELULAR)",correos:"sofomichelle@gmail.com",ultima_gestion:"",resultado:"",dias_venc:42,verif:true,confirmar:"",tipo_cliente:"fisica"},
+  {poliza:"01-01-AUT-2184113",asegurado:"MENESES QUIROS MARIA LUISA",prod:"AUTOMOVILES VOLUNTARIO - ANUAL",desde:"2026-05-21",hasta:"2027-05-21",prima:320679,total:362367,moneda:"CRC",estado_poliza:"Vigente",fr:"Anual",telefonos:"8878-7122, 8398-8951",correos:"",ultima_gestion:"",resultado:"",dias_venc:43,verif:true,confirmar:"",tipo_cliente:"fisica"},
+  {poliza:"01-01-AUT-1514744",asegurado:"ASOCIACION HOGAR DULCE HOGAR",prod:"AUTOMOVILES VOLUNTARIO",desde:"2026-05-22",hasta:"2026-08-22",prima:257937,total:291469,moneda:"CRC",estado_poliza:"Vigente",fr:"Trimestral",telefonos:"8694-1170",correos:"santarosacentrodiurno@hotmail.com",ultima_gestion:"SE PROGRAMA ENVIO PARA 8-4-2026",resultado:"No se pudo obtener confirmación de pago",dias_venc:44,verif:true,confirmar:"2026-05-22",tipo_cliente:"juridica"},
+  {poliza:"02-01-MED-0013954",asegurado:"LORIA CAMPOS ANA EUGENIA",prod:"INS MEDICAL SIAS",desde:"2026-05-22",hasta:"2026-08-22",prima:1303,total:1472,moneda:"USD",estado_poliza:"Vigente",fr:"Trimestral",telefonos:"8881-5016; 2239-2191",correos:"aeloriac@gmail.com",ultima_gestion:"",resultado:"",dias_venc:44,verif:true,confirmar:"",tipo_cliente:"fisica"},
+  {poliza:"01-01-AUT-2184168",asegurado:"MERU LIMITADA",prod:"AUTOMOVILES VOLUNTARIO - ANUAL",desde:"2026-05-22",hasta:"2027-05-22",prima:498619,total:563440,moneda:"CRC",estado_poliza:"Vigente",fr:"Anual",telefonos:"8881-5469 (CELULAR)",correos:"mariajoserojas5@gmail.com",ultima_gestion:"",resultado:"",dias_venc:44,verif:true,confirmar:"",tipo_cliente:"juridica"},
+  {poliza:"01-01-AUT-1992735",asegurado:"ARIAS SANDOVAL MARIA TERESA DE LAS PIEDADES",prod:"AUTOMOVILES VOLUNTARIO - ANUAL",desde:"2026-05-23",hasta:"2027-05-23",prima:404750,total:457367,moneda:"CRC",estado_poliza:"Vigente",fr:"Anual",telefonos:"8922-7599 (CELULAR)",correos:"contrerasgazo@gmail.com",ultima_gestion:"",resultado:"",dias_venc:45,verif:true,confirmar:"",tipo_cliente:"fisica"},
+  {poliza:"01-01-AUT-1414426",asegurado:"CAMACHO DE LA O ANA LORENA DEL CARMEN",prod:"AUTOMOVILES VOLUNTARIO",desde:"2026-05-23",hasta:"2026-11-23",prima:243914,total:275623,moneda:"CRC",estado_poliza:"Vigente",fr:"Semestral",telefonos:"8333-9701 (CELULAR)",correos:"loredelao@gmail.com",ultima_gestion:"",resultado:"",dias_venc:45,verif:true,confirmar:"",tipo_cliente:"fisica"},
+  {poliza:"01-01-AUT-1894168",asegurado:"CHEMTICA NATURAL S.A.",prod:"AUTOMOVILES VOLUNTARIO",desde:"2026-05-23",hasta:"2026-11-23",prima:476681,total:538650,moneda:"CRC",estado_poliza:"Vigente",fr:"Semestral",telefonos:"",correos:"",ultima_gestion:"",resultado:"",dias_venc:45,verif:true,confirmar:"",tipo_cliente:"juridica"},
+  {poliza:"01-01-AUT-2009814",asegurado:"MADRIGAL HERRERA MARIA MAGDALENA",prod:"AUTOMOVILES VOLUNTARIO",desde:"2026-05-23",hasta:"2026-11-23",prima:268973,total:303940,moneda:"CRC",estado_poliza:"Vigente",fr:"Semestral",telefonos:"8338-2999 (CELULAR)",correos:"magmhcr@gmail.com",ultima_gestion:"",resultado:"",dias_venc:45,verif:true,confirmar:"",tipo_cliente:"fisica"},
+  {poliza:"01-01-AUT-2201754",asegurado:"PRENDAS TORRES ABNER CALEB",prod:"AUTOMOVILES VOLUNTARIO - ANUAL",desde:"2026-05-23",hasta:"2026-08-23",prima:91881,total:103826,moneda:"CRC",estado_poliza:"Período gracia",fr:"Trimestral",telefonos:"8594-8750",correos:"calebprendas@gmail.com",ultima_gestion:"SE PROGRAMA ENVIO 8-4-2026",resultado:"No se pudo obtener confirmación de pago",dias_venc:45,verif:true,confirmar:"2026-05-23",tipo_cliente:"fisica"},
+  {poliza:"01-01-AUT-2184256",asegurado:"ALFARO SANCHEZ ANGELICA",prod:"AUTOMOVILES VOLUNTARIO - ANUAL",desde:"2026-05-26",hasta:"2027-05-26",prima:356956,total:403360,moneda:"CRC",estado_poliza:"Vigente",fr:"Anual",telefonos:"8762-3764 (CELULAR)",correos:"aalfaro_s@hotmail.com",ultima_gestion:"",resultado:"",dias_venc:48,verif:true,confirmar:"",tipo_cliente:"fisica"},
+  {poliza:"01-01-AUT-2011501",asegurado:"HERNANDEZ WRAY SONIA ESTER",prod:"AUTOMOVILES VOLUNTARIO",desde:"2026-05-27",hasta:"2026-11-27",prima:284399,total:321371,moneda:"CRC",estado_poliza:"Vigente",fr:"Semestral",telefonos:"8997-7783 (CELULAR)",correos:"sonia.hernandezw@gmail.com",ultima_gestion:"",resultado:"",dias_venc:49,verif:true,confirmar:"",tipo_cliente:"fisica"},
+  {poliza:"01-01-AUT-2184359",asegurado:"MENESES QUIROS NATALIA",prod:"AUTOMOVILES VOLUNTARIO - ANUAL",desde:"2026-05-27",hasta:"2027-05-27",prima:391435,total:442321,moneda:"CRC",estado_poliza:"Vigente",fr:"Anual",telefonos:"",correos:"",ultima_gestion:"",resultado:"",dias_venc:49,verif:true,confirmar:"",tipo_cliente:"fisica"},
+  {poliza:"01-01-AUT-2176245",asegurado:"RAMOS BARRIENTOS ALLAN",prod:"AUTOMOVILES VOLUNTARIO - ANUAL",desde:"2026-05-27",hasta:"2026-08-27",prima:208559,total:235672,moneda:"CRC",estado_poliza:"Vigente",fr:"Trimestral",telefonos:"8920-8265",correos:"allanram@ice.co.cr",ultima_gestion:"SE PROGRAMA ENVIO 8-4-2026",resultado:"No se pudo obtener confirmación de pago",dias_venc:49,verif:true,confirmar:"2026-05-27",tipo_cliente:"fisica"},
+  {poliza:"01-01-AUT-1884887",asegurado:"GARCIA RODRIGUEZ CRISTOPHER DAVID",prod:"AUTOMOVILES VOLUNTARIO",desde:"2026-05-28",hasta:"2026-08-28",prima:174020,total:196643,moneda:"CRC",estado_poliza:"Vigente",fr:"Trimestral",telefonos:"8817-7501",correos:"crisgarod2509@gmail.com",ultima_gestion:"SE PROGRAMA ENVIO 8-4-2026",resultado:"No se pudo obtener confirmación de pago",dias_venc:50,verif:true,confirmar:"2026-05-28",tipo_cliente:"fisica"},
+  {poliza:"01-01-AUT-1612371",asegurado:"RODRIGUEZ JENKINS OLGER",prod:"AUTOMOVILES VOLUNTARIO",desde:"2026-05-28",hasta:"2026-08-28",prima:232601,total:262839,moneda:"CRC",estado_poliza:"Vigente",fr:"Trimestral",telefonos:"8846-5264 (CELULAR)",correos:"olgerrj@gmail.com",ultima_gestion:"SE PROGRAMA ENVIO 8-4-2026",resultado:"No se pudo obtener confirmación de pago",dias_venc:50,verif:true,confirmar:"2026-05-28",tipo_cliente:"fisica"},
+  {poliza:"01-01-AUT-2160844",asegurado:"VARELA RAMIREZ MIGUEL ADOLFO",prod:"AUTOMOVILES VOLUNTARIO - ANUAL",desde:"2026-05-28",hasta:"2027-05-28",prima:559959,total:632754,moneda:"CRC",estado_poliza:"Vigente",fr:"Anual",telefonos:"",correos:"",ultima_gestion:"",resultado:"",dias_venc:50,verif:true,confirmar:"",tipo_cliente:"fisica"},
+  {poliza:"01-19-ROB-0000533",asegurado:"ESPECIALISTAS EN ESTERILIZACION Y ENVASE DE C R",prod:"ROBO COMERCIAL",desde:"2026-05-29",hasta:"2027-05-29",prima:3086977,total:3488284,moneda:"CRC",estado_poliza:"Vigente",fr:"Anual",telefonos:"2239-6464, 2239-7271",correos:"",ultima_gestion:"",resultado:"",dias_venc:51,verif:true,confirmar:"",tipo_cliente:"juridica"},
+  {poliza:"01-01-AUT-1436685",asegurado:"GOMEZ CHACON FREDDY MIGUEL",prod:"AUTOMOVILES VOLUNTARIO - ANUAL",desde:"2026-05-30",hasta:"2027-05-30",prima:529596,total:598444,moneda:"CRC",estado_poliza:"Vigente",fr:"Anual",telefonos:"8899-2901 (CELULAR)",correos:"freddygoch@hotmail.com",ultima_gestion:"",resultado:"",dias_venc:52,verif:true,confirmar:"",tipo_cliente:"fisica"},
+  {poliza:"01-01-AUT-1880441",asegurado:"SPENCER SPENCER PATRICIA",prod:"AUTOMOVILES VOLUNTARIO",desde:"2026-05-30",hasta:"2026-11-30",prima:279129,total:315416,moneda:"CRC",estado_poliza:"Vigente",fr:"Semestral",telefonos:"8320-3254 (CELULAR)",correos:"patci25052016@gmail.com",ultima_gestion:"",resultado:"",dias_venc:52,verif:true,confirmar:"",tipo_cliente:"fisica"},
+  {poliza:"02-01-IMR-0003108",asegurado:"GONZALEZ MIRANDA LILLIANA",prod:"HOGAR COMPRENSIVO",desde:"2026-05-31",hasta:"2027-05-31",prima:519,total:586,moneda:"USD",estado_poliza:"Vigente",fr:"Anual",telefonos:"",correos:"",ultima_gestion:"",resultado:"",dias_venc:53,verif:true,confirmar:"",tipo_cliente:"fisica"}
+];
+
+// ── HELPERS ──────────────────────────────────
+function calcProximaRenovacion(hasta, fr) {
+  if (!hasta) return "";
+  const d = new Date(hasta);
+  const meses = {Mensual:1, Trimestral:3, Semestral:6, Anual:12};
+  d.setMonth(d.getMonth() + (meses[fr] || 12));
+  return d.toISOString().split("T")[0];
+}
+
+function calcDiasVenc(hasta) {
+  if (!hasta) return 0;
+  const hoy = new Date(); hoy.setHours(0,0,0,0);
+  const h = new Date(hasta);
+  return Math.round((h - hoy) / 86400000);
+}
+
+// ── SEED MAYO ────────────────────────────────
+window.__seedMayo = async function() {
+  const col = collection(db, "polizas");
+  const snap = await getDocs(query(col, where("mes_origen","==","MAYO2026")));
+  if (!snap.empty) { showToast("Mayo 2026 ya está cargado en Firebase ✓", "info"); return; }
+  let count = 0;
+  for (const r of MAYO_DATA) {
+    await addDoc(col, {
+      ...r,
+      proxima_renovacion: calcProximaRenovacion(r.hasta, r.fr),
+      mes_origen: "MAYO2026",
+      estado_recibo: "Pendiente",
+      creado: serverTimestamp(),
+      actualizado: serverTimestamp()
+    });
+    count++;
+  }
+  showToast(`✅ ${count} pólizas de Mayo 2026 cargadas en Firebase`, "success");
+  loadPolizas();
+};
+
+// ── GLOBAL STATE ─────────────────────────────
+let POLIZAS = [];
+let CLIENTES = [];
+let currentPolizaId = null;
+let currentTab = "todos";
+let currentPage = 1;
+const PAGE_SIZE = 25;
+
+// ── CARGAR PÓLIZAS ───────────────────────────
+async function loadPolizas() {
+  setStatus("Conectando con Firebase…");
+  try {
+    const snap = await getDocs(query(collection(db, "polizas"), orderBy("dias_venc")));
+    POLIZAS = snap.docs.map(d => ({ _id: d.id, ...d.data() }));
+    renderKPIs();
+    renderTable();
+    setStatus(`${POLIZAS.length} pólizas cargadas · ${new Date().toLocaleTimeString("es-CR")}`);
+    if (POLIZAS.length === 0) {
+      showSeedBanner();
+    }
+  } catch(e) {
+    setStatus("⚠ Error al conectar: " + e.message);
+  }
+}
+
+// ── CARGAR CLIENTES ──────────────────────────
+async function loadClientes() {
+  try {
+    const snap = await getDocs(query(collection(db, "clientes"), orderBy("nombre_completo")));
+    CLIENTES = snap.docs.map(d => ({ _id: d.id, ...d.data() }));
+    renderClientesList();
+  } catch(e) { console.error(e); }
+}
+
+// ── GUARDAR GESTIÓN ──────────────────────────
+window.__saveGestion = async function() {
+  if (!currentPolizaId) return;
+  const tel    = document.getElementById("m-tel").value;
+  const email  = document.getElementById("m-email").value;
+  const res    = document.getElementById("m-resultado").value;
+  const conf   = document.getElementById("m-confirmar").value;
+  const gestion= document.getElementById("m-gestion").value;
+  const estado = document.getElementById("m-estado-select").value;
+
+  try {
+    const ref = doc(db, "polizas", currentPolizaId);
+    await updateDoc(ref, {
+      telefonos: tel, correos: email,
+      resultado: res, confirmar: conf,
+      ultima_gestion: gestion,
+      estado_poliza: estado,
+      actualizado: serverTimestamp()
+    });
+    // Guardar en historial de gestiones
+    if (gestion) {
+      await addDoc(collection(db, "gestiones"), {
+        poliza_id: currentPolizaId,
+        texto: gestion, resultado: res,
+        fecha: serverTimestamp(), usuario: "JHV"
+      });
+    }
+    closeModal("modal-detalle");
+    showToast("Guardado en Firebase ✓", "success");
+    loadPolizas();
+  } catch(e) { showToast("Error: " + e.message, "error"); }
+};
+
+// ── GUARDAR CLIENTE NUEVO ────────────────────
+window.__saveCliente = async function() {
+  const tipo = document.querySelector('input[name="tipo_cliente"]:checked').value;
+  const nombre = tipo === "fisica"
+    ? (document.getElementById("c-nombre").value + " " + document.getElementById("c-apellido1").value + " " + document.getElementById("c-apellido2").value).trim()
+    : document.getElementById("c-razon").value.trim();
+
+  if (!nombre) { showToast("Ingrese el nombre", "error"); return; }
+
+  const data = {
+    tipo_cliente: tipo,
+    nombre_completo: nombre.toUpperCase(),
+    cedula: tipo === "fisica" ? document.getElementById("c-cedula").value : document.getElementById("c-cedula-jur").value,
+    telefono_principal: document.getElementById("c-tel1").value,
+    telefono_secundario: document.getElementById("c-tel2").value,
+    correo_principal: document.getElementById("c-email1").value,
+    correo_secundario: document.getElementById("c-email2").value,
+    direccion: document.getElementById("c-direccion").value,
+    observaciones: document.getElementById("c-obs").value,
+    creado: serverTimestamp()
+  };
+
+  if (tipo === "fisica") {
+    data.fecha_nacimiento = document.getElementById("c-nacimiento").value;
+    data.estado_civil = document.getElementById("c-estadocivil").value;
+    data.ocupacion = document.getElementById("c-ocupacion").value;
+  } else {
+    data.representante_legal = document.getElementById("c-rep").value;
+    data.cedula_representante = document.getElementById("c-cedula-rep").value;
+    data.actividad_comercial = document.getElementById("c-actividad").value;
+  }
+
+  try {
+    await addDoc(collection(db, "clientes"), data);
+
+    // Si viene con póliza, guardarla también
+    const numPol = document.getElementById("c-poliza-num").value;
+    if (numPol) {
+      const frPol = document.getElementById("c-poliza-fr").value;
+      const hastaPol = document.getElementById("c-poliza-hasta").value;
+      await addDoc(collection(db, "polizas"), {
+        poliza: numPol,
+        asegurado: nombre.toUpperCase(),
+        prod: document.getElementById("c-poliza-prod").value,
+        desde: document.getElementById("c-poliza-desde").value,
+        hasta: hastaPol,
+        prima: parseFloat(document.getElementById("c-poliza-prima").value) || 0,
+        total: parseFloat(document.getElementById("c-poliza-total").value) || 0,
+        moneda: document.getElementById("c-poliza-moneda").value,
+        fr: frPol,
+        estado_poliza: "Vigente",
+        estado_recibo: "Pendiente",
+        proxima_renovacion: calcProximaRenovacion(hastaPol, frPol),
+        dias_venc: calcDiasVenc(hastaPol),
+        tipo_cliente: tipo,
+        mes_origen: "NUEVO",
+        verif: false, confirmar: "",
+        ultima_gestion: "", resultado: "",
+        telefonos: data.telefono_principal,
+        correos: data.correo_principal,
+        creado: serverTimestamp(),
+        actualizado: serverTimestamp()
+      });
+    }
+
+    closeModal("modal-cliente");
+    showToast("Cliente guardado en Firebase ✓", "success");
+    loadPolizas(); loadClientes();
+    resetClienteForm();
+  } catch(e) { showToast("Error: " + e.message, "error"); }
+};
+
+// Exponer funciones al scope global
+window.__loadPolizas = loadPolizas;
+window.__loadClientes = loadClientes;
+window.__db = db;
+window.__collection = collection;
+window.__doc = doc;
+window.__updateDoc = updateDoc;
+window.__getDocs = getDocs;
+window.__addDoc = addDoc;
+window.__serverTimestamp = serverTimestamp;
+window.__query = query;
+window.__orderBy = orderBy;
+
+// Iniciar
+loadPolizas();
+loadClientes();
+</script>
+
+<style>
+/* ═══════════════════════════════════════════
+   MÓDULO 1: VARIABLES & RESET
+═══════════════════════════════════════════ */
+:root {
+  --bg: #0b0e18;
+  --surf: #131726;
+  --surf2: #1c2035;
+  --surf3: #242840;
+  --bdr: #2a2f4a;
+  --bdr2: #353b5e;
+  --accent: #4f7cff;
+  --accent2: #7c5cfc;
+  --green: #22d07a;
+  --yellow: #f5a623;
+  --red: #f04438;
+  --text: #e8eaf6;
+  --muted: #6b7299;
+  --crc: #22d07a;
+  --usd: #4f7cff;
+  --font-head: 'Syne', sans-serif;
+  --font-body: 'Mulish', sans-serif;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: var(--font-body); background: var(--bg); color: var(--text); min-height: 100vh; font-size: 14px; }
+input, select, textarea, button { font-family: var(--font-body); }
+
+/* ═══════════════════════════════════════════
+   MÓDULO 2: HEADER
+═══════════════════════════════════════════ */
+.header {
+  background: var(--surf);
+  border-bottom: 1px solid var(--bdr);
+  padding: 0 20px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+.logo {
+  font-family: var(--font-head);
+  font-weight: 800;
+  font-size: 18px;
+  letter-spacing: -0.5px;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  white-space: nowrap;
+}
+.logo-sub { font-size: 10px; color: var(--muted); font-weight: 400; -webkit-text-fill-color: var(--muted); letter-spacing: 0; }
+.hdiv { width: 1px; height: 28px; background: var(--bdr); }
+.nav { display: flex; gap: 2px; }
+.nav-btn {
+  padding: 5px 12px; border-radius: 6px; border: none;
+  background: transparent; color: var(--muted);
+  font-family: var(--font-body); font-size: 13px; font-weight: 600;
+  cursor: pointer; transition: all .15s; white-space: nowrap;
+}
+.nav-btn:hover { background: var(--surf2); color: var(--text); }
+.nav-btn.active { background: var(--surf2); color: var(--text); }
+.header-right { margin-left: auto; display: flex; align-items: center; gap: 10px; }
+.status-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--green); animation: pulse 2s infinite; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+#status-text { font-size: 11px; color: var(--muted); }
+.btn-primary {
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  color: white; border: none; padding: 7px 16px; border-radius: 8px;
+  font-size: 13px; font-weight: 700; cursor: pointer;
+  font-family: var(--font-head); letter-spacing: 0.2px;
+  transition: opacity .15s; white-space: nowrap;
+}
+.btn-primary:hover { opacity: .85; }
+
+/* ═══════════════════════════════════════════
+   MÓDULO 3: SEED BANNER
+═══════════════════════════════════════════ */
+#seed-banner {
+  display: none;
+  background: linear-gradient(135deg, #1a2040, #1e2845);
+  border: 1px solid var(--accent);
+  border-radius: 10px;
+  padding: 16px 20px;
+  margin: 20px 20px 0;
+  align-items: center;
+  gap: 14px;
+}
+#seed-banner.show { display: flex; }
+.seed-icon { font-size: 28px; }
+.seed-text h3 { font-family: var(--font-head); font-size: 15px; font-weight: 700; }
+.seed-text p { font-size: 12px; color: var(--muted); margin-top: 3px; }
+.btn-seed {
+  margin-left: auto; background: var(--accent); color: white;
+  border: none; padding: 9px 20px; border-radius: 8px;
+  font-weight: 700; cursor: pointer; white-space: nowrap;
+  font-family: var(--font-head); font-size: 13px;
+}
+.btn-seed:hover { opacity: .85; }
+
+/* ═══════════════════════════════════════════
+   MÓDULO 4: MAIN LAYOUT
+═══════════════════════════════════════════ */
+.main { padding: 20px; max-width: 1700px; margin: 0 auto; }
+.view { display: none; }
+.view.active { display: block; }
+
+/* ═══════════════════════════════════════════
+   MÓDULO 5: KPI CARDS
+═══════════════════════════════════════════ */
+.kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-bottom: 20px; }
+.kpi-card {
+  background: var(--surf);
+  border: 1px solid var(--bdr);
+  border-radius: 10px;
+  padding: 14px 16px;
+  position: relative;
+  overflow: hidden;
+}
+.kpi-card::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 2px;
+}
+.kpi-card.k-total::before { background: linear-gradient(90deg, var(--accent), var(--accent2)); }
+.kpi-card.k-crc::before { background: var(--green); }
+.kpi-card.k-usd::before { background: var(--usd); }
+.kpi-card.k-gracia::before { background: var(--yellow); }
+.kpi-card.k-sinver::before { background: var(--muted); }
+.kpi-card.k-prox::before { background: var(--red); }
+.kpi-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); margin-bottom: 8px; }
+.kpi-val { font-family: var(--font-head); font-size: 22px; font-weight: 800; letter-spacing: -0.5px; }
+.kpi-sub { font-size: 10px; color: var(--muted); margin-top: 4px; }
+
+/* ═══════════════════════════════════════════
+   MÓDULO 6: TABS + TOOLBAR
+═══════════════════════════════════════════ */
+.tabs { display: flex; gap: 2px; border-bottom: 1px solid var(--bdr); margin-bottom: 14px; }
+.tab { padding: 8px 14px; font-size: 12px; font-weight: 700; color: var(--muted); cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px; transition: all .15s; font-family: var(--font-head); letter-spacing: 0.3px; }
+.tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+.tab:hover { color: var(--text); }
+
+.toolbar { display: flex; gap: 8px; align-items: center; margin-bottom: 14px; flex-wrap: wrap; }
+.search-wrap { position: relative; flex: 1; min-width: 200px; }
+.search-wrap input {
+  width: 100%;
+  background: var(--surf); border: 1px solid var(--bdr);
+  border-radius: 8px; padding: 7px 10px 7px 32px;
+  color: var(--text); font-size: 13px; outline: none;
+  transition: border .15s;
+}
+.search-wrap input:focus { border-color: var(--accent); }
+.search-icon { position: absolute; left: 9px; top: 50%; transform: translateY(-50%); color: var(--muted); font-size: 14px; pointer-events: none; }
+.fselect {
+  background: var(--surf); border: 1px solid var(--bdr);
+  border-radius: 8px; padding: 7px 10px; color: var(--text);
+  font-size: 12px; outline: none; cursor: pointer;
+}
+.fselect:focus { border-color: var(--accent); }
+.count-badge { background: var(--surf2); border: 1px solid var(--bdr); padding: 4px 10px; border-radius: 20px; font-size: 11px; color: var(--muted); white-space: nowrap; }
+
+/* ═══════════════════════════════════════════
+   MÓDULO 7: TABLA
+═══════════════════════════════════════════ */
+.table-wrap { background: var(--surf); border: 1px solid var(--bdr); border-radius: 10px; overflow: hidden; }
+table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+thead th {
+  background: var(--surf2);
+  padding: 9px 10px; text-align: left;
+  font-weight: 700; font-size: 10px;
+  text-transform: uppercase; letter-spacing: .8px;
+  color: var(--muted); white-space: nowrap;
+  border-bottom: 1px solid var(--bdr);
+  font-family: var(--font-head);
+}
+tbody tr { border-bottom: 1px solid var(--bdr)55; cursor: pointer; transition: background .1s; }
+tbody tr:hover { background: var(--surf2); }
+tbody tr:last-child { border-bottom: none; }
+td { padding: 8px 10px; vertical-align: middle; white-space: nowrap; max-width: 200px; overflow: hidden; text-overflow: ellipsis; }
+td.name-td { font-weight: 600; }
+td.mono { font-family: 'Courier New', monospace; font-size: 11px; color: var(--muted); }
+.pill { display: inline-flex; align-items: center; padding: 2px 7px; border-radius: 10px; font-size: 10px; font-weight: 700; font-family: var(--font-head); }
+.pill-green { background: #22d07a18; color: var(--green); border: 1px solid #22d07a33; }
+.pill-yellow { background: #f5a62318; color: var(--yellow); border: 1px solid #f5a62333; }
+.pill-red { background: #f0443818; color: var(--red); border: 1px solid #f0443833; }
+.pill-blue { background: #4f7cff18; color: var(--accent); border: 1px solid #4f7cff33; }
+.pill-gray { background: var(--surf3); color: var(--muted); border: 1px solid var(--bdr); }
+.dias-badge { display: inline-block; padding: 2px 6px; border-radius: 5px; font-size: 10px; font-weight: 800; font-family: var(--font-head); }
+.dias-hot { background: #f0443820; color: var(--red); }
+.dias-mid { background: #f5a62320; color: var(--yellow); }
+.dias-ok { background: #22d07a18; color: var(--green); }
+td.amount { text-align: right; font-family: 'Courier New', monospace; font-size: 12px; }
+.crc-txt { color: var(--crc); font-weight: 700; }
+.usd-txt { color: var(--usd); font-weight: 700; }
+.renovacion-cell { font-size: 10px; color: var(--accent); font-family: 'Courier New', monospace; }
+
+/* ═══════════════════════════════════════════
+   MÓDULO 8: PAGINACIÓN
+═══════════════════════════════════════════ */
+.pagination { display: flex; align-items: center; gap: 6px; padding: 12px 14px; border-top: 1px solid var(--bdr); }
+.page-btn { background: var(--surf2); border: 1px solid var(--bdr); color: var(--muted); padding: 4px 10px; border-radius: 5px; font-size: 11px; cursor: pointer; font-family: var(--font-head); font-weight: 700; transition: all .15s; }
+.page-btn:hover { border-color: var(--accent); color: var(--accent); }
+.page-btn.active { background: var(--accent); border-color: var(--accent); color: white; }
+.page-info { font-size: 11px; color: var(--muted); margin-left: auto; }
+
+/* ═══════════════════════════════════════════
+   MÓDULO 9: MODAL BASE
+═══════════════════════════════════════════ */
+.overlay { position: fixed; inset: 0; background: #000c; display: none; align-items: center; justify-content: center; z-index: 200; padding: 16px; }
+.overlay.open { display: flex; }
+.modal { background: var(--surf); border: 1px solid var(--bdr); border-radius: 14px; width: 100%; max-width: 700px; max-height: 92vh; overflow-y: auto; }
+.modal-lg { max-width: 860px; }
+.modal-hdr { padding: 18px 22px 14px; border-bottom: 1px solid var(--bdr); display: flex; align-items: flex-start; gap: 12px; }
+.modal-icon { width: 42px; height: 42px; border-radius: 10px; background: var(--surf2); display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
+.modal-title { font-family: var(--font-head); font-size: 16px; font-weight: 700; }
+.modal-sub { font-size: 11px; color: var(--muted); margin-top: 2px; font-family: 'Courier New', monospace; }
+.modal-close { margin-left: auto; background: var(--surf2); border: 1px solid var(--bdr); color: var(--muted); width: 28px; height: 28px; border-radius: 6px; cursor: pointer; font-size: 14px; flex-shrink: 0; transition: all .15s; }
+.modal-close:hover { color: var(--red); border-color: var(--red); }
+.modal-body { padding: 18px 22px; }
+.modal-footer { padding: 14px 22px; border-top: 1px solid var(--bdr); display: flex; gap: 8px; justify-content: flex-end; }
+.sec-title { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .8px; color: var(--muted); margin-bottom: 10px; padding-bottom: 6px; border-bottom: 1px solid var(--bdr); font-family: var(--font-head); }
+.sec { margin-bottom: 18px; }
+.fgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.fgrid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+.fg { display: flex; flex-direction: column; gap: 4px; }
+.fg.full { grid-column: 1/-1; }
+.flabel { font-size: 10px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .6px; font-family: var(--font-head); }
+.finput {
+  background: var(--surf2); border: 1px solid var(--bdr);
+  border-radius: 7px; padding: 7px 10px; color: var(--text);
+  font-size: 13px; outline: none; transition: border .15s; width: 100%;
+}
+.finput:focus { border-color: var(--accent); }
+textarea.finput { resize: vertical; min-height: 64px; }
+.fval { font-size: 13px; font-weight: 600; }
+.fval.big { font-family: var(--font-head); font-size: 20px; font-weight: 800; }
+.info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+.btn-save { background: var(--green); color: #0a1a10; border: none; padding: 8px 18px; border-radius: 8px; font-weight: 800; cursor: pointer; font-family: var(--font-head); font-size: 13px; transition: opacity .15s; }
+.btn-save:hover { opacity: .85; }
+.btn-cancel { background: transparent; border: 1px solid var(--bdr); color: var(--muted); padding: 8px 16px; border-radius: 8px; cursor: pointer; font-size: 13px; transition: all .15s; }
+.btn-cancel:hover { border-color: var(--red); color: var(--red); }
+
+/* ═══════════════════════════════════════════
+   MÓDULO 10: MODAL CLIENTE — TIPO TOGGLE
+═══════════════════════════════════════════ */
+.tipo-toggle { display: flex; gap: 8px; margin-bottom: 16px; }
+.tipo-btn {
+  flex: 1; padding: 10px; border-radius: 8px; border: 1px solid var(--bdr);
+  background: var(--surf2); color: var(--muted); cursor: pointer;
+  font-family: var(--font-head); font-weight: 700; font-size: 13px;
+  text-align: center; transition: all .15s;
+}
+.tipo-btn.active { border-color: var(--accent); background: #4f7cff15; color: var(--accent); }
+.tipo-section { display: none; }
+.tipo-section.active { display: block; }
+
+/* ═══════════════════════════════════════════
+   MÓDULO 11: CLIENTES VIEW
+═══════════════════════════════════════════ */
+.clientes-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; }
+.cliente-card {
+  background: var(--surf); border: 1px solid var(--bdr);
+  border-radius: 10px; padding: 14px 16px; cursor: pointer;
+  transition: border-color .15s;
+}
+.cliente-card:hover { border-color: var(--accent); }
+.cliente-card-hdr { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+.avatar { width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: var(--font-head); font-weight: 800; font-size: 14px; flex-shrink: 0; }
+.avatar-f { background: #4f7cff20; color: var(--accent); }
+.avatar-j { background: #22d07a20; color: var(--green); }
+.cliente-nombre { font-family: var(--font-head); font-weight: 700; font-size: 13px; }
+.cliente-tipo { font-size: 10px; color: var(--muted); }
+.cliente-info { display: flex; flex-direction: column; gap: 3px; }
+.cliente-row { display: flex; gap: 6px; font-size: 11px; color: var(--muted); }
+.cliente-row span:first-child { width: 60px; font-weight: 700; color: var(--muted); opacity: .7; }
+
+/* ═══════════════════════════════════════════
+   MÓDULO 12: TOAST
+═══════════════════════════════════════════ */
+.toast { position: fixed; bottom: 20px; right: 20px; padding: 10px 18px; border-radius: 10px; font-size: 13px; font-weight: 700; z-index: 400; transform: translateY(60px); opacity: 0; transition: all .3s; font-family: var(--font-head); }
+.toast.show { transform: translateY(0); opacity: 1; }
+.toast-success { background: var(--green); color: #061a0c; }
+.toast-error { background: var(--red); color: white; }
+.toast-info { background: var(--accent); color: white; }
+
+/* ═══════════════════════════════════════════
+   MÓDULO 13: DASHBOARD
+═══════════════════════════════════════════ */
+.dash-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+.dash-card { background: var(--surf); border: 1px solid var(--bdr); border-radius: 10px; padding: 16px 18px; }
+.bar-row { margin-bottom: 9px; }
+.bar-label { display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 3px; color: var(--muted); }
+.bar-track { background: var(--surf3); border-radius: 4px; height: 5px; overflow: hidden; }
+.bar-fill { height: 100%; border-radius: 4px; background: linear-gradient(90deg, var(--accent), var(--accent2)); }
+
+@media (max-width: 768px) {
+  .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+  .info-grid, .fgrid { grid-template-columns: 1fr; }
+  .fgrid-3 { grid-template-columns: 1fr 1fr; }
+  .dash-grid { grid-template-columns: 1fr; }
+  .main { padding: 12px; }
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════
+     HEADER
+═══════════════════════════════════════════ -->
+<header class="header">
+  <div>
+    <div class="logo">S.A.I.S.</div>
+    <div class="logo-sub">segurosdelins.com · Lic. 08-1318</div>
+  </div>
+  <div class="hdiv"></div>
+  <nav class="nav">
+    <button class="nav-btn active" onclick="showView('cartera',this)">Cartera</button>
+    <button class="nav-btn" onclick="showView('clientes',this)">Clientes</button>
+    <button class="nav-btn" onclick="showView('dashboard',this)">Dashboard</button>
+  </nav>
+  <div class="header-right">
+    <div class="status-dot"></div>
+    <span id="status-text">Conectando…</span>
+    <div class="hdiv"></div>
+    <button class="btn-primary" onclick="openClienteModal()">+ Nuevo Cliente</button>
+  </div>
+</header>
+
+<!-- SEED BANNER -->
+<div id="seed-banner">
+  <span class="seed-icon">🗄️</span>
+  <div class="seed-text">
+    <h3>Firebase vacío — cargar Mayo 2026</h3>
+    <p>Se cargarán 60 pólizas del mes de Mayo 2026 a Firestore</p>
+  </div>
+  <button class="btn-seed" onclick="window.__seedMayo()">Cargar Mayo 2026 →</button>
+</div>
+
+<div class="main">
+
+<!-- ═══════════════════════════════════════════
+     VIEW: CARTERA
+═══════════════════════════════════════════ -->
+<div id="view-cartera" class="view active">
+  <div class="kpi-grid" id="kpi-grid"></div>
+
+  <div class="tabs">
+    <div class="tab active" onclick="setTab('todos',this)">Todos</div>
+    <div class="tab" onclick="setTab('sinconfirmar',this)">Sin confirmar</div>
+    <div class="tab" onclick="setTab('gracia',this)">Período gracia</div>
+    <div class="tab" onclick="setTab('crc',this)">Colones</div>
+    <div class="tab" onclick="setTab('usd',this)">Dólares</div>
+    <div class="tab" onclick="setTab('proximos',this)">≤30 días</div>
+  </div>
+
+  <div class="toolbar">
+    <div class="search-wrap">
+      <span class="search-icon">⌕</span>
+      <input type="text" id="search-input" placeholder="Buscar asegurado, póliza, producto…" oninput="currentPage=1;renderTable()">
+    </div>
+    <select class="fselect" id="filter-prod" onchange="currentPage=1;renderTable()">
+      <option value="">Todos los productos</option>
+    </select>
+    <select class="fselect" id="filter-fr" onchange="currentPage=1;renderTable()">
+      <option value="">Todas las frecuencias</option>
+      <option>Mensual</option><option>Trimestral</option>
+      <option>Semestral</option><option>Anual</option>
+    </select>
+    <select class="fselect" id="sort-sel" onchange="currentPage=1;renderTable()">
+      <option value="dias">Días venc. ↑</option>
+      <option value="az">Nombre A→Z</option>
+      <option value="total_desc">Total mayor→menor</option>
+    </select>
+    <span class="count-badge" id="count-badge">—</span>
+    <button class="btn-primary" style="font-size:12px;padding:6px 12px" onclick="window.__loadPolizas()">↻ Actualizar</button>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>✓</th><th>Días</th><th>Asegurado</th><th>Póliza</th>
+          <th>Producto</th><th>Desde</th><th>Hasta</th>
+          <th>Prox. Renov.</th><th>Fr</th>
+          <th style="text-align:right">Total</th><th>Mon.</th><th>Estado</th>
+        </tr>
+      </thead>
+      <tbody id="table-body"></tbody>
+    </table>
+    <div class="pagination" id="pagination"></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     VIEW: CLIENTES
+═══════════════════════════════════════════ -->
+<div id="view-clientes" class="view">
+  <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
+    <h2 style="font-family:var(--font-head);font-size:18px;font-weight:800;">Base de Clientes</h2>
+    <span class="count-badge" id="clientes-count">—</span>
+    <button class="btn-primary" style="margin-left:auto" onclick="openClienteModal()">+ Nuevo Cliente</button>
+  </div>
+  <div class="clientes-grid" id="clientes-grid">
+    <div style="color:var(--muted);font-size:13px;padding:20px">Cargando clientes…</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     VIEW: DASHBOARD
+═══════════════════════════════════════════ -->
+<div id="view-dashboard" class="view">
+  <div class="kpi-grid" id="dash-kpi" style="margin-bottom:20px"></div>
+  <div class="dash-grid">
+    <div class="dash-card">
+      <div class="sec-title">Por Producto (Colones)</div>
+      <div id="dash-prod"></div>
+    </div>
+    <div class="dash-card">
+      <div class="sec-title">Top 8 · Mayores totales</div>
+      <div id="dash-top"></div>
+    </div>
+  </div>
+  <div class="dash-card" style="margin-bottom:16px">
+    <div class="sec-title">Próximas renovaciones</div>
+    <div id="dash-renov"></div>
+  </div>
+</div>
+
+</div><!-- end main -->
+
+<!-- ═══════════════════════════════════════════
+     MODAL: DETALLE PÓLIZA
+═══════════════════════════════════════════ -->
+<div class="overlay" id="modal-detalle">
+  <div class="modal">
+    <div class="modal-hdr">
+      <div class="modal-icon" id="m-icon">🛡️</div>
+      <div>
+        <div class="modal-title" id="m-nombre">—</div>
+        <div class="modal-sub" id="m-poliza">—</div>
+      </div>
+      <button class="modal-close" onclick="closeModal('modal-detalle')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="sec">
+        <div class="sec-title">Datos de la Póliza</div>
+        <div class="info-grid">
+          <div class="fg"><span class="flabel">Producto</span><span class="fval" id="m-prod">—</span></div>
+          <div class="fg"><span class="flabel">Estado</span><span class="fval" id="m-estado-badge">—</span></div>
+          <div class="fg"><span class="flabel">Vigencia desde</span><span class="fval" id="m-desde">—</span></div>
+          <div class="fg"><span class="flabel">Vigencia hasta</span><span class="fval" id="m-hasta">—</span></div>
+          <div class="fg"><span class="flabel">Frecuencia</span><span class="fval" id="m-fr">—</span></div>
+          <div class="fg"><span class="flabel">Próx. Renovación</span><span class="fval" style="color:var(--accent)" id="m-prox">—</span></div>
+          <div class="fg"><span class="flabel">Total a cobrar</span><span class="fval big" id="m-total">—</span></div>
+          <div class="fg"><span class="flabel">Días para vencer</span><span class="fval" id="m-dias">—</span></div>
+        </div>
+      </div>
+      <div class="sec">
+        <div class="sec-title">Contacto del Asegurado</div>
+        <div class="fgrid">
+          <div class="fg"><label class="flabel">Teléfonos</label><input class="finput" id="m-tel" type="text" placeholder="8822-1348"></div>
+          <div class="fg"><label class="flabel">Correos</label><input class="finput" id="m-email" type="text" placeholder="correo@ejemplo.com"></div>
+        </div>
+      </div>
+      <div class="sec">
+        <div class="sec-title">Gestión de Cobro</div>
+        <div class="fgrid" style="margin-bottom:10px">
+          <div class="fg">
+            <label class="flabel">Estado póliza</label>
+            <select class="finput" id="m-estado-select">
+              <option>Vigente</option>
+              <option>Período gracia</option>
+              <option>Cancelada</option>
+            </select>
+          </div>
+          <div class="fg"><label class="flabel">Fecha confirmación cobro</label><input class="finput" id="m-confirmar" type="date"></div>
+        </div>
+        <div class="fgrid" style="margin-bottom:10px">
+          <div class="fg"><label class="flabel">Resultado última gestión</label><input class="finput" id="m-resultado" type="text"></div>
+          <div class="fg"></div>
+        </div>
+        <div class="fg"><label class="flabel">Notas / Gestión realizada</label><textarea class="finput" id="m-gestion" rows="3" placeholder="Describa la gestión…"></textarea></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeModal('modal-detalle')">Cancelar</button>
+      <button class="btn-save" onclick="window.__saveGestion()">💾 Guardar en Firebase</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     MODAL: NUEVO CLIENTE
+═══════════════════════════════════════════ -->
+<div class="overlay" id="modal-cliente">
+  <div class="modal modal-lg">
+    <div class="modal-hdr">
+      <div class="modal-icon">👤</div>
+      <div>
+        <div class="modal-title">Nuevo Cliente</div>
+        <div class="modal-sub">Persona física o jurídica · se guarda en Firebase</div>
+      </div>
+      <button class="modal-close" onclick="closeModal('modal-cliente')">✕</button>
+    </div>
+    <div class="modal-body">
+
+      <!-- Selector tipo -->
+      <div class="tipo-toggle">
+        <div class="tipo-btn active" id="btn-fisica" onclick="setTipoCliente('fisica')">👤 Persona Física</div>
+        <div class="tipo-btn" id="btn-juridica" onclick="setTipoCliente('juridica')">🏢 Persona Jurídica</div>
+      </div>
+      <input type="hidden" name="tipo_cliente" id="hidden-tipo" value="fisica">
+
+      <!-- FÍSICA -->
+      <div class="tipo-section active" id="sec-fisica">
+        <div class="sec"><div class="sec-title">Datos personales</div>
+          <div class="fgrid-3">
+            <div class="fg"><label class="flabel">Nombre</label><input class="finput" id="c-nombre" placeholder="Nombre"></div>
+            <div class="fg"><label class="flabel">1er Apellido</label><input class="finput" id="c-apellido1" placeholder="Primer apellido"></div>
+            <div class="fg"><label class="flabel">2do Apellido</label><input class="finput" id="c-apellido2" placeholder="Segundo apellido"></div>
+          </div>
+          <div class="fgrid" style="margin-top:10px">
+            <div class="fg"><label class="flabel">Cédula</label><input class="finput" id="c-cedula" placeholder="1-2345-6789"></div>
+            <div class="fg"><label class="flabel">Fecha nacimiento</label><input class="finput" id="c-nacimiento" type="date"></div>
+            <div class="fg"><label class="flabel">Estado civil</label>
+              <select class="finput" id="c-estadocivil">
+                <option>Soltero(a)</option><option>Casado(a)</option><option>Divorciado(a)</option><option>Viudo(a)</option><option>Unión libre</option>
+              </select>
+            </div>
+            <div class="fg"><label class="flabel">Ocupación</label><input class="finput" id="c-ocupacion" placeholder="Profesión u ocupación"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- JURÍDICA -->
+      <div class="tipo-section" id="sec-juridica">
+        <div class="sec"><div class="sec-title">Datos de la empresa</div>
+          <div class="fgrid">
+            <div class="fg full"><label class="flabel">Razón Social</label><input class="finput" id="c-razon" placeholder="Nombre completo de la empresa S.A."></div>
+            <div class="fg"><label class="flabel">Cédula Jurídica</label><input class="finput" id="c-cedula-jur" placeholder="3-101-XXXXXX"></div>
+            <div class="fg"><label class="flabel">Actividad Comercial</label><input class="finput" id="c-actividad" placeholder="Actividad principal"></div>
+            <div class="fg"><label class="flabel">Representante Legal</label><input class="finput" id="c-rep" placeholder="Nombre completo"></div>
+            <div class="fg"><label class="flabel">Cédula Representante</label><input class="finput" id="c-cedula-rep" placeholder="1-2345-6789"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CONTACTO (común) -->
+      <div class="sec"><div class="sec-title">Contacto</div>
+        <div class="fgrid">
+          <div class="fg"><label class="flabel">Teléfono principal</label><input class="finput" id="c-tel1" placeholder="8822-1348 (CELULAR)"></div>
+          <div class="fg"><label class="flabel">Teléfono secundario</label><input class="finput" id="c-tel2" placeholder="2222-3333 (OFICINA)"></div>
+          <div class="fg"><label class="flabel">Correo principal</label><input class="finput" id="c-email1" type="email" placeholder="correo@ejemplo.com"></div>
+          <div class="fg"><label class="flabel">Correo secundario</label><input class="finput" id="c-email2" type="email" placeholder="alterno@ejemplo.com"></div>
+          <div class="fg full"><label class="flabel">Dirección</label><input class="finput" id="c-direccion" placeholder="Provincia, cantón, señas"></div>
+          <div class="fg full"><label class="flabel">Observaciones</label><textarea class="finput" id="c-obs" rows="2" placeholder="Notas importantes del cliente…"></textarea></div>
+        </div>
+      </div>
+
+      <!-- PÓLIZA INICIAL (opcional) -->
+      <div class="sec">
+        <div class="sec-title">Póliza inicial (opcional — si ya tiene una)</div>
+        <div class="fgrid">
+          <div class="fg"><label class="flabel">Número de póliza</label><input class="finput" id="c-poliza-num" placeholder="01-01-AUT-XXXXXXX"></div>
+          <div class="fg"><label class="flabel">Producto</label>
+            <select class="finput" id="c-poliza-prod">
+              <option>AUTOMOVILES VOLUNTARIO</option>
+              <option>AUTOMOVILES VOLUNTARIO - ANUAL</option>
+              <option>RIESGOS DEL TRABAJO</option>
+              <option>HOGAR COMPRENSIVO</option>
+              <option>RESPONSABILIDAD CIVIL</option>
+              <option>RESP. CIVIL UMBRELLA</option>
+              <option>INCENDIO COMERCIAL</option>
+              <option>ROBO COMERCIAL</option>
+              <option>INS MEDICAL SIAS</option>
+              <option>PLAN FAMILIAR (COL)</option>
+              <option>PLAN FAMILIAR AUCOL</option>
+              <option>VIDA UNIVERSAL PLUS</option>
+              <option>EQUIPO ELECTRONICO</option>
+              <option>FIDELIDAD</option>
+              <option>CAUCION</option>
+              <option>VALORES EN TRANSITO</option>
+            </select>
+          </div>
+          <div class="fg"><label class="flabel">Vigencia desde</label><input class="finput" id="c-poliza-desde" type="date"></div>
+          <div class="fg"><label class="flabel">Vigencia hasta</label><input class="finput" id="c-poliza-hasta" type="date"></div>
+          <div class="fg"><label class="flabel">Prima</label><input class="finput" id="c-poliza-prima" type="number" placeholder="0"></div>
+          <div class="fg"><label class="flabel">Total</label><input class="finput" id="c-poliza-total" type="number" placeholder="0"></div>
+          <div class="fg"><label class="flabel">Moneda</label>
+            <select class="finput" id="c-poliza-moneda">
+              <option value="CRC">₡ Colones (CRC)</option>
+              <option value="USD">$ Dólares (USD)</option>
+            </select>
+          </div>
+          <div class="fg"><label class="flabel">Frecuencia</label>
+            <select class="finput" id="c-poliza-fr">
+              <option>Mensual</option><option>Trimestral</option>
+              <option>Semestral</option><option selected>Anual</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeModal('modal-cliente')">Cancelar</button>
+      <button class="btn-save" onclick="window.__saveCliente()">✅ Guardar en Firebase</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<!-- ═══════════════════════════════════════════
+     JS NO-MODULE: UI LOGIC
+═══════════════════════════════════════════ -->
+<script>
+// ── RENDER KPIs ──────────────────────────────
+function renderKPIs() {
+  const D = window.POLIZAS || [];
+  const crc = D.filter(r=>r.moneda==='CRC');
+  const usd = D.filter(r=>r.moneda==='USD');
+  const gracia = D.filter(r=>r.estado_poliza==='Período gracia');
+  const sinver = D.filter(r=>!r.verif);
+  const prox = D.filter(r=>(r.dias_venc||0)<=30);
+  const tCRC = crc.reduce((s,r)=>s+(r.total||0),0);
+  const tUSD = usd.reduce((s,r)=>s+(r.total||0),0);
+
+  document.getElementById('kpi-grid').innerHTML = `
+    <div class="kpi-card k-total"><div class="kpi-label">Total pólizas</div><div class="kpi-val">${D.length}</div><div class="kpi-sub">Cartera activa</div></div>
+    <div class="kpi-card k-crc"><div class="kpi-label">Total Colones</div><div class="kpi-val" style="color:var(--crc)">₡${fmt(tCRC)}</div><div class="kpi-sub">${crc.length} pólizas CRC</div></div>
+    <div class="kpi-card k-usd"><div class="kpi-label">Total Dólares</div><div class="kpi-val" style="color:var(--usd)">$${fmt(tUSD)}</div><div class="kpi-sub">${usd.length} pólizas USD</div></div>
+    <div class="kpi-card k-gracia"><div class="kpi-label">Período Gracia</div><div class="kpi-val" style="color:var(--yellow)">${gracia.length}</div><div class="kpi-sub">Atención urgente</div></div>
+    <div class="kpi-card k-sinver"><div class="kpi-label">Sin verificar</div><div class="kpi-val" style="color:var(--muted)">${sinver.length}</div><div class="kpi-sub">Pendientes revisión</div></div>
+    <div class="kpi-card k-prox"><div class="kpi-label">≤30 días</div><div class="kpi-val" style="color:var(--red)">${prox.length}</div><div class="kpi-sub">Vencen pronto</div></div>
+  `;
+}
+
+// ── FILTROS ──────────────────────────────────
+function getFiltered() {
+  const D = window.POLIZAS || [];
+  const q = document.getElementById('search-input').value.toLowerCase();
+  const prod = document.getElementById('filter-prod').value;
+  const fr   = document.getElementById('filter-fr').value;
+  const sort = document.getElementById('sort-sel').value;
+
+  let data = D.filter(r => {
+    const mq = !q || (r.asegurado||'').toLowerCase().includes(q)
+                   || (r.poliza||'').toLowerCase().includes(q)
+                   || (r.prod||'').toLowerCase().includes(q)
+                   || (r.telefonos||'').includes(q)
+                   || (r.correos||'').toLowerCase().includes(q);
+    const mp = !prod || r.prod === prod;
+    const mf = !fr   || r.fr === fr;
+    let mt = true;
+    if (currentTab === 'sinconfirmar') mt = !r.confirmar;
+    else if (currentTab === 'gracia')  mt = r.estado_poliza === 'Período gracia';
+    else if (currentTab === 'crc')     mt = r.moneda === 'CRC';
+    else if (currentTab === 'usd')     mt = r.moneda === 'USD';
+    else if (currentTab === 'proximos')mt = (r.dias_venc||0) <= 30;
+    return mq && mp && mf && mt;
+  });
+
+  if (sort === 'az')         data.sort((a,b)=>(a.asegurado||'').localeCompare(b.asegurado||''));
+  else if (sort==='total_desc') data.sort((a,b)=>(b.total||0)-(a.total||0));
+  else data.sort((a,b)=>(a.dias_venc||0)-(b.dias_venc||0));
+  return data;
+}
+
+// ── RENDER TABLA ─────────────────────────────
+function renderTable() {
+  // Populate product filter
+  const D = window.POLIZAS || [];
+  const fp = document.getElementById('filter-prod');
+  if (fp.options.length <= 1) {
+    const prods = [...new Set(D.map(r=>r.prod).filter(Boolean))].sort();
+    prods.forEach(p => { const o = document.createElement('option'); o.value=p; o.textContent=p; fp.appendChild(o); });
+  }
+
+  const filtered = getFiltered();
+  const total = filtered.length;
+  const pages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+  if (currentPage > pages) currentPage = 1;
+  const start = (currentPage-1)*PAGE_SIZE;
+  const rows = filtered.slice(start, start+PAGE_SIZE);
+
+  document.getElementById('count-badge').textContent = `${total} registro${total!==1?'s':''}`;
+
+  document.getElementById('table-body').innerHTML = rows.map(r => {
+    const dv = r.dias_venc||0;
+    const dcls = dv<=25?'dias-hot':dv<=35?'dias-mid':'dias-ok';
+    const sym  = r.moneda==='CRC'?'₡':'$';
+    const tcls = r.moneda==='CRC'?'crc-txt':'usd-txt';
+    const prox = r.proxima_renovacion ? formatDate(r.proxima_renovacion) : '—';
+    const verif= r.verif ? '✓' : '–';
+    const estadoPill = r.estado_poliza==='Período gracia'
+      ? '<span class="pill pill-yellow">⚠ Gracia</span>'
+      : r.estado_poliza==='Cancelada'
+        ? '<span class="pill pill-red">✕ Cancelada</span>'
+        : '<span class="pill pill-green">● Vigente</span>';
+    return `<tr onclick="openDetail('${r._id}')">
+      <td style="color:${r.verif?'var(--green)':'var(--muted)'};font-weight:700">${verif}</td>
+      <td><span class="dias-badge ${dcls}">${dv}d</span></td>
+      <td class="name-td" title="${r.asegurado||''}">${trunc(r.asegurado||'',28)}</td>
+      <td class="mono" title="${r.poliza||''}">${trunc(r.poliza||'',22)}</td>
+      <td title="${r.prod||''}">${trunc(r.prod||'',26)}</td>
+      <td class="mono">${formatDate(r.desde)}</td>
+      <td class="mono">${formatDate(r.hasta)}</td>
+      <td class="renovacion-cell">${prox}</td>
+      <td><span class="pill pill-gray">${r.fr||'—'}</span></td>
+      <td class="amount ${tcls}">${sym}${fmt(r.total||0)}</td>
+      <td><span class="${tcls}" style="font-size:11px;font-weight:700">${r.moneda||''}</span></td>
+      <td>${estadoPill}</td>
+    </tr>`;
+  }).join('');
+
+  // Paginación
+  const pag = document.getElementById('pagination');
+  let btns = '';
+  const maxShow = 7;
+  const sp = Math.max(1, currentPage-3);
+  const ep = Math.min(pages, sp+maxShow-1);
+  if (sp>1) btns += `<button class="page-btn" onclick="goPage(1)">1</button>${sp>2?'<span style="color:var(--muted);font-size:11px">…</span>':''}`;
+  for(let i=sp;i<=ep;i++) btns+=`<button class="page-btn ${i===currentPage?'active':''}" onclick="goPage(${i})">${i}</button>`;
+  if(ep<pages) btns+=`${ep<pages-1?'<span style="color:var(--muted);font-size:11px">…</span>':''}<button class="page-btn" onclick="goPage(${pages})">${pages}</button>`;
+  pag.innerHTML = `${btns}<span class="page-info">${start+1}–${Math.min(start+PAGE_SIZE,total)} de ${total}</span>`;
+}
+
+function goPage(p) { currentPage=p; renderTable(); }
+function setTab(t,el) {
+  currentTab=t; currentPage=1;
+  document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+  el.classList.add('active');
+  renderTable();
+}
+
+// ── OPEN DETAIL ──────────────────────────────
+function openDetail(id) {
+  const r = (window.POLIZAS||[]).find(x=>x._id===id);
+  if (!r) return;
+  currentPolizaId = id;
+  document.getElementById('m-icon').textContent = getIcon(r.prod||'');
+  document.getElementById('m-nombre').textContent = r.asegurado||'';
+  document.getElementById('m-poliza').textContent = (r.poliza||'') + ' · ' + (r.prod||'');
+  document.getElementById('m-prod').textContent = r.prod||'';
+  document.getElementById('m-desde').textContent = formatDate(r.desde);
+  document.getElementById('m-hasta').textContent = formatDate(r.hasta);
+  document.getElementById('m-fr').textContent = r.fr||'—';
+  document.getElementById('m-prox').textContent = formatDate(r.proxima_renovacion) || '—';
+  const sym = r.moneda==='CRC'?'₡':'$';
+  const tcls = r.moneda==='CRC'?'crc-txt':'usd-txt';
+  document.getElementById('m-total').innerHTML = `<span class="${tcls}">${sym}${fmt(r.total||0)}</span>`;
+  document.getElementById('m-dias').textContent = `${r.dias_venc||0} días`;
+  document.getElementById('m-estado-badge').innerHTML = r.estado_poliza==='Período gracia'
+    ? '<span class="pill pill-yellow">⚠ Período gracia</span>'
+    : '<span class="pill pill-green">● Vigente</span>';
+  // Editable
+  document.getElementById('m-tel').value = r.telefonos||'';
+  document.getElementById('m-email').value = (r.correos||'').trim();
+  document.getElementById('m-resultado').value = r.resultado||'';
+  document.getElementById('m-confirmar').value = r.confirmar||'';
+  document.getElementById('m-gestion').value = r.ultima_gestion||'';
+  document.getElementById('m-estado-select').value = r.estado_poliza||'Vigente';
+  document.getElementById('modal-detalle').classList.add('open');
+}
+
+// ── CLIENTES ─────────────────────────────────
+function renderClientesList() {
+  const C = window.CLIENTES || [];
+  document.getElementById('clientes-count').textContent = `${C.length} cliente${C.length!==1?'s':''}`;
+  if (!C.length) {
+    document.getElementById('clientes-grid').innerHTML = '<div style="color:var(--muted);font-size:13px;padding:20px;grid-column:1/-1">No hay clientes registrados aún. Use "+ Nuevo Cliente" para agregar.</div>';
+    return;
+  }
+  document.getElementById('clientes-grid').innerHTML = C.map(c => {
+    const initials = (c.nombre_completo||'??').split(' ').slice(0,2).map(w=>w[0]).join('');
+    const esJ = c.tipo_cliente === 'juridica';
+    return `<div class="cliente-card" title="Ver detalle">
+      <div class="cliente-card-hdr">
+        <div class="avatar ${esJ?'avatar-j':'avatar-f'}">${initials}</div>
+        <div>
+          <div class="cliente-nombre">${trunc(c.nombre_completo||'',32)}</div>
+          <div class="cliente-tipo">${esJ?'🏢 Jurídica':'👤 Física'} · ${c.cedula||c.cedula_jur||'Sin cédula'}</div>
+        </div>
+      </div>
+      <div class="cliente-info">
+        ${c.telefono_principal?`<div class="cliente-row"><span>Tel</span><span>${c.telefono_principal}</span></div>`:''}
+        ${c.correo_principal?`<div class="cliente-row"><span>Email</span><span>${trunc(c.correo_principal,28)}</span></div>`:''}
+        ${c.actividad_comercial?`<div class="cliente-row"><span>Act.</span><span>${trunc(c.actividad_comercial,28)}</span></div>`:''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function openClienteModal() {
+  resetClienteForm();
+  document.getElementById('modal-cliente').classList.add('open');
+}
+
+function resetClienteForm() {
+  ['c-nombre','c-apellido1','c-apellido2','c-cedula','c-ocupacion',
+   'c-razon','c-cedula-jur','c-rep','c-cedula-rep','c-actividad',
+   'c-tel1','c-tel2','c-email1','c-email2','c-direccion','c-obs',
+   'c-poliza-num','c-poliza-prima','c-poliza-total'].forEach(id=>{
+    const el=document.getElementById(id); if(el) el.value='';
+  });
+  document.getElementById('c-nacimiento').value='';
+  document.getElementById('c-poliza-desde').value='';
+  document.getElementById('c-poliza-hasta').value='';
+  setTipoCliente('fisica');
+}
+
+function setTipoCliente(tipo) {
+  document.getElementById('hidden-tipo').value = tipo;
+  document.getElementById('btn-fisica').classList.toggle('active', tipo==='fisica');
+  document.getElementById('btn-juridica').classList.toggle('active', tipo==='juridica');
+  document.getElementById('sec-fisica').classList.toggle('active', tipo==='fisica');
+  document.getElementById('sec-juridica').classList.toggle('active', tipo==='juridica');
+  // Sync radio hidden
+  document.querySelectorAll('input[name="tipo_cliente"]').forEach(r=>r.value===tipo?r.checked=true:null);
+}
+// Aseguramos que el campo hidden funcione como "radio"
+document.addEventListener('DOMContentLoaded', ()=>{
+  const hid = document.getElementById('hidden-tipo');
+  Object.defineProperty(hid, 'value', {
+    get() { return this.getAttribute('value'); },
+    set(v) { this.setAttribute('value', v); }
+  });
+});
+// Simular querySelectorAll radio
+document.querySelectorAll = (function(orig){
+  return function(sel) {
+    if (sel==='input[name="tipo_cliente"]:checked') {
+      const v = document.getElementById('hidden-tipo').value;
+      return [{ value: v }];
+    }
+    return orig.call(document, sel);
+  };
+})(document.querySelectorAll.bind(document));
+
+// ── DASHBOARD ────────────────────────────────
+function renderDashboard() {
+  const D = window.POLIZAS || [];
+  const crc = D.filter(r=>r.moneda==='CRC');
+  const usd = D.filter(r=>r.moneda==='USD');
+  const tCRC=crc.reduce((s,r)=>s+(r.total||0),0);
+  const tUSD=usd.reduce((s,r)=>s+(r.total||0),0);
+  const gracia=D.filter(r=>r.estado_poliza==='Período gracia');
+
+  document.getElementById('dash-kpi').innerHTML=`
+    <div class="kpi-card k-crc"><div class="kpi-label">Cartera CRC</div><div class="kpi-val" style="color:var(--crc)">₡${fmt(tCRC)}</div><div class="kpi-sub">${crc.length} pólizas</div></div>
+    <div class="kpi-card k-usd"><div class="kpi-label">Cartera USD</div><div class="kpi-val" style="color:var(--usd)">$${fmt(tUSD)}</div><div class="kpi-sub">${usd.length} pólizas</div></div>
+    <div class="kpi-card k-gracia"><div class="kpi-label">Período gracia</div><div class="kpi-val" style="color:var(--yellow)">${gracia.length}</div><div class="kpi-sub">Atención urgente</div></div>
+    <div class="kpi-card k-prox"><div class="kpi-label">Próx. renovaciones</div><div class="kpi-val" style="color:var(--accent)">${D.filter(r=>r.dias_venc<=30).length}</div><div class="kpi-sub">≤30 días</div></div>
+  `;
+
+  // Por producto CRC
+  const byCRC={};
+  crc.forEach(r=>{ byCRC[r.prod]=(byCRC[r.prod]||0)+(r.total||0); });
+  const sorted=Object.entries(byCRC).sort((a,b)=>b[1]-a[1]).slice(0,8);
+  const maxV=sorted[0]?.[1]||1;
+  document.getElementById('dash-prod').innerHTML=sorted.map(([p,v])=>`
+    <div class="bar-row">
+      <div class="bar-label"><span>${trunc(p,32)}</span><span style="color:var(--crc)">₡${fmt(v)}</span></div>
+      <div class="bar-track"><div class="bar-fill" style="width:${(v/maxV*100).toFixed(1)}%"></div></div>
+    </div>
+  `).join('');
+
+  // Top 8 totales
+  const top8=[...D].sort((a,b)=>(b.total||0)-(a.total||0)).slice(0,8);
+  document.getElementById('dash-top').innerHTML=top8.map((r,i)=>`
+    <div style="display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid var(--bdr)33;font-size:12px;cursor:pointer" onclick="showView('cartera',document.querySelector('.nav-btn'))">
+      <span style="color:var(--muted);min-width:16px;font-family:var(--font-head);font-weight:800">${i+1}</span>
+      <span style="flex:1;font-weight:600">${trunc(r.asegurado||'',26)}</span>
+      <span class="${r.moneda==='CRC'?'crc-txt':'usd-txt'}" style="font-family:'Courier New',monospace;font-size:11px">${r.moneda==='CRC'?'₡':'$'}${fmt(r.total||0)}</span>
+    </div>
+  `).join('');
+
+  // Próximas renovaciones
+  const hoy=new Date(); hoy.setHours(0,0,0,0);
+  const proximas=[...D]
+    .filter(r=>r.proxima_renovacion)
+    .sort((a,b)=>new Date(a.proxima_renovacion)-new Date(b.proxima_renovacion))
+    .slice(0,10);
+  document.getElementById('dash-renov').innerHTML=`<table style="width:100%;font-size:12px;border-collapse:collapse">
+    <thead><tr style="color:var(--muted);font-size:10px;text-transform:uppercase;font-family:var(--font-head)">
+      <th style="padding:6px 8px;text-align:left">Asegurado</th>
+      <th style="padding:6px 8px;text-align:left">Producto</th>
+      <th style="padding:6px 8px;text-align:left">Prox. Renov.</th>
+      <th style="padding:6px 8px;text-align:left">Fr.</th>
+      <th style="padding:6px 8px;text-align:right">Total</th>
+    </tr></thead>
+    <tbody>${proximas.map(r=>`<tr style="border-top:1px solid var(--bdr)33">
+      <td style="padding:7px 8px;font-weight:600">${trunc(r.asegurado||'',26)}</td>
+      <td style="padding:7px 8px;color:var(--muted);font-size:11px">${trunc(r.prod||'',24)}</td>
+      <td style="padding:7px 8px;color:var(--accent);font-family:'Courier New',monospace;font-size:11px">${formatDate(r.proxima_renovacion)}</td>
+      <td style="padding:7px 8px"><span class="pill pill-gray">${r.fr||'—'}</span></td>
+      <td style="padding:7px 8px;text-align:right;font-family:'Courier New',monospace;font-size:11px" class="${r.moneda==='CRC'?'crc-txt':'usd-txt'}">${r.moneda==='CRC'?'₡':'$'}${fmt(r.total||0)}</td>
+    </tr>`).join('')}</tbody>
+  </table>`;
+}
+
+// ── UTILS ─────────────────────────────────────
+function fmt(n) { return Number(n).toLocaleString('es-CR'); }
+function trunc(s,n) { return (s||'').length>n?(s||'').substring(0,n-1)+'…':s; }
+function formatDate(d) {
+  if (!d) return '—';
+  try {
+    const dt = new Date(d+'T12:00:00');
+    return dt.toLocaleDateString('es-CR',{day:'2-digit',month:'short',year:'2-digit'});
+  } catch { return d; }
+}
+function getIcon(prod) {
+  if (prod.includes('AUTO')) return '🚗';
+  if (prod.includes('RIESGO')) return '👷';
+  if (prod.includes('HOGAR')||prod.includes('INCENDIO')) return '🏠';
+  if (prod.includes('MEDICAL')||prod.includes('FAMILIAR')||prod.includes('AUCOL')) return '❤️';
+  if (prod.includes('VIDA')) return '🌿';
+  if (prod.includes('CAUCION')||prod.includes('FIDELIDAD')) return '📋';
+  if (prod.includes('ROBO')||prod.includes('VALOR')) return '🔒';
+  if (prod.includes('CIVIL')||prod.includes('UMBRELLA')) return '⚖️';
+  return '🛡️';
+}
+function setStatus(msg) { document.getElementById('status-text').textContent=msg; }
+function showSeedBanner() { document.getElementById('seed-banner').classList.add('show'); }
+function showToast(msg, type='success') {
+  const t=document.getElementById('toast');
+  t.className=`toast toast-${type}`;
+  t.textContent=msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),3200);
+}
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+function showView(v, btn) {
+  document.querySelectorAll('.view').forEach(x=>x.classList.remove('active'));
+  document.getElementById('view-'+v).classList.add('active');
+  document.querySelectorAll('.nav-btn').forEach(x=>x.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  if (v==='dashboard') renderDashboard();
+  if (v==='clientes') { if(window.CLIENTES) renderClientesList(); }
+}
+
+// ── EXPOSE GLOBALS ────────────────────────────
+window.POLIZAS = [];
+window.CLIENTES = [];
+window.currentPolizaId = null;
+window.currentTab = 'todos';
+window.currentPage = 1;
+
+// Hooks para que el módulo Firebase actualice UI
+const origLoad = window.__loadPolizas;
+window.renderKPIs = renderKPIs;
+window.renderTable = renderTable;
+window.renderClientesList = renderClientesList;
+
+// Patch loadPolizas result into globals
+const _origLoadP = window.__loadPolizas;
+Object.defineProperty(window,'POLIZAS',{
+  get(){ return this._polizas||[]; },
+  set(v){ this._polizas=v; renderKPIs(); renderTable(); }
+});
+Object.defineProperty(window,'CLIENTES',{
+  get(){ return this._clientes||[]; },
+  set(v){ this._clientes=v; renderClientesList(); }
+});
+
+// Overlay click to close
+document.querySelectorAll('.overlay').forEach(o=>{
+  o.addEventListener('click',e=>{ if(e.target===o) o.classList.remove('open'); });
+});
+
+// Keyboard ESC
+document.addEventListener('keydown',e=>{ if(e.key==='Escape') document.querySelectorAll('.overlay.open').forEach(o=>o.classList.remove('open')); });
+</script>
+
+<!-- Patch Firebase callbacks to update globals -->
+<script type="module">
+// Re-import para hacer el bridge
+import { getFirestore, collection, doc, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { getApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+const db = getFirestore(getApp());
+
+window.__loadPolizas = async function() {
+  window.__setStatus && window.__setStatus("Actualizando…");
+  document.getElementById('status-text').textContent = "Actualizando…";
+  try {
+    const { getDocs: gd, query: q, collection: col, orderBy: ob } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
+    const snap = await gd(q(col(db,"polizas"), ob("dias_venc")));
+    window.POLIZAS = snap.docs.map(d=>({_id:d.id,...d.data()}));
+    document.getElementById('status-text').textContent = `${window.POLIZAS.length} pólizas · ${new Date().toLocaleTimeString('es-CR')}`;
+    if(window.POLIZAS.length===0) document.getElementById('seed-banner').classList.add('show');
+    else document.getElementById('seed-banner').classList.remove('show');
+  } catch(e) {
+    document.getElementById('status-text').textContent = "⚠ Error: " + e.message;
+  }
+};
+
+window.__loadClientes = async function() {
+  try {
+    const { getDocs: gd, query: q, collection: col, orderBy: ob } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
+    const snap = await gd(q(col(db,"clientes"), ob("nombre_completo")));
+    window.CLIENTES = snap.docs.map(d=>({_id:d.id,...d.data()}));
+  } catch(e){ console.error(e); }
+};
+
+// Auto-cargar al iniciar
+setTimeout(async ()=>{
+  await window.__loadPolizas();
+  await window.__loadClientes();
+}, 800);
+</script>
+
+</body>
+</html>
