@@ -2260,6 +2260,15 @@ window.resetAdmWa = function() {
   showToast('Plantilla WhatsApp restaurada');
 };
 
+
+// ── SAFETY PATCH: renderTable accede a elementos eliminados de Cartera ──
+// Se inyectó para que el loadAll no falle al no encontrar #tbody
+const _origRenderTable = window.renderTable;
+window.renderTable = function() {
+  if(!document.getElementById('tbody')) return;
+  _origRenderTable();
+};
+
 // ── INICIAR ───────────────────────────────────────────────────
 loadAll();
 </script>
