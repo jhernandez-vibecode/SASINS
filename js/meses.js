@@ -11,30 +11,47 @@ import { state } from './state.js';
 import { buildCobProdFilter, renderCobros, updateCobStats } from './cobros.js';
 
 // ── Renderizar lista de meses en el sidebar de Cobros ────────
-// Genera el selector dropdown y los chips de meses que
-// tienen pólizas cargadas en Firebase.
-// Muestra un rango desde 2 meses atrás hasta 18 meses adelante.
+// Muestra solo el selector dropdown, sin chips visibles.
+// Los chips se eliminaron para simplificar la interfaz.
 export function renderMesesList() {
   const list = document.getElementById('meses-list');
   const sel  = document.getElementById('mes-activo-sel');
   if (!list || !sel) return;
 
-  // Generar rango de meses a mostrar en el selector
-  const hoy  = new Date();
+  const hoy   = new Date();
   const start = new Date(hoy.getFullYear(), hoy.getMonth() - 2, 1);
   const end   = new Date(hoy.getFullYear(), hoy.getMonth() + 19, 1);
   const rango = [];
   for (let d = new Date(start); d < end; d.setMonth(d.getMonth() + 1))
     rango.push(MESES_ES[d.getMonth()] + d.getFullYear());
 
-  // Contar pólizas por mes según su fecha "desde"
-  // (mes en que inicia el período = mes en que se cobra)
   const cuentas = {};
   state.polizas.forEach(r => {
     if (!r.desde) return;
     const m = calcMesOrigen(r.desde);
     cuentas[m] = (cuentas[m] || 0) + 1;
   });
+
+  Object.keys(cuentas).forEach(m => {
+    if (!rango.includes(m)) rango.push(m);
+  });
+  rango.sort();
+
+  // Solo mostrar en el selector los meses que tienen pólizas
+  sel.innerHTML = '<option value="">— Seleccionar mes —</option>';
+  rango.filter(m => cuentas[m] > 0).forEach(m => {
+    const o   = document.createElement('option');
+    o.value   = m;
+    o.textContent = `${m}  (${cuentas[m]} pólizas)`;
+    sel.appendChild(o);
+  });
+
+  if (state.mesActivo) sel.value = state.mesActivo;
+
+  // Ocultar la sección de chips — solo mostrar el selector
+  list.innerHTML = '';
+  list.style.display = 'none';
+}
 
   // Agregar meses que tienen pólizas pero están fuera del rango
   Object.keys(cuentas).forEach(m => {
