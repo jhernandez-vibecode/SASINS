@@ -7,23 +7,23 @@
 
 /* ── Variables globales de color y tipografía ──────────────── */
 :root {
-  --bg:      #0b0e18;   /* Fondo principal oscuro */
-  --surf:    #131726;   /* Superficie de tarjetas */
-  --surf2:   #1c2035;   /* Superficie secundaria */
-  --surf3:   #242840;   /* Superficie terciaria */
-  --bdr:     #2a2f4a;   /* Borde estándar */
-  --bdr2:    #353b5e;   /* Borde más visible */
+  --bg:      #ffffff;   /* Fondo principal blanco */
+  --surf:    #f8f9fa;   /* Superficie de tarjetas */
+  --surf2:   #f1f3f5;   /* Superficie secundaria */
+  --surf3:   #e9ecef;   /* Superficie terciaria */
+  --bdr:     #dee2e6;   /* Borde estándar */
+  --bdr2:    #ced4da;   /* Borde más visible */
   --accent:  #4f7cff;   /* Azul principal */
   --accent2: #7c5cfc;   /* Violeta secundario */
-  --green:   #22d07a;   /* Verde éxito / pagado */
-  --yellow:  #f5a623;   /* Amarillo advertencia */
-  --red:     #f04438;   /* Rojo error / urgente */
-  --text:    #e8eaf6;   /* Texto principal */
-  --muted:   #6b7299;   /* Texto secundario */
-  --crc:     #22d07a;   /* Color moneda colones */
+  --green:   #1a9e5c;   /* Verde éxito / pagado */
+  --yellow:  #e08c00;   /* Amarillo advertencia */
+  --red:     #d93025;   /* Rojo error / urgente */
+  --text:    #1a1d2e;   /* Texto principal oscuro */
+  --muted:   #6b7280;   /* Texto secundario */
+  --crc:     #1a9e5c;   /* Color moneda colones */
   --usd:     #4f7cff;   /* Color moneda dólares */
-  --fh:      'Syne', sans-serif;    /* Fuente títulos */
-  --fb:      'Mulish', sans-serif;  /* Fuente cuerpo */
+  --fh:      'Syne', sans-serif;
+  --fb:      'Mulish', sans-serif;
 }
 
 /* ── Reset básico ───────────────────────────────────────────── */
