@@ -90,21 +90,27 @@ export function enviarCorreos() {
     return;
   }
 
-  // Filtrar seleccionados que tengan correo registrado
-  const conEmail = state.cobFiltered.filter(r =>
-    state.selectedCob.has(r._id) && parseEmails(r.correos).length > 0
-  );
+  // Si hay checkboxes seleccionados usar solo esos,
+  // si no hay ninguno seleccionado usar todos los filtrados
+  const base = state.selectedCob.size > 0
+    ? state.cobFiltered.filter(r => state.selectedCob.has(r._id))
+    : state.cobFiltered;
+
+  // De ese grupo, solo los que tienen correo registrado
+  const conEmail = base.filter(r => parseEmails(r.correos).length > 0);
 
   if (!conEmail.length) {
-    showToast('Ningún seleccionado tiene correo', 'e');
+    showToast('No hay pólizas con correo en la vista actual', 'e');
     return;
   }
 
-  if (!confirm(`Enviar ${conEmail.length} correos desde ${state.gmailUser}?`)) return;
+  const detalle = state.selectedCob.size > 0
+    ? `${conEmail.length} seleccionados con correo`
+    : `${conEmail.length} pólizas del mes con correo`;
+
+  if (!confirm(`Enviar correos a ${detalle}\nDesde: ${state.gmailUser}`)) return;
 
   state.sendingActive = true;
-
-  // Mostrar caja de progreso
   document.getElementById('send-prog-box').style.display = 'block';
   document.getElementById('send-log').innerHTML = '';
   document.getElementById('send-fill').style.width = '0%';
@@ -112,7 +118,6 @@ export function enviarCorreos() {
   const subj = document.getElementById('plt-subject').value    || PLT_SUBJECT_DEF;
   const body = document.getElementById('plt-body-text').value  || PLT_BODY_DEF;
 
-  // Iniciar envío secuencial
   procesarEnvio(conEmail, subj, body, 0);
 }
 
