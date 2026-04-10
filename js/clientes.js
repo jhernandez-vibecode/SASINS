@@ -211,12 +211,15 @@ export function resetCliForm() {
 }
 
 // ── Poblar selector de productos en modal cliente ────────────
-// Llena el dropdown de producto con los productos activos
+// Llena el dropdown de producto con los productos activos.
+// Incluye opción en blanco para forzar selección manual.
 export function populateProdSelect() {
   const s = document.getElementById('cp-prod');
   if (!s) return;
-  s.innerHTML = state.prods
-    .filter(p => p.activo)
-    .map(p => `<option value="${p.nombre}">${p.nombre}</option>`)
-    .join('');
+  s.innerHTML =
+    '<option value="">— Seleccionar producto —</option>' +
+    state.prods
+      .filter(p => p.activo)
+      .map(p => `<option value="${p.nombre}">${p.nombre}</option>`)
+      .join('');
 }
