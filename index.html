@@ -1367,7 +1367,7 @@ window.saveCliente = async function() {
     if(np){
       const fr=document.getElementById('cp-fr').value;
       const hasta=document.getElementById('cp-hasta').value;
-      await addDoc(collection(db,"polizas"),{
+      const pdata = {
         poliza:np, asegurado:nombre,
         prod:document.getElementById('cp-prod').value,
         desde:document.getElementById('cp-desde').value,
@@ -1377,11 +1377,18 @@ window.saveCliente = async function() {
         estado_poliza:"Vigente", estado_recibo:"Pendiente",
         proxima_renovacion:calcProx(hasta,fr),
         dias_venc:calcDias(hasta),
-        tipo_cliente:tipo, mes_origen:"NUEVO",
+        tipo_cliente:tipo, mes_origen:calcMesOrigen(hasta),
         verif:false, confirmar:"", ultima_gestion:"", resultado:"",
         telefonos:data.telefono_principal, correos:data.correo_principal,
         creado:serverTimestamp(), actualizado:serverTimestamp()
-      });
+      };
+      await addDoc(collection(db,"polizas"), pdata);
+      // Generar períodos futuros del contrato anual
+      const ekMap = new Map(window._POLIZAS.filter(r=>r.poliza&&r.desde).map(r=>[(r.poliza+'__'+r.desde),r._id]));
+      const periodosFuturos = generarPeriodos(pdata, ekMap);
+      for(const p of periodosFuturos){
+        await addDoc(collection(db,'polizas'),{...p,creado:serverTimestamp(),actualizado:serverTimestamp()});
+      }
     }
     closeModal('modal-cli'); toast('Cliente guardado ✓','s');
     resetCliForm(); loadAll();
@@ -2314,25 +2321,43 @@ window.handleXLS = function(file){
 
 window.confirmXLS = async function(){
   if(!_xls_pending||!_xls_pending.length){showToast('No hay datos','e');return;}
-  const mes=_xls_pending[0].mes_origen;
-  const existing=window._POLIZAS.filter(r=>r.mes_origen===mes);
-  if(existing.length>0){showToast(`"${mes}" ya tiene ${existing.length} pólizas. Limpie primero.`,'w');return;}
+  const mes = _xls_pending[0].mes_origen;
+  // Deduplicar por poliza+desde — mismo número puede tener varios recibos anuales
+  const existingKeys = new Map(
+    window._POLIZAS.filter(r=>r.poliza&&r.desde)
+      .map(r=>[(r.poliza+'__'+r.desde), r._id])
+  );
+  const duplicadas = _xls_pending.filter(r=>existingKeys.has((r.poliza||'')+'__'+(r.desde||'')));
+  const nuevas     = _xls_pending.filter(r=>!existingKeys.has((r.poliza||'')+'__'+(r.desde||'')));
+  if(!nuevas.length){
+    showToast(`Todos los recibos de "${mes}" ya existen (${duplicadas.length} omitidos).`,'w');
+    return;
+  }
   document.getElementById('xls-pg-wrap').style.display='block';
   const fill=document.getElementById('xls-fill'),ptxt=document.getElementById('xls-ptxt');
-  let n=0;
-  for(const r of _xls_pending){
+  let n=0, nPer=0;
+  for(const r of nuevas){
     await addDoc(collection(db,'polizas'),{...r,creado:serverTimestamp(),actualizado:serverTimestamp()});
-    n++;fill.style.width=Math.round(n/_xls_pending.length*100)+'%';ptxt.textContent=`${n}/${_xls_pending.length}…`;
+    existingKeys.set((r.poliza+'__'+r.desde),'new');
+    n++;
+    const periodos = generarPeriodos(r, existingKeys);
+    for(const p of periodos){
+      await addDoc(collection(db,'polizas'),{...p,creado:serverTimestamp(),actualizado:serverTimestamp()});
+      existingKeys.set((p.poliza+'__'+p.desde),'new');
+      nPer++;
+    }
+    fill.style.width=Math.round(n/nuevas.length*100)+'%';
+    ptxt.textContent=`${n}/${nuevas.length} recibos · ${nPer} períodos generados…`;
   }
-  showToast(`✅ ${n} pólizas de ${mes} importadas`);
+  const msg=`✅ ${n} recibos importados${nPer?` · ${nPer} períodos futuros generados`:''}${duplicadas.length?` · ${duplicadas.length} ya existían`:''}`;
+  showToast(msg);
   _xls_pending=null;
   document.getElementById('xls-prev').style.display='none';
   document.getElementById('xls-pg-wrap').style.display='none';
   document.getElementById('drop-xls').classList.remove('loaded');
   document.getElementById('xls-file').value='';
   window.loadAll();
-};
-window.cancelXLS = function(){
+};window.cancelXLS = function(){
   _xls_pending=null;
   document.getElementById('xls-prev').style.display='none';
   document.getElementById('drop-xls').classList.remove('loaded');
@@ -2343,16 +2368,29 @@ window.cancelXLS = function(){
 // MAYO 2026 CARGAR
 // ══════════════════════════════════════════════════════
 window.loadMayo = async function(){
-  const existingNums = new Set(window._POLIZAS.map(r=>r.poliza).filter(Boolean));
-  const nuevas = MAYO_DATA.filter(r=>!existingNums.has(r.poliza));
+  // Deduplicar por poliza+desde (mismo número puede tener varios recibos)
+  const existingKeys = new Map(
+    window._POLIZAS.filter(r=>r.poliza&&r.desde)
+      .map(r=>[(r.poliza+'__'+r.desde), r._id])
+  );
+  const nuevas = MAYO_DATA.filter(r=>!existingKeys.has((r.poliza||'')+'__'+(r.desde||'')));
   if(!nuevas.length){showToast(`Todas las pólizas de Mayo 2026 ya están en Firebase.`,'w');return;}
   const btn=document.getElementById('btn-mayo');btn.disabled=true;btn.textContent='Cargando…';
   document.getElementById('mayo-prog').style.display='block';
   const fill=document.getElementById('mayo-fill'),ptxt=document.getElementById('mayo-ptxt');
-  let n=0;
+  let n=0, nPer=0;
   for(const r of nuevas){
     await addDoc(collection(db,'polizas'),{...r,estado_recibo:'Pendiente',creado:serverTimestamp(),actualizado:serverTimestamp()});
-    n++;fill.style.width=Math.round(n/nuevas.length*100)+'%';ptxt.textContent=`${n}/${nuevas.length}…`;
+    n++;
+    // Generar períodos futuros del contrato anual
+    const periodos = generarPeriodos(r, existingKeys);
+    for(const p of periodos){
+      await addDoc(collection(db,'polizas'),{...p,creado:serverTimestamp(),actualizado:serverTimestamp()});
+      existingKeys.set((p.poliza+'__'+p.desde), 'new');
+      nPer++;
+    }
+    fill.style.width=Math.round(n/nuevas.length*100)+'%';
+    ptxt.textContent=`${n}/${nuevas.length} pólizas · ${nPer} períodos generados…`;
   }
   showToast(`✅ ${n} pólizas de Mayo 2026 cargadas`);
   btn.textContent=`✓ Cargado (${n})`;
@@ -2645,6 +2683,72 @@ window.toggleHistorialInline = async function(btn) {
       `<div style="text-align:center;padding:16px;color:var(--red);font-size:12px;">Error: ${e.message}</div>`;
   }
 };
+
+
+// ── GENERADOR DE PERÍODOS DE COBRO ───────────────────────────────────────────
+// Dado el primer recibo de una póliza, genera todos los recibos restantes
+// del contrato anual que aún no existen en Firebase.
+const FR_MESES = {'Mensual':1,'Trimestral':3,'Semestral':6,'Anual':12};
+
+function generarPeriodos(base, existingKeys) {
+  const incremento = FR_MESES[base.fr] || 12;
+  if(incremento >= 12) return []; // Anual: un solo recibo, ya está
+
+  const periodos = [];
+  const hoy = new Date();
+
+  // Contrato anual: 12 meses desde el inicio del primer período
+  const inicioContrato = new Date(base.desde + 'T12:00:00');
+  const finContrato    = new Date(inicioContrato);
+  finContrato.setFullYear(finContrato.getFullYear() + 1);
+
+  let desdeActual = new Date(base.hasta + 'T12:00:00');
+
+  while(desdeActual < finContrato) {
+    const hastaActual = new Date(desdeActual);
+    hastaActual.setMonth(hastaActual.getMonth() + incremento);
+
+    // Ajustar último período al fin exacto del contrato
+    const hastaFinal = hastaActual > finContrato ? finContrato : hastaActual;
+
+    const desdeStr = desdeActual.toISOString().split('T')[0];
+    const hastaStr = hastaFinal.toISOString().split('T')[0];
+    const pKey     = (base.poliza||'') + '__' + desdeStr;
+
+    // Solo agregar si no existe ya en Firebase
+    if(!existingKeys.has(pKey)) {
+      const diasVenc = Math.round((hastaFinal - hoy) / 86400000);
+      periodos.push({
+        poliza:         base.poliza        || '',
+        asegurado:      base.asegurado     || '',
+        prod:           base.prod          || '',
+        desde:          desdeStr,
+        hasta:          hastaStr,
+        prima:          base.prima         || 0,
+        total:          base.total         || 0,
+        moneda:         base.moneda        || 'CRC',
+        fr:             base.fr            || '',
+        dias_venc:      diasVenc,
+        estado_poliza:  'Vigente',
+        estado_recibo:  'Pendiente',
+        verif:          false,
+        confirmar:      '',
+        telefonos:      base.telefonos     || '',
+        correos:        base.correos       || '',
+        ultima_gestion: '',
+        resultado:      '',
+        proxima_renovacion: base.proxima_renovacion || '',
+        mes_origen:     calcMesOrigen(hastaStr),
+        tipo:           'RENOVACION',
+        es_proyeccion:  true
+      });
+    }
+
+    desdeActual = hastaFinal;
+    if(hastaFinal >= finContrato) break;
+  }
+  return periodos;
+}
 
 // ── INICIAR ───────────────────────────────────────────────────
 loadAll();
