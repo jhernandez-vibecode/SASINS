@@ -118,7 +118,12 @@ window._openDet = function (id) {
   document.getElementById('m-pol').textContent  = (r.poliza || '') + ' · ' + (r.prod || '');
 
   // Rellenar datos de la póliza (solo lectura)
-  document.getElementById('m-prod').textContent  = r.prod  || '';
+  // Poblar selector de producto con todos los productos activos
+const mprod = document.getElementById('m-prod');
+mprod.innerHTML = '<option value="">— Seleccionar producto —</option>' +
+  state.prods.filter(p => p.activo).map(p =>
+    `<option value="${p.nombre}" ${p.nombre === r.prod ? 'selected' : ''}>${p.nombre}</option>`
+  ).join('');
   document.getElementById('m-desde').textContent = fmtDate(r.desde);
   document.getElementById('m-hasta').textContent = fmtDate(r.hasta);
   document.getElementById('m-fr').textContent    = r.fr    || '—';
