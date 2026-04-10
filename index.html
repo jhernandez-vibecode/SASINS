@@ -1874,18 +1874,57 @@ window._crGo = p=>{_crPage=p;renderCRTable();};
 // COBROS — MESES
 // ══════════════════════════════════════════════════════
 window.renderMesesList = function() {
-  const meses=[...new Set(window._POLIZAS.map(r=>r.mes_origen).filter(Boolean))].sort();
-  const list=document.getElementById('meses-list');
-  const sel=document.getElementById('mes-activo-sel');
-  if(!list||!sel) return;
-  sel.innerHTML='<option value="">— Seleccionar mes —</option>';
-  if(!meses.length){list.innerHTML='<span style="color:var(--yellow)">⚠ Sin meses. Importe Mayo 2026.</span>';return;}
-  list.innerHTML=meses.map(m=>{
-    const cnt=window._POLIZAS.filter(r=>r.mes_origen===m).length;
-    return `<span class="mes-chip ${m===_mesActivo?'mes-active':''}">✓ <strong>${m}</strong> <span style="color:var(--muted)">(${cnt})</span></span>`;
-  }).join('');
-  meses.forEach(m=>{const o=document.createElement('option');o.value=m;o.textContent=m+(m===_mesActivo?' ← activo':'');sel.appendChild(o);});
-  if(_mesActivo)sel.value=_mesActivo;
+  const list = document.getElementById('meses-list');
+  const sel  = document.getElementById('mes-activo-sel');
+  if(!list || !sel) return;
+
+  // Generar rango de meses: desde 2 meses atrás hasta 18 meses adelante
+  const MESES_NOMBRE = ['ENERO','FEBRERO','MARZO','ABRIL','MAYO','JUNIO',
+                        'JULIO','AGOSTO','SEPTIEMBRE','OCTUBRE','NOVIEMBRE','DICIEMBRE'];
+  const hoy   = new Date();
+  const start = new Date(hoy.getFullYear(), hoy.getMonth() - 2, 1);
+  const end   = new Date(hoy.getFullYear(), hoy.getMonth() + 19, 1);
+  const rango = [];
+  for(let d = new Date(start); d < end; d.setMonth(d.getMonth()+1)){
+    rango.push(MESES_NOMBRE[d.getMonth()] + d.getFullYear());
+  }
+
+  // Contar pólizas por mes según su fecha 'hasta'
+  const cuentas = {};
+  window._POLIZAS.forEach(r => {
+    if(!r.hasta) return;
+    const m = calcMesOrigen(r.hasta);
+    cuentas[m] = (cuentas[m]||0) + 1;
+  });
+
+  // Agregar meses que tengan pólizas pero estén fuera del rango generado
+  Object.keys(cuentas).forEach(m => { if(!rango.includes(m)) rango.push(m); });
+  rango.sort();
+
+  // Render selector
+  sel.innerHTML = '<option value="">— Seleccionar mes —</option>';
+  rango.forEach(m => {
+    const o = document.createElement('option');
+    o.value = m;
+    const cnt = cuentas[m] || 0;
+    o.textContent = m + (cnt ? ` (${cnt})` : ' — sin pólizas') + (m===_mesActivo?' ←':'');
+    sel.appendChild(o);
+  });
+  if(_mesActivo) sel.value = _mesActivo;
+
+  // Render chips solo de meses con pólizas
+  const conPolizas = rango.filter(m => cuentas[m] > 0);
+  if(!conPolizas.length){
+    list.innerHTML = '<span style="color:var(--muted);font-size:11px;">Sin pólizas cargadas aún.</span>';
+  } else {
+    list.innerHTML = conPolizas.map(m => {
+      const cnt = cuentas[m] || 0;
+      return `<span class="mes-chip ${m===_mesActivo?'mes-active':''}">
+        <strong>${m}</strong>
+        <span style="color:var(--muted);font-size:10px;">${cnt} póliza${cnt!==1?'s':''}</span>
+      </span>`;
+    }).join('');
+  }
 };
 
 window.setMesActivo = function(mes){
@@ -1895,11 +1934,10 @@ window.setMesActivo = function(mes){
 function setCobData(){
   if(!_mesActivo){ _cobData=[]; }
   else {
-    _cobData=window._POLIZAS.filter(r=>{
-      if(r.mes_origen===_mesActivo) return true;
-      // También incluir pólizas nuevas cuyo calcMesOrigen coincida
-      if(r.mes_origen && r.mes_origen!=='NUEVO') return false;
-      return calcMesOrigen(r.hasta)===_mesActivo;
+    // Filtrar por fecha 'hasta' — independiente de cómo se cargó la póliza
+    _cobData = window._POLIZAS.filter(r => {
+      if(!r.hasta) return false;
+      return calcMesOrigen(r.hasta) === _mesActivo;
     });
   }
   _selectedCob=new Set();
