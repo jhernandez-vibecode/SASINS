@@ -1482,7 +1482,7 @@ window.renderTable = function() {
       <td>${trunc(r.prod||'',24)}</td>
       <td class="mn">${fmtDate(r.desde)}</td>
       <td class="mn">${fmtDate(r.hasta)}</td>
-      <td class="rvc">${fmtDate(r.proxima_renovacion)}</td>
+      <td class="rvc">${fmtDate(r.hasta)}</td>
       <td><span class="pill pgr">${r.fr||'—'}</span></td>
       <td class="am ${tc}">${sym}${fmt(r.total||0)}</td>
       <td><span class="${tc}" style="font-size:10px;font-weight:700">${r.moneda||''}</span></td>
@@ -1508,7 +1508,7 @@ window.openDet = function(id) {
   document.getElementById('m-desde').textContent=fmtDate(r.desde);
   document.getElementById('m-hasta').textContent=fmtDate(r.hasta);
   document.getElementById('m-fr').textContent=r.fr||'—';
-  document.getElementById('m-prox').textContent=fmtDate(r.proxima_renovacion);
+  document.getElementById('m-prox').textContent=fmtDate(r.hasta); // Próx. renovación = fin del período actual
   const sym=r.moneda==='CRC'?'₡':'$'; const tc=r.moneda==='CRC'?'crc-t':'usd-t';
   document.getElementById('m-total').innerHTML=`<span class="${tc}">${sym}${fmt(r.total||0)}</span>`;
   document.getElementById('m-dias').textContent=`${r.dias_venc||0} días`;
@@ -1594,7 +1594,7 @@ window.renderDashboard = function() {
       <span style="flex:1;font-weight:600">${trunc(r.asegurado||'',24)}</span>
       <span class="${r.moneda==='CRC'?'crc-t':'usd-t'}" style="font-family:'Courier New',monospace;font-size:10px">${r.moneda==='CRC'?'₡':'$'}${fmt(r.total||0)}</span>
     </div>`).join('');
-  const proximas=[...D].filter(r=>r.proxima_renovacion).sort((a,b)=>new Date(a.proxima_renovacion)-new Date(b.proxima_renovacion)).slice(0,10);
+  const proximas=[...D].filter(r=>r.hasta).sort((a,b)=>new Date(a.hasta)-new Date(b.hasta)).slice(0,10);
   document.getElementById('dash-renov').innerHTML=`<table style="width:100%;font-size:11px;border-collapse:collapse">
     <thead><tr style="color:var(--muted);font-size:10px;text-transform:uppercase;font-family:var(--fh)">
       <th style="padding:5px 7px;text-align:left">Asegurado</th><th style="padding:5px 7px;text-align:left">Producto</th>
@@ -1604,7 +1604,7 @@ window.renderDashboard = function() {
     <tbody>${proximas.map(r=>`<tr style="border-top:1px solid var(--bdr)33">
       <td style="padding:6px 7px;font-weight:600">${trunc(r.asegurado||'',24)}</td>
       <td style="padding:6px 7px;color:var(--muted)">${trunc(r.prod||'',22)}</td>
-      <td style="padding:6px 7px;color:var(--accent);font-family:'Courier New',monospace">${fmtDate(r.proxima_renovacion)}</td>
+      <td style="padding:6px 7px;color:var(--accent);font-family:'Courier New',monospace">${fmtDate(r.hasta)}</td>
       <td style="padding:6px 7px"><span class="pill pgr">${r.fr||'—'}</span></td>
       <td style="padding:6px 7px;text-align:right;font-family:'Courier New',monospace" class="${r.moneda==='CRC'?'crc-t':'usd-t'}">${r.moneda==='CRC'?'₡':'$'}${fmt(r.total||0)}</td>
     </tr>`).join('')}</tbody>
@@ -1858,7 +1858,7 @@ function renderCRTable() {
       <td>${trunc(r.prod||'',24)}</td>
       <td class="mn">${fmtDate(r.desde)}</td>
       <td class="mn">${fmtDate(r.hasta)}</td>
-      <td class="rvc">${fmtDate(r.proxima_renovacion)}</td>
+      <td class="rvc">${fmtDate(r.hasta)}</td>
       <td><span class="pill pgr">${r.fr||'—'}</span></td>
       <td class="am ${tc}">${sym}${fmt(r.total||0)}</td>
       <td><span class="${tc}" style="font-size:10px;font-weight:700">${r.moneda||''}</span></td>
