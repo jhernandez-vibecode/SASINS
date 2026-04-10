@@ -916,6 +916,17 @@ const calcDias = h => {
   const hoy=new Date(); hoy.setHours(0,0,0,0);
   return Math.round((new Date(h)-hoy)/86400000);
 };
+
+// Calcula mes_origen desde fecha 'hasta' (ej: hasta=2026-05-09 -> 'MAYO2026')
+const MESES_ES = ['ENERO','FEBRERO','MARZO','ABRIL','MAYO','JUNIO','JULIO','AGOSTO','SEPTIEMBRE','OCTUBRE','NOVIEMBRE','DICIEMBRE'];
+const calcMesOrigen = (hasta) => {
+  if(!hasta) return 'NUEVO';
+  try {
+    const d = new Date(hasta+'T12:00:00');
+    return MESES_ES[d.getMonth()] + d.getFullYear();
+  } catch(e) { return 'NUEVO'; }
+};
+
 const calcProx = (hasta,fr) => {
   if(!hasta) return '';
   const d=new Date(hasta+'T12:00:00');
@@ -1769,7 +1780,15 @@ window.setMesActivo = function(mes){
 };
 
 function setCobData(){
-  _cobData=_mesActivo?window._POLIZAS.filter(r=>r.mes_origen===_mesActivo):[];
+  if(!_mesActivo){ _cobData=[]; }
+  else {
+    _cobData=window._POLIZAS.filter(r=>{
+      if(r.mes_origen===_mesActivo) return true;
+      // También incluir pólizas nuevas cuyo calcMesOrigen coincida
+      if(r.mes_origen && r.mes_origen!=='NUEVO') return false;
+      return calcMesOrigen(r.hasta)===_mesActivo;
+    });
+  }
   _selectedCob=new Set();
   buildCobProdFilter(); renderCobros(); updateCobStats();
 }
@@ -2119,15 +2138,16 @@ window.cancelXLS = function(){
 // MAYO 2026 CARGAR
 // ══════════════════════════════════════════════════════
 window.loadMayo = async function(){
-  const existing=window._POLIZAS.filter(r=>r.mes_origen==='MAYO2026');
-  if(existing.length>0){showToast(`Mayo 2026 ya tiene ${existing.length} pólizas. Use "Limpiar" primero si quiere recargar.`,'w');return;}
+  const existingNums = new Set(window._POLIZAS.map(r=>r.poliza).filter(Boolean));
+  const nuevas = MAYO_DATA.filter(r=>!existingNums.has(r.poliza));
+  if(!nuevas.length){showToast(`Todas las pólizas de Mayo 2026 ya están en Firebase.`,'w');return;}
   const btn=document.getElementById('btn-mayo');btn.disabled=true;btn.textContent='Cargando…';
   document.getElementById('mayo-prog').style.display='block';
   const fill=document.getElementById('mayo-fill'),ptxt=document.getElementById('mayo-ptxt');
   let n=0;
-  for(const r of MAYO_DATA){
+  for(const r of nuevas){
     await addDoc(collection(db,'polizas'),{...r,estado_recibo:'Pendiente',creado:serverTimestamp(),actualizado:serverTimestamp()});
-    n++;fill.style.width=Math.round(n/MAYO_DATA.length*100)+'%';ptxt.textContent=`${n}/${MAYO_DATA.length}…`;
+    n++;fill.style.width=Math.round(n/nuevas.length*100)+'%';ptxt.textContent=`${n}/${nuevas.length}…`;
   }
   showToast(`✅ ${n} pólizas de Mayo 2026 cargadas`);
   btn.textContent=`✓ Cargado (${n})`;
