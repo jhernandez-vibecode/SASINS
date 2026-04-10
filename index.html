@@ -1100,11 +1100,8 @@ window.ejecutarLimpiar = async function() {
     await batch.commit();
     deleted+=Math.min(499,docs.length-i);
   }
-  toast(`🗑 ${deleted} pólizas eliminadas. Ahora puede cargar Mayo 2026.`,'s');
   window._POLIZAS=[];
-  document.getElementById('btn-load-mayo').disabled=false;
-  document.getElementById('btn-load-mayo').textContent='📥 Cargar Mayo 2026 a Firebase';
-  document.getElementById('mayo-preview').style.display='flex';
+  toast(`🗑 ${deleted} registros eliminados. Listo para importar.`,'s');
   loadAll();
 };
 
@@ -1899,8 +1896,8 @@ window.renderMesesList = function() {
   // Contar pólizas por mes según su fecha 'hasta'
   const cuentas = {};
   window._POLIZAS.forEach(r => {
-    if(!r.hasta) return;
-    const m = calcMesOrigen(r.hasta);
+    if(!r.desde) return;
+    const m = calcMesOrigen(r.desde);
     cuentas[m] = (cuentas[m]||0) + 1;
   });
 
@@ -1941,10 +1938,10 @@ window.setMesActivo = function(mes){
 function setCobData(){
   if(!_mesActivo){ _cobData=[]; }
   else {
-    // Filtrar por fecha 'hasta' — independiente de cómo se cargó la póliza
+    // Filtrar por fecha 'desde' — mes en que vence el recibo y se debe cobrar
     _cobData = window._POLIZAS.filter(r => {
-      if(!r.hasta) return false;
-      return calcMesOrigen(r.hasta) === _mesActivo;
+      if(!r.desde) return false;
+      return calcMesOrigen(r.desde) === _mesActivo;
     });
   }
   _selectedCob=new Set();
@@ -2738,7 +2735,7 @@ function generarPeriodos(base, existingKeys) {
         ultima_gestion: '',
         resultado:      '',
         proxima_renovacion: base.proxima_renovacion || '',
-        mes_origen:     calcMesOrigen(hastaStr),
+        mes_origen:     calcMesOrigen(desdeStr),
         tipo:           'RENOVACION',
         es_proyeccion:  true
       });
