@@ -2105,7 +2105,7 @@ async function sendGmailRaw(to,subj,body,r){
 </div>
 
 <!-- Modal historial de pagos -->
-<div class="ov" id="modal-historial">
+<div class="ov" id="modal-historial" style="z-index:300;">
   <div class="modal" style="max-width:680px;">
     <div class="mhdr">
       <div class="micon" style="background:#4f7cff20;">📋</div>
@@ -2465,13 +2465,14 @@ window.confirmarPago = async function() {
 
 // Ver historial de pagos de la póliza abierta en modal-det
 window.verHistorialPago = async function() {
-  if (!_currentPolId) return;
-  const r = window._POLIZAS.find(x => x._id === _currentPolId);
+  if (!window.currentPolId) return;
+  const r = window._POLIZAS.find(x => x._id === window.currentPolId);
   if (!r) return;
 
   document.getElementById('historial-sub').textContent = r.asegurado + ' · ' + (r.poliza||'');
   document.getElementById('historial-content').innerHTML =
     '<div style="text-align:center;padding:30px;color:var(--muted);">Cargando historial…</div>';
+  closeModal('modal-det');
   document.getElementById('modal-historial').classList.add('open');
 
   try {
