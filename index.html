@@ -761,8 +761,15 @@ textarea.fi{resize:vertical;min-height:58px;}
         <div class="fg"><label class="fl">Notas / Gestión realizada</label><textarea class="fi" id="m-gestion" rows="3" placeholder="Describa la gestión…"></textarea></div>
       </div>
     </div>
+    <!-- Panel historial inline -->
+    <div id="historial-panel" style="display:none;border-top:1px solid var(--bdr);padding:14px 18px 4px;max-height:320px;overflow-y:auto;">
+      <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);font-family:var(--fh);margin-bottom:10px;">📋 Historial de pagos</div>
+      <div id="historial-inline-content">
+        <div style="text-align:center;padding:20px;color:var(--muted);font-size:12px;">Cargando…</div>
+      </div>
+    </div>
     <div class="mftr">
-      <button class="bc" onclick="verHistorialPago()">📋 Historial de pagos</button>
+      <button class="bc" id="btn-historial" onclick="toggleHistorialInline(this)">📋 Ver historial</button>
       <button class="bc" onclick="closeModal('modal-det')">Cancelar</button>
       <button class="bs" onclick="saveGestion()">💾 Guardar en Firebase</button>
     </div>
@@ -1445,6 +1452,11 @@ window.openDet = function(id) {
   document.getElementById('m-medio-pago').value=r.medio_pago||'';
   document.getElementById('m-pago-obs').value=r.pago_obs||'';
   togglePagadaFields();
+  // Resetear historial inline al abrir
+  const hp = document.getElementById('historial-panel');
+  if(hp) hp.style.display='none';
+  const bhist = document.getElementById('btn-historial');
+  if(bhist){ bhist.textContent='📋 Ver historial'; bhist.dataset.poliza = r.poliza||''; bhist.dataset.moneda = r.moneda||'CRC'; }
   document.getElementById('modal-det').classList.add('open');
 };
 
@@ -2464,72 +2476,70 @@ window.confirmarPago = async function() {
 };
 
 // Ver historial de pagos de la póliza abierta en modal-det
-window.verHistorialPago = async function() {
-  if (!window.currentPolId) return;
-  const r = window._POLIZAS.find(x => x._id === window.currentPolId);
-  if (!r) return;
-
-  document.getElementById('historial-sub').textContent = r.asegurado + ' · ' + (r.poliza||'');
-  document.getElementById('historial-content').innerHTML =
-    '<div style="text-align:center;padding:30px;color:var(--muted);">Cargando historial…</div>';
-  closeModal('modal-det');
-  document.getElementById('modal-historial').classList.add('open');
-
-  try {
-    // Query sin índice compuesto — ordenamos en cliente
-    const snap = await getDocs(
-      query(collection(db,'pagos'),
-        where('poliza','==', r.poliza||''))
-    );
-
-    if (snap.empty) {
-      document.getElementById('historial-content').innerHTML =
-        '<div style="text-align:center;padding:30px;color:var(--muted);">Sin pagos registrados aún para esta póliza.</div>';
-      return;
-    }
-
-    const rows = snap.docs.map(d => d.data()).sort((a,b) => (b.fecha_pago||'').localeCompare(a.fecha_pago||''));
-    const total_pagado = rows.reduce((s,p) => s + (p.monto||0), 0);
-    const sym = r.moneda === 'CRC' ? '₡' : '$';
-    const tc  = r.moneda === 'CRC' ? 'crc-t' : 'usd-t';
-
-    document.getElementById('historial-content').innerHTML = `
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;padding:10px 12px;background:var(--surf2);border-radius:8px;">
-        <div style="font-size:12px;color:var(--muted);">${rows.length} pago${rows.length!==1?'s':''} registrado${rows.length!==1?'s':''}</div>
-        <div style="font-family:var(--mono);font-size:14px;font-weight:800;" class="${tc}">
-          Total pagado: ${sym}${fmt(total_pagado)}
-        </div>
-      </div>
-      <div class="tw">
-        <div style="display:grid;grid-template-columns:100px 1fr 160px 110px;gap:10px;padding:8px 12px;background:var(--surf2);border-bottom:1px solid var(--bdr);">
-          <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--muted);font-family:var(--fh);">Fecha pago</div>
-          <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--muted);font-family:var(--fh);">Periodo cubierto</div>
-          <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--muted);font-family:var(--fh);">Medio de pago</div>
-          <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--muted);font-family:var(--fh);text-align:right;">Monto</div>
-        </div>
-        ${rows.map(p => `
-          <div class="pago-row">
-            <div style="font-family:var(--mono);font-size:11px;color:var(--green);">${fmtDate(p.fecha_pago)}</div>
-            <div>
-              <div style="font-size:11px;">${fmtDate(p.desde)} → ${fmtDate(p.hasta)}</div>
-              ${p.observacion ? `<div style="font-size:10px;color:var(--muted);">${p.observacion}</div>` : ''}
-            </div>
-            <div><span class="medio-badge">💳 ${p.medio_pago||'—'}</span></div>
-            <div style="text-align:right;font-family:var(--mono);font-size:11px;font-weight:700;" class="${tc}">${sym}${fmt(p.monto||0)}</div>
-          </div>`).join('')}
-      </div>`;
-  } catch(e) {
-    document.getElementById('historial-content').innerHTML =
-      `<div style="text-align:center;padding:30px;color:var(--red);">Error cargando historial: ${e.message}</div>`;
-  }
-};
-
+// verHistorialPago reemplazado por toggleHistorialInline
 
 // Muestra/oculta campos de pago según estado seleccionado
 window.togglePagadaFields = function() {
   const estado = (document.getElementById('m-estado-sel')||{}).value||'';
   const fields = document.getElementById('pago-fields');
   if(fields) fields.style.display = estado === 'Pagada' ? 'block' : 'none';
+};
+
+
+// ── HISTORIAL INLINE ─────────────────────────────────────────────────────────
+window.toggleHistorialInline = async function(btn) {
+  const panel = document.getElementById('historial-panel');
+  if (!panel) return;
+
+  // Alternar visibilidad
+  if (panel.style.display !== 'none') {
+    panel.style.display = 'none';
+    btn.textContent = '📋 Ver historial';
+    return;
+  }
+
+  // Obtener datos del botón directamente
+  const poliza  = btn.dataset.poliza  || '';
+  const moneda  = btn.dataset.moneda  || 'CRC';
+
+  panel.style.display = 'block';
+  btn.textContent = '🔼 Ocultar historial';
+  document.getElementById('historial-inline-content').innerHTML =
+    '<div style="text-align:center;padding:20px;color:var(--muted);font-size:12px;">Cargando historial…</div>';
+
+  try {
+    const snap = await getDocs(
+      query(collection(db,'pagos'), where('poliza','==', poliza))
+    );
+
+    if (snap.empty) {
+      document.getElementById('historial-inline-content').innerHTML =
+        '<div style="text-align:center;padding:16px;color:var(--muted);font-size:12px;">Sin pagos registrados aún para esta póliza.</div>';
+      return;
+    }
+
+    const rows = snap.docs.map(d => d.data())
+      .sort((a,b) => (b.fecha_pago||'').localeCompare(a.fecha_pago||''));
+    const sym = moneda === 'CRC' ? '₡' : '$';
+    const tc  = moneda === 'CRC' ? 'crc-t' : 'usd-t';
+    const total = rows.reduce((s,p)=>s+(p.monto||0),0);
+
+    document.getElementById('historial-inline-content').innerHTML = `
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;font-size:11px;">
+        <span style="color:var(--muted);">${rows.length} pago${rows.length!==1?'s':''}</span>
+        <span class="${tc}" style="font-family:var(--mono);font-weight:700;">Total: ${sym}${fmt(total)}</span>
+      </div>
+      ${rows.map(p=>`
+        <div style="display:grid;grid-template-columns:90px 130px 1fr;gap:8px;align-items:center;padding:7px 0;border-bottom:1px solid var(--bdr)44;font-size:11px;">
+          <div style="font-family:var(--mono);color:var(--green);">${p.fecha_pago||'—'}</div>
+          <div><span style="background:var(--surf3);padding:2px 7px;border-radius:6px;font-size:10px;font-family:var(--fh);font-weight:700;">💳 ${p.medio_pago||'—'}</span></div>
+          <div style="text-align:right;font-family:var(--mono);font-weight:700;" class="${tc}">${sym}${fmt(p.monto||0)}</div>
+          ${p.observacion?`<div style="grid-column:1/-1;font-size:10px;color:var(--muted);padding-left:2px;">↳ ${p.observacion}</div>`:''}
+        </div>`).join('')}`;
+  } catch(e) {
+    document.getElementById('historial-inline-content').innerHTML =
+      `<div style="text-align:center;padding:16px;color:var(--red);font-size:12px;">Error: ${e.message}</div>`;
+  }
 };
 
 // ── INICIAR ───────────────────────────────────────────────────
