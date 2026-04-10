@@ -1247,24 +1247,90 @@ async function checkMeses() {
 // ── GESTIÓN ───────────────────────────────────────────────────
 window.saveGestion = async function() {
   if(!window.currentPolId) return;
+
+  const r = window._POLIZAS.find(x => x._id === window.currentPolId);
+  if(!r) return;
+
+  const estadoNuevo = document.getElementById('m-estado-sel').value;
+  const fechaPago   = document.getElementById('m-confirmar').value;
+  const medioPago   = document.getElementById('m-medio-pago') ? document.getElementById('m-medio-pago').value : '';
+  const pagoObs     = document.getElementById('m-pago-obs')   ? document.getElementById('m-pago-obs').value.trim() : '';
+
+  // Validar cuando estado = Pagada
+  if(estadoNuevo === 'Pagada') {
+    if(!fechaPago) { toast('Ingrese la fecha de pago','e'); return; }
+    if(!medioPago) { toast('Seleccione el medio de pago','e'); return; }
+  }
+
   try {
-    await updateDoc(doc(db,"polizas",window.currentPolId),{
-      telefonos:document.getElementById('m-tel').value,
-      correos:document.getElementById('m-email').value,
-      resultado:document.getElementById('m-resultado').value,
-      confirmar:document.getElementById('m-confirmar').value,
+    // 1. Actualizar póliza en Firestore
+    await updateDoc(doc(db,"polizas",window.currentPolId), {
+      telefonos:     document.getElementById('m-tel').value,
+      correos:       document.getElementById('m-email').value,
+      resultado:     document.getElementById('m-resultado').value,
+      confirmar:     fechaPago,
       ultima_gestion:document.getElementById('m-gestion').value,
-      estado_poliza:document.getElementById('m-estado-sel').value,
-      actualizado:serverTimestamp()
+      estado_poliza: estadoNuevo,
+      medio_pago:    medioPago,
+      pago_obs:      pagoObs,
+      actualizado:   serverTimestamp()
     });
-    const g=document.getElementById('m-gestion').value;
+
+    // 2. Si estado = Pagada → crear registro en bitácora pagos
+    if(estadoNuevo === 'Pagada') {
+      const k = rowKey(r);
+      // Marcar como pagado
+      _pagadosCache[k] = true;
+      await setDoc(doc(db,'pagados',k), {
+        pol: r.poliza, nom: r.asegurado, ts: new Date().toISOString()
+      });
+      // Guardar en bitácora — verificar que no exista ya para este período
+      const existePago = await getDocs(
+        query(collection(db,'pagos'),
+          where('poliza','==', r.poliza||''),
+          where('fecha_pago','==', fechaPago))
+      );
+      if(existePago.empty) {
+        await addDoc(collection(db,'pagos'), {
+          poliza_key:  rowKey(r),
+          poliza:      r.poliza      || '',
+          asegurado:   r.asegurado   || '',
+          prod:        r.prod        || '',
+          desde:       r.desde       || '',
+          hasta:       r.hasta       || '',
+          fr:          r.fr          || '',
+          monto:       r.total       || 0,
+          moneda:      r.moneda      || 'CRC',
+          mes_origen:  r.mes_origen  || '',
+          fecha_pago:  fechaPago,
+          medio_pago:  medioPago,
+          observacion: pagoObs,
+          registrado:  serverTimestamp()
+        });
+      }
+      toast('✅ Pago registrado en bitácora','s');
+    } else {
+      // Si cambió de Pagada a otro estado → desmarcar
+      if(isPagado(r)){
+        const k = rowKey(r);
+        delete _pagadosCache[k];
+        try{ await deleteDoc(doc(db,'pagados',k)); }catch(e2){}
+      }
+      toast('Guardado en Firebase ✓','s');
+    }
+
+    // 3. Guardar gestión en historial si hay notas
+    const g = document.getElementById('m-gestion').value;
     if(g) await addDoc(collection(db,"gestiones"),{
-      poliza_id:window.currentPolId, texto:g,
-      resultado:document.getElementById('m-resultado').value,
-      fecha:serverTimestamp(), usuario:"JHV"
+      poliza_id: window.currentPolId, texto:g,
+      resultado: document.getElementById('m-resultado').value,
+      fecha: serverTimestamp(), usuario:'JHV'
     });
-    closeModal('modal-det'); toast('Guardado en Firebase ✓','s'); loadAll();
-  } catch(e){ toast('Error: '+e.message,'e'); }
+
+    closeModal('modal-det');
+    loadAll();
+
+  } catch(e){ toast('Error al guardar: '+e.message,'e'); }
 };
 
 // ── CLIENTE ───────────────────────────────────────────────────
