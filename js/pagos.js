@@ -52,6 +52,7 @@ export async function saveGestion() {
       resultado:      document.getElementById('m-resultado').value,
       confirmar:      fechaPago,
       ultima_gestion: document.getElementById('m-gestion').value,
+      prod:           document.getElementById('m-prod').value || r.prod,
       estado_poliza:  estadoNuevo,
       medio_pago:     medioPago,
       pago_obs:       pagoObs,
