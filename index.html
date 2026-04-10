@@ -257,6 +257,12 @@ textarea.fi{resize:vertical;min-height:58px;}
 .danger-box p{font-size:11px;color:var(--muted);margin-bottom:8px;}
 @media(max-width:900px){.cobros-layout{grid-template-columns:1fr;}.cob-sidebar{position:static;}.sq-grid{grid-template-columns:1fr 1fr;}.cob-stats{grid-template-columns:repeat(3,1fr);}}
 
+
+.pago-row{display:grid;grid-template-columns:100px 1fr 140px 120px;gap:10px;align-items:center;padding:9px 12px;border-bottom:1px solid var(--bdr)44;font-size:12px;}
+.pago-row:last-child{border-bottom:none;}
+.pago-row:hover{background:var(--surf2);}
+.medio-badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:8px;font-size:10px;font-weight:700;font-family:var(--fh);background:var(--surf3);color:var(--muted);border:1px solid var(--bdr);}
+
 </style>
 </head>
 <body>
@@ -731,6 +737,7 @@ textarea.fi{resize:vertical;min-height:58px;}
       </div>
     </div>
     <div class="mftr">
+      <button class="bc" onclick="verHistorialPago()">📋 Historial de pagos</button>
       <button class="bc" onclick="closeModal('modal-det')">Cancelar</button>
       <button class="bs" onclick="saveGestion()">💾 Guardar en Firebase</button>
     </div>
@@ -2034,7 +2041,73 @@ async function procesarEnvio(queue,subj,body,idx){
 
 async function sendGmailRaw(to,subj,body,r){
   const htmlBody=interpol(body,r);const subjFmt=interpol(subj,r);const plain=htmlBody.replace(/<[^>]+>/g,'');
-  const full=`<!DOCTYPE html><html><head><meta charset="UTF-8"></head><body style="margin:0;padding:0;background:#f0f2f5;font-family:Arial,sans-serif"><table width="100%" cellpadding="0" cellspacing="0" style="background:#f0f2f5;padding:24px 0"><tr><td align="center"><table width="580" cellpadding="0" cellspacing="0" style="background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,.1)"><tr><td style="background:#1a3a5c;padding:24px 32px 20px;text-align:center"><div style="font-size:18px;font-weight:700;color:#fff">Juan Carlos Hernández Vargas</div><div style="font-size:12px;color:#a0c4e8;margin-top:2px">Agente de Seguros | Licencia 08-1318 | INS</div></td></tr><tr><td style="padding:30px 32px"><div style="font-size:14px;color:#1a1a1a;line-height:1.8">${htmlBody}</div></td></tr><tr><td style="background:#f8f9fa;padding:14px 32px;border-top:1px solid #e9ecef;text-align:center"><div style="font-size:11px;color:#6c757d">SASINS · Sistema de Administración de Seguros</div></td></tr></table></td></tr></table></body></html>`;
+  const full=`<!DOCTYPE html><html><head><meta charset="UTF-8"></head><body style="margin:0;padding:0;background:#f0f2f5;font-family:Arial,sans-serif"><table width="100%" cellpadding="0" cellspacing="0" style="background:#f0f2f5;padding:24px 0"><tr><td align="center"><table width="580" cellpadding="0" cellspacing="0" style="background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,.1)"><tr><td style="background:#1a3a5c;padding:24px 32px 20px;text-align:center"><div style="font-size:18px;font-weight:700;color:#fff">Juan Carlos Hernández Vargas</div><div style="font-size:12px;color:#a0c4e8;margin-top:2px">Agente de Seguros | Licencia 08-1318 | INS</div></td></tr><tr><td style="padding:30px 32px"><div style="font-size:14px;color:#1a1a1a;line-height:1.8">${htmlBody}</div></td></tr><tr><td style="background:#f8f9fa;padding:14px 32px;border-top:1px solid #e9ecef;text-align:center"><div style="font-size:11px;color:#6c757d">SASINS · Sistema de Administración de Seguros</div></td></tr></table></td></tr></table>
+<!-- Modal confirmación de pago -->
+<div class="ov" id="modal-pago">
+  <div class="modal" style="max-width:460px;">
+    <div class="mhdr">
+      <div class="micon" style="background:#10b98120;">💳</div>
+      <div>
+        <div class="mtitle">Registrar Pago</div>
+        <div class="msub" id="pago-modal-sub">—</div>
+      </div>
+      <button class="mclose" onclick="closeModal('modal-pago')">✕</button>
+    </div>
+    <div class="mbody">
+      <div style="background:var(--surf2);border-radius:8px;padding:11px 13px;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center;">
+        <div style="font-size:12px;color:var(--muted);">Monto</div>
+        <div id="pago-monto" style="font-family:var(--mono);font-size:16px;font-weight:800;color:var(--green);">—</div>
+      </div>
+      <div class="fg2">
+        <div class="fg">
+          <label class="fl">Fecha de pago</label>
+          <input class="fi" id="pago-fecha" type="date">
+        </div>
+        <div class="fg">
+          <label class="fl">Medio de pago</label>
+          <select class="fi" id="pago-medio">
+            <option value="">— Seleccione —</option>
+            <option value="Directo en el INS">Directo en el INS</option>
+            <option value="Con tarjeta">Con tarjeta</option>
+            <option value="Con depósito">Con depósito</option>
+            <option value="SINPE Móvil">SINPE Móvil</option>
+            <option value="INS en Línea">INS en Línea</option>
+            <option value="Conectividad-Bancos">Conectividad-Bancos</option>
+          </select>
+        </div>
+        <div class="fg full">
+          <label class="fl">Observación (opcional)</label>
+          <input class="fi" id="pago-obs" type="text" placeholder="Ej: Comprobante #12345">
+        </div>
+      </div>
+    </div>
+    <div class="mftr">
+      <button class="bc" onclick="closeModal('modal-pago')">Cancelar</button>
+      <button class="bs" onclick="confirmarPago()">✅ Confirmar pago</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal historial de pagos -->
+<div class="ov" id="modal-historial">
+  <div class="modal" style="max-width:680px;">
+    <div class="mhdr">
+      <div class="micon" style="background:#4f7cff20;">📋</div>
+      <div>
+        <div class="mtitle">Historial de Pagos</div>
+        <div class="msub" id="historial-sub">—</div>
+      </div>
+      <button class="mclose" onclick="closeModal('modal-historial')">✕</button>
+    </div>
+    <div class="mbody">
+      <div id="historial-content">
+        <div style="text-align:center;padding:30px;color:var(--muted);">Cargando…</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body></html>`;
   const bnd='b'+Date.now();
   const raw=[`From: ${gmailUser}`,`To: ${to}`,`Subject: =?UTF-8?B?${btoa(unescape(encodeURIComponent(subjFmt)))}?=`,'MIME-Version: 1.0',`Content-Type: multipart/alternative; boundary="${bnd}"`,``,`--${bnd}`,'Content-Type: text/plain; charset=UTF-8','Content-Transfer-Encoding: base64','',btoa(unescape(encodeURIComponent(plain))),``,`--${bnd}`,'Content-Type: text/html; charset=UTF-8','Content-Transfer-Encoding: base64','',btoa(unescape(encodeURIComponent(full))),``,`--${bnd}--`].join('\r\n');
   const encoded=btoa(unescape(encodeURIComponent(raw))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
@@ -2287,6 +2360,151 @@ const _origRenderTable = window.renderTable;
 window.renderTable = function() {
   if(!document.getElementById('tbody')) return;
   _origRenderTable();
+};
+
+
+// ══════════════════════════════════════════════════════
+// MÓDULO DE PAGOS CON BITÁCORA
+// ══════════════════════════════════════════════════════
+let _pagoPolizaId = null; // ID Firestore del registro a pagar
+
+// Abre modal de confirmación de pago
+window.togglePagado = async function(id) {
+  const r = window._POLIZAS.find(x => x._id === id);
+  if (!r) return;
+
+  if (isPagado(r)) {
+    // Si ya está pagado, preguntar si desmarcar
+    if (!confirm('¿Desmarcar como pagado? El registro en la bitácora se conservará.')) return;
+    const k = rowKey(r);
+    delete _pagadosCache[k];
+    try { await deleteDoc(doc(db,'pagados',k)); } catch(e){}
+    showToast('Desmarcado. El historial se conserva.','w');
+    window.renderCobros(); window.updateCobStats();
+    return;
+  }
+
+  // Abrir modal de confirmación de pago
+  _pagoPolizaId = id;
+  const sym = r.moneda === 'CRC' ? '₡' : '$';
+  const tc  = r.moneda === 'CRC' ? 'crc-t' : 'usd-t';
+  document.getElementById('pago-modal-sub').textContent = r.asegurado + ' · ' + (r.poliza||'');
+  document.getElementById('pago-monto').innerHTML =
+    `<span class="${tc}">${sym}${fmt(r.total||0)}</span>`;
+  // Fecha por defecto = hoy
+  document.getElementById('pago-fecha').value = new Date().toISOString().split('T')[0];
+  document.getElementById('pago-medio').value = '';
+  document.getElementById('pago-obs').value = '';
+  document.getElementById('modal-pago').classList.add('open');
+};
+
+// Confirmar y guardar pago
+window.confirmarPago = async function() {
+  const fecha = document.getElementById('pago-fecha').value;
+  const medio = document.getElementById('pago-medio').value;
+  const obs   = document.getElementById('pago-obs').value.trim();
+
+  if (!fecha) { showToast('Ingrese la fecha de pago','e'); return; }
+  if (!medio) { showToast('Seleccione el medio de pago','e'); return; }
+
+  const r = window._POLIZAS.find(x => x._id === _pagoPolizaId);
+  if (!r) return;
+
+  const k = rowKey(r);
+
+  try {
+    // 1. Marcar como pagado en cache y colección 'pagados'
+    _pagadosCache[k] = true;
+    await setDoc(doc(db,'pagados',k), {
+      pol: r.poliza, nom: r.asegurado, ts: new Date().toISOString()
+    });
+
+    // 2. Guardar en bitácora 'pagos'
+    await addDoc(collection(db,'pagos'), {
+      poliza_key:  k,
+      poliza:      r.poliza      || '',
+      asegurado:   r.asegurado   || '',
+      prod:        r.prod        || '',
+      desde:       r.desde       || '',
+      hasta:       r.hasta       || '',
+      fr:          r.fr          || '',
+      monto:       r.total       || 0,
+      moneda:      r.moneda      || 'CRC',
+      mes_origen:  r.mes_origen  || '',
+      fecha_pago:  fecha,
+      medio_pago:  medio,
+      observacion: obs,
+      registrado:  serverTimestamp()
+    });
+
+    closeModal('modal-pago');
+    showToast('✅ Pago registrado en bitácora');
+    window.renderCobros();
+    window.updateCobStats();
+
+  } catch(e) {
+    showToast('Error guardando pago: ' + e.message, 'e');
+  }
+};
+
+// Ver historial de pagos de la póliza abierta en modal-det
+window.verHistorialPago = async function() {
+  if (!_currentPolId) return;
+  const r = window._POLIZAS.find(x => x._id === _currentPolId);
+  if (!r) return;
+
+  document.getElementById('historial-sub').textContent = r.asegurado + ' · ' + (r.poliza||'');
+  document.getElementById('historial-content').innerHTML =
+    '<div style="text-align:center;padding:30px;color:var(--muted);">Cargando historial…</div>';
+  document.getElementById('modal-historial').classList.add('open');
+
+  try {
+    // Query sin índice compuesto — ordenamos en cliente
+    const snap = await getDocs(
+      query(collection(db,'pagos'),
+        where('poliza','==', r.poliza||''))
+    );
+
+    if (snap.empty) {
+      document.getElementById('historial-content').innerHTML =
+        '<div style="text-align:center;padding:30px;color:var(--muted);">Sin pagos registrados aún para esta póliza.</div>';
+      return;
+    }
+
+    const rows = snap.docs.map(d => d.data()).sort((a,b) => (b.fecha_pago||'').localeCompare(a.fecha_pago||''));
+    const total_pagado = rows.reduce((s,p) => s + (p.monto||0), 0);
+    const sym = r.moneda === 'CRC' ? '₡' : '$';
+    const tc  = r.moneda === 'CRC' ? 'crc-t' : 'usd-t';
+
+    document.getElementById('historial-content').innerHTML = `
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;padding:10px 12px;background:var(--surf2);border-radius:8px;">
+        <div style="font-size:12px;color:var(--muted);">${rows.length} pago${rows.length!==1?'s':''} registrado${rows.length!==1?'s':''}</div>
+        <div style="font-family:var(--mono);font-size:14px;font-weight:800;" class="${tc}">
+          Total pagado: ${sym}${fmt(total_pagado)}
+        </div>
+      </div>
+      <div class="tw">
+        <div style="display:grid;grid-template-columns:100px 1fr 160px 110px;gap:10px;padding:8px 12px;background:var(--surf2);border-bottom:1px solid var(--bdr);">
+          <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--muted);font-family:var(--fh);">Fecha pago</div>
+          <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--muted);font-family:var(--fh);">Periodo cubierto</div>
+          <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--muted);font-family:var(--fh);">Medio de pago</div>
+          <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--muted);font-family:var(--fh);text-align:right;">Monto</div>
+        </div>
+        ${rows.map(p => `
+          <div class="pago-row">
+            <div style="font-family:var(--mono);font-size:11px;color:var(--green);">${fmtDate(p.fecha_pago)}</div>
+            <div>
+              <div style="font-size:11px;">${fmtDate(p.desde)} → ${fmtDate(p.hasta)}</div>
+              ${p.observacion ? `<div style="font-size:10px;color:var(--muted);">${p.observacion}</div>` : ''}
+            </div>
+            <div><span class="medio-badge">💳 ${p.medio_pago||'—'}</span></div>
+            <div style="text-align:right;font-family:var(--mono);font-size:11px;font-weight:700;" class="${tc}">${sym}${fmt(p.monto||0)}</div>
+          </div>`).join('')}
+      </div>`;
+  } catch(e) {
+    document.getElementById('historial-content').innerHTML =
+      `<div style="text-align:center;padding:30px;color:var(--red);">Error cargando historial: ${e.message}</div>`;
+  }
 };
 
 // ── INICIAR ───────────────────────────────────────────────────
