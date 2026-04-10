@@ -89,13 +89,13 @@ export async function saveCliente() {
   const tipo = state.tipoCliente;
 
   // Construir nombre completo según tipo de cliente
-  let nombre = tipo === 'fisica'
-    ? [
-        document.getElementById('c-nom').value,
-        document.getElementById('c-ap1').value,
-        document.getElementById('c-ap2').value
-      ].filter(Boolean).join(' ')
-    : document.getElementById('c-rz').value;
+let nombre = tipo === 'fisica'
+  ? [
+      document.getElementById('c-ap1').value,  // Primer apellido primero
+      document.getElementById('c-ap2').value,  // Segundo apellido
+      document.getElementById('c-nom').value   // Nombre al final
+    ].filter(Boolean).join(' ')
+  : document.getElementById('c-rz').value;
 
   nombre = nombre.trim().toUpperCase();
   if (!nombre) { showToast('Ingrese el nombre', 'e'); return; }
