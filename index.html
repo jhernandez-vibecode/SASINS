@@ -725,9 +725,34 @@ textarea.fi{resize:vertical;min-height:58px;}
       <div class="sec"><div class="st">Gestión de Cobro</div>
         <div class="fg2" style="margin-bottom:9px;">
           <div class="fg"><label class="fl">Estado póliza</label>
-            <select class="fi" id="m-estado-sel"><option>Vigente</option><option>Período gracia</option><option>Cancelada</option></select>
+            <select class="fi" id="m-estado-sel" onchange="togglePagadaFields()">
+              <option>Vigente</option>
+              <option>Período gracia</option>
+              <option>Pagada</option>
+              <option>Cancelada</option>
+            </select>
           </div>
-          <div class="fg"><label class="fl">Fecha confirmación</label><input class="fi" id="m-confirmar" type="date"></div>
+          <div class="fg"><label class="fl">Fecha confirmación / pago</label><input class="fi" id="m-confirmar" type="date"></div>
+        </div>
+        <!-- Campos extra que aparecen solo cuando estado = Pagada -->
+        <div id="pago-fields" style="display:none;background:var(--gdim);border:1px solid #10b98133;border-radius:8px;padding:12px;margin-bottom:9px;">
+          <div style="font-size:10px;font-weight:700;color:var(--green);font-family:var(--fh);text-transform:uppercase;letter-spacing:.8px;margin-bottom:9px;">💳 Datos del pago</div>
+          <div class="fg2">
+            <div class="fg"><label class="fl">Medio de pago</label>
+              <select class="fi" id="m-medio-pago">
+                <option value="">— Seleccione —</option>
+                <option value="Directo en el INS">Directo en el INS</option>
+                <option value="Con tarjeta">Con tarjeta</option>
+                <option value="Con depósito">Con depósito</option>
+                <option value="SINPE Móvil">SINPE Móvil</option>
+                <option value="INS en Línea">INS en Línea</option>
+                <option value="Conectividad-Bancos">Conectividad-Bancos</option>
+              </select>
+            </div>
+            <div class="fg"><label class="fl">Observación (opcional)</label>
+              <input class="fi" id="m-pago-obs" type="text" placeholder="Ej: Comprobante #12345">
+            </div>
+          </div>
         </div>
         <div class="fg2" style="margin-bottom:9px;">
           <div class="fg"><label class="fl">Resultado gestión</label><input class="fi" id="m-resultado" type="text"></div>
@@ -1417,6 +1442,9 @@ window.openDet = function(id) {
   document.getElementById('m-confirmar').value=r.confirmar||'';
   document.getElementById('m-gestion').value=r.ultima_gestion||'';
   document.getElementById('m-estado-sel').value=r.estado_poliza||'Vigente';
+  document.getElementById('m-medio-pago').value=r.medio_pago||'';
+  document.getElementById('m-pago-obs').value=r.pago_obs||'';
+  togglePagadaFields();
   document.getElementById('modal-det').classList.add('open');
 };
 
@@ -1866,7 +1894,9 @@ window.renderCobros = function(){
     const waCell=!hasPhone?'<span style="font-size:10px;color:var(--muted);">sin tel.</span>':
       wa>0?`<div style="display:flex;align-items:center;gap:4px;"><button onclick="abrirWa('${r._id}')" style="background:#25d366;color:#fff;border:none;padding:2px 7px;border-radius:6px;font-size:10px;cursor:pointer;">WA</button><span onclick="resetWa('${r._id}')" style="font-size:10px;background:#fff;color:#000;padding:1px 5px;border-radius:10px;font-family:var(--mono);cursor:pointer;" title="Enviado ${wa}x · clic para desmarcar">✓${wa}</span></div>`:
       `<button onclick="abrirWa('${r._id}')" style="background:#25d366;color:#fff;border:none;padding:2px 8px;border-radius:6px;font-size:10px;cursor:pointer;">📱 WA</button>`;
-    const pagBtn=`<button class="pag-btn ${pag?'is-pag':'no-pag'}" onclick="togglePagado('${r._id}')">${pag?'✅ Pagado':'○ Pend.'}</button>`;
+    const pagBtn=pag
+      ? `<button class="pag-btn is-pag" onclick="openDet('${r._id}')" title="Ver detalle del pago">✅ Pagada</button>`
+      : `<button class="pag-btn no-pag" onclick="openDet('${r._id}')" title="Abrir detalle para registrar pago">○ Registrar pago</button>`;
     return `<tr>
       <td><input type="checkbox" ${_selectedCob.has(r._id)?'checked':''} onchange="toggleSelCob('${r._id}',this)" style="cursor:pointer"></td>
       <td class="mn" title="${r.poliza||''}">${trunc(r.poliza||'',18)}</td>
@@ -2491,6 +2521,14 @@ window.verHistorialPago = async function() {
     document.getElementById('historial-content').innerHTML =
       `<div style="text-align:center;padding:30px;color:var(--red);">Error cargando historial: ${e.message}</div>`;
   }
+};
+
+
+// Muestra/oculta campos de pago según estado seleccionado
+window.togglePagadaFields = function() {
+  const estado = (document.getElementById('m-estado-sel')||{}).value||'';
+  const fields = document.getElementById('pago-fields');
+  if(fields) fields.style.display = estado === 'Pagada' ? 'block' : 'none';
 };
 
 // ── INICIAR ───────────────────────────────────────────────────
