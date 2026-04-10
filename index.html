@@ -4,17 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>SASINS · segurosdelins.com</title>
-
-<!-- Librería XLSX para leer archivos Excel del INS -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-
-<!-- Google Sign-In para autenticación Gmail OAuth -->
 <script src="https://accounts.google.com/gsi/client" async defer></script>
-
-<!-- Fuentes tipográficas -->
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Mulish:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-
-<!-- Todos los estilos del sistema -->
 <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
@@ -204,7 +196,11 @@
 <!-- ══ COBROS ════════════════════════════════════════════════ -->
 <div id="view-cobros" class="view">
   <div class="cobros-layout">
+
+    <!-- SIDEBAR -->
     <div class="cob-sidebar">
+
+      <!-- Cargar XLS -->
       <div class="cob-sec">
         <div class="cob-sec-title">📥 Cargar mes XLS</div>
         <div class="import-drop" id="drop-xls" onclick="document.getElementById('xls-file').click()">
@@ -218,28 +214,43 @@
           <div id="xls-prev-stats" style="font-size:10px;color:var(--muted);margin-bottom:7px;">—</div>
           <div id="xls-pg-wrap" style="display:none;"><div class="prog-track"><div class="prog-fill" id="xls-fill"></div></div><div id="xls-ptxt" style="font-size:10px;color:var(--muted);"></div></div>
           <div style="display:flex;gap:6px;margin-top:6px;">
-            <button onclick="confirmXLS()" style="flex:1;background:var(--green);color:#061a0c;border:none;padding:6px;border-radius:6px;font-weight:700;cursor:pointer;font-size:11px;">✅ Importar</button>
+            <button onclick="confirmXLS()" style="flex:1;background:var(--green);color:#fff;border:none;padding:6px;border-radius:6px;font-weight:700;cursor:pointer;font-size:11px;">✅ Importar</button>
             <button onclick="cancelXLS()" style="background:transparent;border:1px solid var(--bdr);color:var(--muted);padding:6px 10px;border-radius:6px;cursor:pointer;font-size:11px;">✕</button>
           </div>
         </div>
       </div>
-<div class="cob-sec">
-  <details style="cursor:pointer;">
-    <summary style="font-family:var(--fh);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--red);list-style:none;display:flex;align-items:center;gap:6px;">
-      <span>⚠</span> Zona de administración
-    </summary>
-    <div style="margin-top:10px;">
-      <p style="font-size:11px;color:var(--muted);margin-bottom:8px;">
-        Elimina TODOS los registros de pólizas de Firebase. Acción irreversible.
-      </p>
-      <button onclick="confirmLimpiar()" style="background:var(--red);color:#fff;border:none;padding:6px 12px;border-radius:7px;font-size:11px;font-weight:700;cursor:pointer;width:100%;">
-        🗑 Limpiar colección
-      </button>
-    </div>
-  </details>
-</div>
 
+      <!-- Selector de mes activo -->
+      <div class="cob-sec">
+        <div class="cob-sec-title">📅 Mes activo para cobros</div>
+        <div id="meses-list"></div>
+        <select id="mes-activo-sel" onchange="setMesActivo(this.value)" class="fsel" style="width:100%;">
+          <option value="">— Seleccionar mes —</option>
+        </select>
+      </div>
+
+      <!-- Zona de administración colapsable -->
+      <div class="cob-sec">
+        <details>
+          <summary style="font-family:var(--fh);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--red);cursor:pointer;list-style:none;display:flex;align-items:center;gap:5px;">
+            ⚠ Zona de administración
+          </summary>
+          <div style="margin-top:10px;">
+            <p style="font-size:11px;color:var(--muted);margin-bottom:8px;">
+              Elimina TODOS los registros de pólizas de Firebase. Acción irreversible.
+            </p>
+            <button onclick="confirmLimpiar()" style="width:100%;background:var(--red);color:#fff;border:none;padding:6px 12px;border-radius:7px;font-size:11px;font-weight:700;cursor:pointer;">
+              🗑 Limpiar colección
+            </button>
+          </div>
+        </details>
+      </div>
+
+    </div><!-- /sidebar -->
+
+    <!-- PANEL PRINCIPAL -->
     <div>
+      <!-- Gmail -->
       <div class="gmail-bar">
         <div style="display:flex;align-items:center;gap:9px;">
           <div class="gmail-dot" id="gmail-dot" style="background:var(--red);"></div>
@@ -253,6 +264,8 @@
           <button id="btn-gm-logout" onclick="gmailLogout()" style="display:none;background:var(--surf2);color:var(--muted);border:1px solid var(--bdr);padding:5px 10px;border-radius:7px;font-size:11px;cursor:pointer;">Desconectar</button>
         </div>
       </div>
+
+      <!-- Stats -->
       <div class="cob-stats">
         <div class="cob-stat"><div class="cob-stat-v" id="cs-total">0</div><div class="cob-stat-l">Total</div></div>
         <div class="cob-stat"><div class="cob-stat-v" id="cs-pend" style="color:var(--yellow);">0</div><div class="cob-stat-l">Pendientes</div></div>
@@ -260,6 +273,8 @@
         <div class="cob-stat"><div class="cob-stat-v" id="cs-pag" style="color:var(--green);">0</div><div class="cob-stat-l">Pagados</div></div>
         <div class="cob-stat"><div class="cob-stat-v" id="cs-wa" style="color:#25d366;">0</div><div class="cob-stat-l">WA enviados</div></div>
       </div>
+
+      <!-- Plantilla correo colapsable -->
       <div class="tw" style="margin-bottom:14px;padding:0;">
         <div class="plt-toggle" id="plt-toggle" onclick="togglePlt()">
           <span style="font-family:var(--fh);font-size:12px;font-weight:700;">✉️ Plantilla de correo <span id="plt-saved" style="font-size:10px;color:var(--green);display:none;">✓ Guardada</span></span>
@@ -277,14 +292,18 @@
           </div>
         </div>
       </div>
+
+      <!-- Chips de filtro -->
       <div class="chip-row" id="cob-chips">
-        <button class="cob-chip on"  id="chip-all-cob"   onclick="setCobTab('all',this)">Todos</button>
-        <button class="cob-chip"     id="chip-pend-cob"  onclick="setCobTab('Pendiente',this)">⏳ Pendientes</button>
+        <button class="cob-chip on"  id="chip-all-cob"    onclick="setCobTab('all',this)">Todos</button>
+        <button class="cob-chip"     id="chip-pend-cob"   onclick="setCobTab('Pendiente',this)">⏳ Pendientes</button>
         <button class="cob-chip"     id="chip-gracia-cob" onclick="setCobTab('Período gracia',this)">🔴 Período gracia</button>
-        <button class="cob-chip"     id="chip-pag-cob"   onclick="setCobTab('pagado',this)">✅ Pagados</button>
-        <button class="cob-chip"     id="chip-nowa-cob"  onclick="toggleCobF('nowa')">⏱ Sin WA</button>
+        <button class="cob-chip"     id="chip-pag-cob"    onclick="setCobTab('pagado',this)">✅ Pagados</button>
+        <button class="cob-chip"     id="chip-nowa-cob"   onclick="toggleCobF('nowa')">⏱ Sin WA</button>
         <button class="cob-chip"     id="chip-noemail-cob" onclick="toggleCobF('noemail')">📧 Sin correo</button>
       </div>
+
+      <!-- Toolbar de búsqueda -->
       <div class="toolbar">
         <div class="sw"><span class="si">⌕</span><input type="text" id="cob-search" placeholder="Buscar póliza o nombre…" oninput="renderCobros()"></div>
         <select id="cob-prod-sel" class="fsel" onchange="renderCobros()"><option value="">Todos los productos</option></select>
@@ -295,11 +314,15 @@
           <button onclick="abrirWaMasivo()" style="background:#25d366;color:#fff;border:none;padding:5px 11px;border-radius:7px;font-size:11px;font-weight:700;cursor:pointer;">📱 WA masivo</button>
         </div>
       </div>
+
+      <!-- Progreso de envío -->
       <div class="send-prog-box" id="send-prog-box">
         <div style="display:flex;justify-content:space-between;font-size:12px;font-weight:600;margin-bottom:4px;"><span id="send-lbl">Enviando…</span><span id="send-cnt" style="font-family:'Courier New',monospace;"></span></div>
         <div class="prog-track"><div class="prog-fill" id="send-fill"></div></div>
         <div class="send-log" id="send-log"></div>
       </div>
+
+      <!-- Tabla de cobros -->
       <div class="tw">
         <table><thead><tr>
           <th><input type="checkbox" id="chk-all-cob" onchange="toggleAllCob(this)" style="cursor:pointer"></th>
@@ -310,8 +333,9 @@
         <tbody id="tbody-cobros"></tbody></table>
         <div class="pag" id="pag-cobros"></div>
       </div>
-    </div>
-  </div>
+
+    </div><!-- /panel principal -->
+  </div><!-- /cobros-layout -->
 </div>
 
 </div><!-- /main -->
@@ -526,11 +550,10 @@
   </div>
 </div>
 
-<!-- ══ TOAST (mensajes emergentes) ══════════════════════════ -->
+<!-- ══ TOAST ══════════════════════════════════════════════════ -->
 <div class="toast" id="toast"></div>
 
 <!-- ══ SCRIPT PRINCIPAL ══════════════════════════════════════ -->
-<!-- type="module" activa el sistema de imports entre archivos JS -->
 <script type="module" src="js/app.js"></script>
 
 </body>
