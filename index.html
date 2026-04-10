@@ -1911,21 +1911,7 @@ window.updateCobStats = function(){
 // ══════════════════════════════════════════════════════
 // PAGADO TOGGLE
 // ══════════════════════════════════════════════════════
-window.togglePagado = async function(id){
-  const r=window._POLIZAS.find(x=>x._id===id); if(!r) return;
-  const k=rowKey(r);
-  if(_pagadosCache[k]){
-    if(!confirm('¿Desmarcar como pagado?')) return;
-    delete _pagadosCache[k];
-    try{await deleteDoc(doc(db,'pagados',k));}catch(e){}
-    showToast('Vuelto a pendiente','w');
-  } else {
-    _pagadosCache[k]=true;
-    try{await setDoc(doc(db,'pagados',k),{pol:r.poliza,nom:r.asegurado,ts:new Date().toISOString()});}catch(e){}
-    showToast('Marcado como pagado ✓');
-  }
-  window.renderCobros(); window.updateCobStats();
-};
+// togglePagado movido al módulo de bitácora de pagos
 
 // ══════════════════════════════════════════════════════
 // WHATSAPP
