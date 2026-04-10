@@ -144,7 +144,13 @@ export function buscarC() {
   const polizasCoinciden = new Set(
     state.polizas.filter(r => {
       if (pol  && !(r.poliza    || '').toLowerCase().includes(pol))  return false;
-      if (nom  && !(r.asegurado || '').toLowerCase().includes(nom))  return false;
+      if (nom) {
+  const nombreCompleto = (r.asegurado || '').toLowerCase();
+  // Buscar cada palabra por separado sin importar el orden
+  // "pedro perez" encuentra "PEREZ PEREIRA PEDRO" ✓
+  const palabras = nom.split(/\s+/).filter(Boolean);
+  if (!palabras.every(p => nombreCompleto.includes(p))) return false;
+}
       if (ced  && !((r.cedula   || r.poliza || '') + ' ' + (r.telefonos || '')).toLowerCase().includes(ced)) return false;
       if (prod && r.prod          !== prod) return false;
       if (est  && r.estado_poliza !== est)  return false;
