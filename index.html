@@ -42,7 +42,7 @@
   <div class="sq-panel">
     <div style="font-family:var(--fh);font-size:14px;font-weight:700;margin-bottom:14px;">🔍 Búsqueda de Pólizas</div>
     <div class="sq-grid">
-      <div class="sq-field"><label class="sq-label">Número de Póliza</label><input type="text" id="sq-pol" class="sq-input" placeholder="01-01-AUT-XXXXXXX" onkeydown="if(event.key==='Enter')buscarC()"></div>
+      <div class="sq-field"><label class="sq-label">Número de Póliza</label><input type="text" id="sq-pol" class="sq-input" placeholder="01-01-AUT-0000000-00" onkeydown="if(event.key==='Enter')buscarC()"></div>
       <div class="sq-field"><label class="sq-label">Nombre / Asegurado</label><input type="text" id="sq-nom" class="sq-input" placeholder="Ej: HERNANDEZ" onkeydown="if(event.key==='Enter')buscarC()"></div>
       <div class="sq-field"><label class="sq-label">Identificación</label><input type="text" id="sq-ced" class="sq-input" placeholder="Cédula o cédula jurídica" onkeydown="if(event.key==='Enter')buscarC()"></div>
       <div class="sq-field"><label class="sq-label">Producto</label><select id="sq-prod-sel" class="sq-input"><option value="">Todos los productos</option></select></div>
@@ -199,8 +199,6 @@
 
     <!-- SIDEBAR -->
     <div class="cob-sidebar">
-
-      <!-- Cargar XLS -->
       <div class="cob-sec">
         <div class="cob-sec-title">📥 Cargar mes XLS</div>
         <div class="import-drop" id="drop-xls" onclick="document.getElementById('xls-file').click()">
@@ -219,38 +217,24 @@
           </div>
         </div>
       </div>
-
-      <!-- Selector de mes activo -->
       <div class="cob-sec">
         <div class="cob-sec-title">📅 Mes activo para cobros</div>
         <div id="meses-list"></div>
-        <select id="mes-activo-sel" onchange="setMesActivo(this.value)" class="fsel" style="width:100%;">
-          <option value="">— Seleccionar mes —</option>
-        </select>
+        <select id="mes-activo-sel" onchange="setMesActivo(this.value)" class="fsel" style="width:100%;"><option value="">— Seleccionar mes —</option></select>
       </div>
-
-      <!-- Zona de administración colapsable -->
       <div class="cob-sec">
         <details>
-          <summary style="font-family:var(--fh);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--red);cursor:pointer;list-style:none;display:flex;align-items:center;gap:5px;">
-            ⚠ Zona de administración
-          </summary>
+          <summary style="font-family:var(--fh);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--red);cursor:pointer;list-style:none;display:flex;align-items:center;gap:5px;">⚠ Zona de administración</summary>
           <div style="margin-top:10px;">
-            <p style="font-size:11px;color:var(--muted);margin-bottom:8px;">
-              Elimina TODOS los registros de pólizas de Firebase. Acción irreversible.
-            </p>
-            <button onclick="confirmLimpiar()" style="width:100%;background:var(--red);color:#fff;border:none;padding:6px 12px;border-radius:7px;font-size:11px;font-weight:700;cursor:pointer;">
-              🗑 Limpiar colección
-            </button>
+            <p style="font-size:11px;color:var(--muted);margin-bottom:8px;">Elimina TODOS los registros de pólizas de Firebase. Acción irreversible.</p>
+            <button onclick="confirmLimpiar()" style="width:100%;background:var(--red);color:#fff;border:none;padding:6px 12px;border-radius:7px;font-size:11px;font-weight:700;cursor:pointer;">🗑 Limpiar colección</button>
           </div>
         </details>
       </div>
-
-    </div><!-- /sidebar -->
+    </div>
 
     <!-- PANEL PRINCIPAL -->
     <div>
-      <!-- Gmail -->
       <div class="gmail-bar">
         <div style="display:flex;align-items:center;gap:9px;">
           <div class="gmail-dot" id="gmail-dot" style="background:var(--red);"></div>
@@ -264,8 +248,6 @@
           <button id="btn-gm-logout" onclick="gmailLogout()" style="display:none;background:var(--surf2);color:var(--muted);border:1px solid var(--bdr);padding:5px 10px;border-radius:7px;font-size:11px;cursor:pointer;">Desconectar</button>
         </div>
       </div>
-
-      <!-- Stats -->
       <div class="cob-stats">
         <div class="cob-stat"><div class="cob-stat-v" id="cs-total">0</div><div class="cob-stat-l">Total</div></div>
         <div class="cob-stat"><div class="cob-stat-v" id="cs-pend" style="color:var(--yellow);">0</div><div class="cob-stat-l">Pendientes</div></div>
@@ -273,17 +255,13 @@
         <div class="cob-stat"><div class="cob-stat-v" id="cs-pag" style="color:var(--green);">0</div><div class="cob-stat-l">Pagados</div></div>
         <div class="cob-stat"><div class="cob-stat-v" id="cs-wa" style="color:#25d366;">0</div><div class="cob-stat-l">WA enviados</div></div>
       </div>
-
-      <!-- Plantilla correo colapsable -->
       <div class="tw" style="margin-bottom:14px;padding:0;">
         <div class="plt-toggle" id="plt-toggle" onclick="togglePlt()">
           <span style="font-family:var(--fh);font-size:12px;font-weight:700;">✉️ Plantilla de correo <span id="plt-saved" style="font-size:10px;color:var(--green);display:none;">✓ Guardada</span></span>
           <span id="plt-arrow" style="font-size:11px;color:var(--muted);">▼ Editar</span>
         </div>
         <div class="plt-body" id="plt-body">
-          <div style="font-size:10px;color:var(--muted);background:var(--surf2);border-radius:6px;padding:8px;margin-bottom:9px;line-height:1.8;">
-            Variables: <code style="background:var(--surf3);padding:1px 4px;border-radius:3px;">{nombre}</code> <code style="background:var(--surf3);padding:1px 4px;border-radius:3px;">{poliza}</code> <code style="background:var(--surf3);padding:1px 4px;border-radius:3px;">{producto}</code> <code style="background:var(--surf3);padding:1px 4px;border-radius:3px;">{vence}</code> <code style="background:var(--surf3);padding:1px 4px;border-radius:3px;">{total}</code> <code style="background:var(--surf3);padding:1px 4px;border-radius:3px;">{moneda}</code>
-          </div>
+          <div style="font-size:10px;color:var(--muted);background:var(--surf2);border-radius:6px;padding:8px;margin-bottom:9px;line-height:1.8;">Variables: <code style="background:var(--surf3);padding:1px 4px;border-radius:3px;">{nombre}</code> <code style="background:var(--surf3);padding:1px 4px;border-radius:3px;">{poliza}</code> <code style="background:var(--surf3);padding:1px 4px;border-radius:3px;">{producto}</code> <code style="background:var(--surf3);padding:1px 4px;border-radius:3px;">{vence}</code> <code style="background:var(--surf3);padding:1px 4px;border-radius:3px;">{total}</code> <code style="background:var(--surf3);padding:1px 4px;border-radius:3px;">{moneda}</code></div>
           <div class="fg" style="margin-bottom:8px;"><label class="fl">Asunto</label><input class="fi" id="plt-subject" type="text"></div>
           <div class="fg"><label class="fl">Cuerpo (HTML)</label><textarea class="fi" id="plt-body-text" rows="8" style="font-size:11px;line-height:1.6;"></textarea></div>
           <div style="display:flex;gap:7px;margin-top:9px;justify-content:flex-end;">
@@ -292,8 +270,6 @@
           </div>
         </div>
       </div>
-
-      <!-- Chips de filtro -->
       <div class="chip-row" id="cob-chips">
         <button class="cob-chip on"  id="chip-all-cob"    onclick="setCobTab('all',this)">Todos</button>
         <button class="cob-chip"     id="chip-pend-cob"   onclick="setCobTab('Pendiente',this)">⏳ Pendientes</button>
@@ -302,8 +278,6 @@
         <button class="cob-chip"     id="chip-nowa-cob"   onclick="toggleCobF('nowa')">⏱ Sin WA</button>
         <button class="cob-chip"     id="chip-noemail-cob" onclick="toggleCobF('noemail')">📧 Sin correo</button>
       </div>
-
-      <!-- Toolbar de búsqueda -->
       <div class="toolbar">
         <div class="sw"><span class="si">⌕</span><input type="text" id="cob-search" placeholder="Buscar póliza o nombre…" oninput="renderCobros()"></div>
         <select id="cob-prod-sel" class="fsel" onchange="renderCobros()"><option value="">Todos los productos</option></select>
@@ -314,15 +288,11 @@
           <button onclick="abrirWaMasivo()" style="background:#25d366;color:#fff;border:none;padding:5px 11px;border-radius:7px;font-size:11px;font-weight:700;cursor:pointer;">📱 WA masivo</button>
         </div>
       </div>
-
-      <!-- Progreso de envío -->
       <div class="send-prog-box" id="send-prog-box">
         <div style="display:flex;justify-content:space-between;font-size:12px;font-weight:600;margin-bottom:4px;"><span id="send-lbl">Enviando…</span><span id="send-cnt" style="font-family:'Courier New',monospace;"></span></div>
         <div class="prog-track"><div class="prog-fill" id="send-fill"></div></div>
         <div class="send-log" id="send-log"></div>
       </div>
-
-      <!-- Tabla de cobros -->
       <div class="tw">
         <table><thead><tr>
           <th><input type="checkbox" id="chk-all-cob" onchange="toggleAllCob(this)" style="cursor:pointer"></th>
@@ -333,9 +303,8 @@
         <tbody id="tbody-cobros"></tbody></table>
         <div class="pag" id="pag-cobros"></div>
       </div>
-
-    </div><!-- /panel principal -->
-  </div><!-- /cobros-layout -->
+    </div>
+  </div>
 </div>
 
 </div><!-- /main -->
@@ -349,6 +318,8 @@
       <button class="mclose" onclick="_closeModal('modal-det')">✕</button>
     </div>
     <div class="mbody">
+
+      <!-- Datos de la póliza -->
       <div class="sec"><div class="st">Datos de la Póliza</div>
         <div class="igrid">
           <div class="fg"><label class="fl">Producto</label><select class="fi" id="m-prod"></select></div>
@@ -361,12 +332,41 @@
           <div class="fg"><span class="fl">Días para vencer</span><span class="fv" id="m-dias">—</span></div>
         </div>
       </div>
+
+      <!-- Sección vehículo — visible solo para pólizas de automóviles -->
+      <div class="sec" id="sec-vehiculo" style="display:none;">
+        <div class="st">🚗 Bien Asegurado</div>
+        <div class="fg2">
+          <div class="fg"><label class="fl">Marca</label><input class="fi" id="m-marca" type="text" placeholder="Toyota"></div>
+          <div class="fg"><label class="fl">Modelo</label><input class="fi" id="m-modelo" type="text" placeholder="Corolla"></div>
+          <div class="fg"><label class="fl">Año</label><input class="fi" id="m-anio" type="text" placeholder="2022"></div>
+          <div class="fg"><label class="fl">Color</label><input class="fi" id="m-color" type="text" placeholder="Blanco"></div>
+          <div class="fg"><label class="fl">Monto asegurado</label><input class="fi" id="m-monto-aseg" type="text" placeholder="₡8.000.000"></div>
+          <div class="fg"><label class="fl">Placa</label><input class="fi" id="m-placa" type="text" placeholder="ABC-123"></div>
+        </div>
+        <div class="fg" style="margin-top:9px;">
+          <label class="fl">Coberturas contratadas</label>
+          <textarea class="fi" id="m-coberturas" rows="3" placeholder="Ej: A-B-C-D-F-G-H-M Y N EN C CON IDD 400.000"></textarea>
+        </div>
+        <div class="fg" style="margin-top:9px;">
+          <label class="fl">📋 Bitácora de cambios</label>
+          <div id="m-bitacora-list" style="background:var(--surf2);border:1px solid var(--bdr);border-radius:6px;padding:8px;min-height:40px;font-size:11px;color:var(--muted);margin-bottom:6px;max-height:120px;overflow-y:auto;"></div>
+          <div style="display:flex;gap:6px;">
+            <input class="fi" id="m-bitacora-nueva" type="text" placeholder="Agregar cambio o nota (ej: Cambio de placa, Aumento de cobertura…)" style="flex:1;">
+            <button onclick="agregarBitacora()" class="bs" style="padding:6px 12px;white-space:nowrap;">+ Agregar</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Contacto -->
       <div class="sec"><div class="st">Contacto</div>
         <div class="fg2">
           <div class="fg"><label class="fl">Teléfonos</label><input class="fi" id="m-tel" type="text" placeholder="8822-1348"></div>
           <div class="fg"><label class="fl">Correos</label><input class="fi" id="m-email" type="text"></div>
         </div>
       </div>
+
+      <!-- Gestión de cobro -->
       <div class="sec"><div class="st">Gestión de Cobro</div>
         <div class="fg2" style="margin-bottom:9px;">
           <div class="fg"><label class="fl">Estado póliza</label>
@@ -400,6 +400,8 @@
         <div class="fg"><label class="fl">Notas / Gestión realizada</label><textarea class="fi" id="m-gestion" rows="3" placeholder="Describa la gestión…"></textarea></div>
       </div>
     </div>
+
+    <!-- Historial de pagos inline -->
     <div id="historial-panel" style="display:none;border-top:1px solid var(--bdr);padding:14px 18px 4px;max-height:320px;overflow-y:auto;">
       <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);font-family:var(--fh);margin-bottom:10px;">📋 Historial de pagos</div>
       <div id="historial-inline-content"></div>
@@ -503,8 +505,12 @@
       </div>
       <div class="sec"><div class="st">Póliza inicial (opcional)</div>
         <div class="fg2">
-          <div class="fg"><label class="fl">Número de póliza</label><input class="fi" id="cp-num" placeholder="01-01-AUT-XXXXXXX"></div>
-          <div class="fg"><label class="fl">Producto</label><select class="fi" id="cp-prod" style="font-size:11px;"></select></div>
+          <div class="fg">
+            <label class="fl">Número de póliza</label>
+            <input class="fi" id="cp-num" placeholder="01-01-AUT-0000000-00" oninput="this.value=this.value.toUpperCase()" title="Formato: 01-01-AUT-0000000-00">
+            <div style="font-size:10px;color:var(--muted);margin-top:3px;">Módulo -00 póliza nueva · -01 primera renovación · -02 segunda renovación</div>
+          </div>
+          <div class="fg"><label class="fl">Producto</label><select class="fi" id="cp-prod" style="font-size:11px;"><option value="">— Seleccionar producto —</option></select></div>
           <div class="fg"><label class="fl">Vigencia desde</label><input class="fi" id="cp-desde" type="date"></div>
           <div class="fg"><label class="fl">Vigencia hasta</label><input class="fi" id="cp-hasta" type="date"></div>
           <div class="fg"><label class="fl">Prima</label><input class="fi" id="cp-prima" type="number" placeholder="0"></div>
