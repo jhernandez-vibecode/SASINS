@@ -169,7 +169,7 @@ export function renderCobros() {
       ? `<button class="pag-btn is-pag" onclick="window._openDet('${r._id}')">✅ Pagada</button>`
       : `<button class="pag-btn no-pag" onclick="window._openDet('${r._id}')">○ Registrar pago</button>`;
 
-    return `<tr>
+    return `<tr onclick="window._openDet('${r._id}')" style="cursor:pointer;">
       <td><input type="checkbox" ${state.selectedCob.has(r._id) ? 'checked' : ''}
           onchange="window._toggleSelCob('${r._id}', this)" style="cursor:pointer"></td>
       <td class="mn">${trunc(r.poliza    || '', 18)}</td>
