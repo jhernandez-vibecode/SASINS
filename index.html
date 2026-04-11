@@ -41,7 +41,6 @@
   <div class="kgrid" id="kpi-grid"></div>
   <div class="sq-panel">
     <div style="font-family:var(--fh);font-size:14px;font-weight:700;margin-bottom:14px;">🔍 Búsqueda de Pólizas</div>
-    <div class="sq-field"><label class="sq-label">Placa</label><input type="text" id="sq-placa" class="sq-input" placeholder="Ej: ABC-123" onkeydown="if(event.key==='Enter')buscarC()"></div>
     <div class="sq-grid">
       <div class="sq-field"><label class="sq-label">Número de Póliza</label><input type="text" id="sq-pol" class="sq-input" placeholder="01-01-AUT-0000000-00" onkeydown="if(event.key==='Enter')buscarC()"></div>
       <div class="sq-field"><label class="sq-label">Nombre / Asegurado</label><input type="text" id="sq-nom" class="sq-input" placeholder="Ej: HERNANDEZ" onkeydown="if(event.key==='Enter')buscarC()"></div>
@@ -49,8 +48,9 @@
       <div class="sq-field"><label class="sq-label">Producto</label><select id="sq-prod-sel" class="sq-input"><option value="">Todos los productos</option></select></div>
       <div class="sq-field"><label class="sq-label">Estado Póliza</label><select id="sq-est" class="sq-input"><option value="">Todos</option><option value="Vigente">Vigente</option><option value="Período gracia">Período gracia</option><option value="Cancelada">Cancelada</option></select></div>
       <div class="sq-field"><label class="sq-label">Moneda</label><select id="sq-mon" class="sq-input"><option value="">Todas</option><option value="CRC">₡ Colones</option><option value="USD">$ Dólares</option></select></div>
+      <div class="sq-field"><label class="sq-label">Placa</label><input type="text" id="sq-placa" class="sq-input" placeholder="Ej: ABC-123" onkeydown="if(event.key==='Enter')buscarC()"></div>
     </div>
-    <div style="display:flex;gap:9px;align-items:center;">
+    <div style="display:flex;gap:9px;align-items:center;margin-top:12px;">
       <button onclick="buscarC()" style="background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border:none;padding:8px 20px;border-radius:8px;font-weight:700;cursor:pointer;font-family:var(--fh);font-size:12px;">🔍 Buscar</button>
       <button onclick="limpiarC()" style="background:transparent;border:1px solid var(--bdr);color:var(--muted);padding:8px 14px;border-radius:8px;cursor:pointer;font-size:12px;">✕ Limpiar</button>
       <span id="sq-hint" style="font-size:11px;color:var(--muted);margin-left:auto;">Ingrese al menos un criterio de búsqueda</span>
@@ -298,7 +298,8 @@
         <table><thead><tr>
           <th><input type="checkbox" id="chk-all-cob" onchange="toggleAllCob(this)" style="cursor:pointer"></th>
           <th>Póliza</th><th>Asegurado</th><th>Producto</th>
-          <th>Desde</th><th>Hasta</th><th>Fr</th><th style="text-align:right">Total</th>
+          <th>Desde</th><th>Hasta</th><th>Fr</th>
+          <th style="text-align:right">Total</th>
           <th>Correo</th><th>WA</th><th>Pagado</th><th></th>
         </tr></thead>
         <tbody id="tbody-cobros"></tbody></table>
@@ -353,7 +354,7 @@
           <label class="fl">📋 Bitácora de cambios</label>
           <div id="m-bitacora-list" style="background:var(--surf2);border:1px solid var(--bdr);border-radius:6px;padding:8px;min-height:40px;font-size:11px;color:var(--muted);margin-bottom:6px;max-height:120px;overflow-y:auto;"></div>
           <div style="display:flex;gap:6px;">
-            <input class="fi" id="m-bitacora-nueva" type="text" placeholder="Agregar cambio o nota (ej: Cambio de placa, Aumento de cobertura…)" style="flex:1;">
+            <input class="fi" id="m-bitacora-nueva" type="text" placeholder="Agregar cambio o nota…" style="flex:1;">
             <button onclick="agregarBitacora()" class="bs" style="padding:6px 12px;white-space:nowrap;">+ Agregar</button>
           </div>
         </div>
@@ -388,8 +389,8 @@
                 <option value="Con depósito">Con depósito</option>
                 <option value="SINPE Móvil">SINPE Móvil</option>
                 <option value="INS en Línea">INS en Línea</option>
-                <option value="Link de pago">Link de pago</option>
                 <option value="Conectividad-Bancos">Conectividad-Bancos</option>
+                <option value="Link de pago">Link de pago</option>
               </select>
             </div>
             <div class="fg"><label class="fl">Observación (opcional)</label><input class="fi" id="m-pago-obs" type="text" placeholder="Ej: Comprobante #12345"></div>
