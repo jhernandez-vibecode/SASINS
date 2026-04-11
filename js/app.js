@@ -154,6 +154,32 @@ mprod.innerHTML = '<option value="">— Seleccionar producto —</option>' +
   document.getElementById('m-pago-obs').value   = r.pago_obs      || '';
 
   // Mostrar/ocultar sección de pago según estado
+  // Mostrar sección vehículo solo para pólizas de automóviles
+const esAuto = (r.prod || '').toUpperCase().includes('AUTO');
+const secVeh = document.getElementById('sec-vehiculo');
+if (secVeh) secVeh.style.display = esAuto ? 'block' : 'none';
+
+// Cargar datos del vehículo si existen
+document.getElementById('m-marca').value       = r.marca      || '';
+document.getElementById('m-modelo').value      = r.modelo     || '';
+document.getElementById('m-anio').value        = r.anio       || '';
+document.getElementById('m-color').value       = r.color      || '';
+document.getElementById('m-monto-aseg').value  = r.monto_aseg || '';
+document.getElementById('m-placa').value       = r.placa      || '';
+document.getElementById('m-coberturas').value  = r.coberturas || '';
+
+// Cargar bitácora de cambios
+const bitEl = document.getElementById('m-bitacora-list');
+const bits  = r.bitacora || [];
+bitEl.innerHTML = bits.length
+  ? bits.map(b => `<div style="padding:3px 0;border-bottom:1px solid var(--bdr)33;">
+      <span style="color:var(--muted);font-size:10px;">${b.fecha}</span>
+      <span style="margin-left:8px;">${b.texto}</span>
+    </div>`).join('')
+  : '<span style="color:var(--muted);">Sin cambios registrados aún.</span>';
+
+// Limpiar campo de nueva entrada
+document.getElementById('m-bitacora-nueva').value = '';       
   togglePagadaFields();
 
   // Resetear historial inline al abrir modal
