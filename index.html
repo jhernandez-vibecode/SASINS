@@ -513,8 +513,7 @@
             <input class="fi" id="cp-num" placeholder="01-01-AUT-0000000-00" maxlength="20" oninput="let v=this.value.replace(/[^0-9A-Za-z]/g,'').toUpperCase();let r='';if(v.length>0)r+=v.substring(0,2);if(v.length>2)r+='-'+v.substring(2,4);if(v.length>4)r+='-'+v.substring(4,7);if(v.length>7)r+='-'+v.substring(7,14);if(v.length>14)r+='-'+v.substring(14,16);this.value=r;" title="Formato: 01-01-AUT-0000000-00">
             <div style="font-size:10px;color:var(--muted);margin-top:3px;">Módulo -00 póliza nueva · -01 primera renovación · -02 segunda renovación</div>
           </div>
-          <div class="fg"><label class="fl">Producto</label><select class="fi" id="cp-prod" style="font-size:11px;"><option value="">— Seleccionar producto —</option></select></div>
-          <div class="fg"><label class="fl">Vigencia desde</label><input class="fi" id="cp-desde" type="date"></div>
+<div class="fg"><label class="fl">Producto</label><select class="fi" id="cp-prod" style="font-size:11px;" onchange="window._adaptPolizaInput(this.value)"><option value="">— Seleccionar producto —</option></select></div>          <div class="fg"><label class="fl">Vigencia desde</label><input class="fi" id="cp-desde" type="date"></div>
           <div class="fg"><label class="fl">Vigencia hasta</label><input class="fi" id="cp-hasta" type="date"></div>
           <div class="fg"><label class="fl">Prima</label><input class="fi" id="cp-prima" type="number" placeholder="0"></div>
           <div class="fg"><label class="fl">Total</label><input class="fi" id="cp-total" type="number" placeholder="0"></div>
