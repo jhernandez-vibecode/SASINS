@@ -322,4 +322,39 @@ document.querySelectorAll('.ov').forEach(o =>
 
 // ── Iniciar la aplicación ─────────────────────────────────────
 // Carga todos los datos de Firebase al abrir la página
+// ── Agregar entrada a la bitácora de cambios ─────────────────
+window.agregarBitacora = async function() {
+  const texto = document.getElementById('m-bitacora-nueva').value.trim();
+  if (!texto) return;
+  if (!state.currentPolId) return;
+
+  const r = state.polizas.find(x => x._id === state.currentPolId);
+  if (!r) return;
+
+  const fecha = new Date().toLocaleDateString('es-CR',
+    { day:'2-digit', month:'short', year:'numeric' });
+  const nuevaEntrada = { fecha, texto };
+  const bitacoraActual = r.bitacora || [];
+  const nuevaBitacora  = [...bitacoraActual, nuevaEntrada];
+
+  try {
+    await updateDoc(doc(db, 'polizas', state.currentPolId), {
+      bitacora: nuevaBitacora,
+      actualizado: serverTimestamp()
+    });
+    // Actualizar en memoria
+    r.bitacora = nuevaBitacora;
+    // Refrescar visual
+    const bitEl = document.getElementById('m-bitacora-list');
+    bitEl.innerHTML = nuevaBitacora.map(b => `
+      <div style="padding:3px 0;border-bottom:1px solid var(--bdr)33;">
+        <span style="color:var(--muted);font-size:10px;">${b.fecha}</span>
+        <span style="margin-left:8px;">${b.texto}</span>
+      </div>`).join('');
+    document.getElementById('m-bitacora-nueva').value = '';
+    toast('Cambio registrado en bitácora ✓', 's');
+  } catch(e) {
+    toast('Error: ' + e.message, 'e');
+  }
+};
 window.loadAll();
