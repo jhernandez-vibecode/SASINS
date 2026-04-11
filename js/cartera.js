@@ -18,7 +18,6 @@ const PAGE_SIZE = 25;
 // 1. El que está activo hoy (hoy está entre desde y hasta)
 // 2. Si no hay activo, el próximo a vencer
 // 3. Si no, el más reciente
-// Esto evita mostrar duplicados en Cartera
 function getRecibosActivos(polizas) {
   const hoy = new Date();
   hoy.setHours(0, 0, 0, 0);
@@ -33,12 +32,11 @@ function getRecibosActivos(polizas) {
 
   // Para cada contrato, elegir el recibo más relevante
   return Object.values(byPoliza).map(records => {
-    // Ordenar por fecha desde (más antiguo primero)
     const sorted = records.sort((a, b) =>
       new Date(a.desde + 'T12:00:00') - new Date(b.desde + 'T12:00:00')
     );
 
-    // 1. Buscar el período activo hoy
+    // 1. Período activo hoy
     const activo = sorted.find(r => {
       if (!r.desde || !r.hasta) return false;
       const desde = new Date(r.desde + 'T12:00:00');
@@ -47,22 +45,20 @@ function getRecibosActivos(polizas) {
     });
     if (activo) return activo;
 
-    // 2. Si no hay activo, el próximo período futuro
+    // 2. Próximo período futuro
     const futuro = sorted.find(r =>
       r.desde && new Date(r.desde + 'T12:00:00') > hoy
     );
     if (futuro) return futuro;
 
-    // 3. Si no, el más reciente (último de la lista)
+    // 3. El más reciente
     return sorted[sorted.length - 1];
   });
 }
 
 // ── KPIs del header de Cartera ───────────────────────────────
-// Muestra las 6 tarjetas de resumen basadas en contratos únicos,
-// no en el total de recibos almacenados en Firebase
+// Muestra las 6 tarjetas basadas en contratos únicos
 export function renderKPIs() {
-  // Obtener solo el recibo activo de cada contrato
   const D   = getRecibosActivos(state.polizas);
   const crc = D.filter(r => r.moneda === 'CRC');
   const usd = D.filter(r => r.moneda === 'USD');
@@ -124,37 +120,46 @@ export function populateSQProd() {
 }
 
 // ── Buscar pólizas ───────────────────────────────────────────
-// Filtra sobre los recibos activos (1 por contrato)
-// para que el resultado no muestre duplicados
+// Soporta búsqueda por: número de póliza, nombre (cualquier orden
+// de palabras), cédula, producto, estado, moneda y placa
 export function buscarC() {
-  const pol  = (document.getElementById('sq-pol').value  || '').trim().toLowerCase();
-  const nom  = (document.getElementById('sq-nom').value  || '').trim().toLowerCase();
-  const ced  = (document.getElementById('sq-ced').value  || '').trim().toLowerCase();
-  const prod =  document.getElementById('sq-prod-sel').value;
-  const est  =  document.getElementById('sq-est').value;
-  const mon  =  document.getElementById('sq-mon').value;
+  const pol   = (document.getElementById('sq-pol').value   || '').trim().toLowerCase();
+  const nom   = (document.getElementById('sq-nom').value   || '').trim().toLowerCase();
+  const ced   = (document.getElementById('sq-ced').value   || '').trim().toLowerCase();
+  const placa = (document.getElementById('sq-placa')?.value || '').trim().toLowerCase();
+  const prod  =  document.getElementById('sq-prod-sel').value;
+  const est   =  document.getElementById('sq-est').value;
+  const mon   =  document.getElementById('sq-mon').value;
 
-  if (!pol && !nom && !ced && !prod && !est && !mon) {
+  // Requiere al menos un criterio para buscar
+  if (!pol && !nom && !ced && !placa && !prod && !est && !mon) {
     import('./utils.js').then(u => u.showToast('Ingrese al menos un criterio', 'w'));
     return;
   }
 
-  // Buscar primero en TODOS los recibos para encontrar contratos
-  // que coincidan, luego mostrar solo el recibo activo de cada uno
+  // Buscar en TODOS los recibos para encontrar contratos que coincidan
   const polizasCoinciden = new Set(
     state.polizas.filter(r => {
-      if (pol  && !(r.poliza    || '').toLowerCase().includes(pol))  return false;
+      // Filtro por número de póliza
+      if (pol && !(r.poliza || '').toLowerCase().includes(pol)) return false;
+
+      // Filtro por nombre — busca cada palabra sin importar el orden
+      // Ejemplo: "perez pedro" encuentra "PEREZ VARGAS PEDRO" ✓
       if (nom) {
-  const nombreCompleto = (r.asegurado || '').toLowerCase();
-  // Buscar cada palabra por separado sin importar el orden
-  // "pedro perez" encuentra "PEREZ PEREIRA PEDRO" ✓
-  const palabras = nom.split(/\s+/).filter(Boolean);
-  if (!palabras.every(p => nombreCompleto.includes(p))) return false;
-}
-      if (ced  && !((r.cedula   || r.poliza || '') + ' ' + (r.telefonos || '')).toLowerCase().includes(ced)) return false;
-      if (prod && r.prod          !== prod) return false;
-      if (est  && r.estado_poliza !== est)  return false;
-      if (mon  && r.moneda        !== mon)  return false;
+        const nombreCompleto = (r.asegurado || '').toLowerCase();
+        const palabras = nom.split(/\s+/).filter(Boolean);
+        if (!palabras.every(p => nombreCompleto.includes(p))) return false;
+      }
+
+      // Filtro por cédula o teléfono
+      if (ced && !((r.cedula || r.poliza || '') + ' ' + (r.telefonos || '')).toLowerCase().includes(ced)) return false;
+
+      // Filtro por placa — busca en el campo placa del registro
+      if (placa && !(r.placa || '').toLowerCase().includes(placa)) return false;
+
+      // Filtro por producto
+      if (prod && r.prod !== prod) return false;
+
       return true;
     }).map(r => r.poliza)
   );
@@ -181,8 +186,9 @@ export function buscarC() {
 }
 
 // ── Limpiar búsqueda ─────────────────────────────────────────
+// Resetea TODOS los campos incluyendo placa
 export function limpiarC() {
-  ['sq-pol', 'sq-nom', 'sq-ced'].forEach(id => {
+  ['sq-pol', 'sq-nom', 'sq-ced', 'sq-placa'].forEach(id => {
     const e = document.getElementById(id);
     if (e) e.value = '';
   });
@@ -210,6 +216,7 @@ export function sortCR() {
 }
 
 // ── Renderizar tabla de resultados ───────────────────────────
+// Muestra la placa en la tabla si el registro la tiene
 export function renderCRTable() {
   const total = state.crResults.length;
   const pages = Math.max(1, Math.ceil(total / PAGE_SIZE));
@@ -231,11 +238,22 @@ export function renderCRTable() {
           : r.estado_poliza === 'Cancelada'
             ? '<span class="pill pr">✕</span>'
             : '<span class="pill pg">● Vigente</span>';
-        return `<tr onclick="window._openDet('${r._id}')">
+
+        // Mostrar placa si existe
+        const placaCell = r.placa
+          ? `<span style="font-family:'Courier New',monospace;font-size:10px;
+              background:var(--surf2);padding:1px 5px;border-radius:4px;
+              border:1px solid var(--bdr);">${r.placa}</span>`
+          : '';
+
+        return `<tr onclick="window._openDet('${r._id}')" style="cursor:pointer;">
           <td style="color:${r.verif ? 'var(--green)' : 'var(--muted)'};font-weight:800">${r.verif ? '✓' : '–'}</td>
           <td><span class="db ${dc}">${dv}d</span></td>
-          <td class="nm">${trunc(r.asegurado || '', 26)}</td>
-          <td class="mn">${trunc(r.poliza    || '', 20)}</td>
+          <td class="nm">
+            ${trunc(r.asegurado || '', 24)}
+            ${placaCell}
+          </td>
+          <td class="mn">${trunc(r.poliza || '', 20)}</td>
           <td>${trunc(r.prod || '', 24)}</td>
           <td class="mn">${fmtDate(r.desde)}</td>
           <td class="mn">${fmtDate(r.hasta)}</td>
