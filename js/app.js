@@ -342,4 +342,49 @@ document.querySelectorAll('.ov').forEach(o =>
 });
 
 // ── Iniciar la aplicación ─────────────────────────────────────
+// ── Adaptar campo número de póliza según producto ─────────────
+// Cambia el placeholder y la máscara según el tipo de producto
+// RT → 7 dígitos · VIDA → alfanumérico libre · AUTO → máscara estándar
+window._adaptPolizaInput = function(prod) {
+  const input = document.getElementById('cp-num');
+  const hint  = input?.nextElementSibling;
+  if (!input) return;
+
+  const p = (prod || '').toUpperCase();
+
+  if (p.includes('TRABAJO') || p.includes('RT')) {
+    // RT: solo 7 dígitos numéricos
+    input.placeholder = '0000000';
+    input.maxLength   = 7;
+    input.oninput     = function() {
+      this.value = this.value.replace(/[^0-9]/g, '').substring(0, 7);
+    };
+    if (hint) hint.textContent = 'Solo 7 dígitos numéricos';
+
+  } else if (p.includes('VIDA') || p.includes('UNIVERSAL')) {
+    // VIDA: alfanumérico libre sin máscara
+    input.placeholder = 'UC0120140211380';
+    input.maxLength   = 20;
+    input.oninput     = function() {
+      this.value = this.value.toUpperCase();
+    };
+    if (hint) hint.textContent = 'Formato libre · Ej: UC0120140211380';
+
+  } else {
+    // Estándar: máscara 01-01-AUT-0000000-00
+    input.placeholder = '01-01-AUT-0000000-00';
+    input.maxLength   = 20;
+    input.oninput     = function() {
+      let v = this.value.replace(/[^0-9A-Za-z]/g,'').toUpperCase();
+      let r = '';
+      if(v.length > 0)  r += v.substring(0,2);
+      if(v.length > 2)  r += '-' + v.substring(2,4);
+      if(v.length > 4)  r += '-' + v.substring(4,7);
+      if(v.length > 7)  r += '-' + v.substring(7,14);
+      if(v.length > 14) r += '-' + v.substring(14,16);
+      this.value = r;
+    };
+    if (hint) hint.textContent = 'Módulo -00 póliza nueva · -01 primera renovación · -02 segunda renovación';
+  }
+};
 window.loadAll();
