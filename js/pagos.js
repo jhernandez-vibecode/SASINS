@@ -52,17 +52,18 @@ export async function saveGestion() {
       resultado:      document.getElementById('m-resultado').value,
       confirmar:      fechaPago,
       ultima_gestion: document.getElementById('m-gestion').value,
-      prod:           document.getElementById('m-prod').value || r.prod,
       estado_poliza:  estadoNuevo,
       medio_pago:     medioPago,
       pago_obs:       pagoObs,
-marca:      document.getElementById('m-marca')?.value      || r.marca      || '',
-modelo:     document.getElementById('m-modelo')?.value     || r.modelo     || '',
-anio:       document.getElementById('m-anio')?.value       || r.anio       || '',
-color:      document.getElementById('m-color')?.value      || r.color      || '',
-monto_aseg: document.getElementById('m-monto-aseg')?.value || r.monto_aseg || '',
-placa:      document.getElementById('m-placa')?.value      || r.placa      || '',
-coberturas: document.getElementById('m-coberturas')?.value || r.coberturas || '',
+      // Datos del vehículo — solo se guardan si la póliza es de AUTO
+      // Si los campos no existen en el DOM devuelve el valor previo
+      marca:      (document.getElementById('m-marca')?.value      || r.marca      || '').trim(),
+      modelo:     (document.getElementById('m-modelo')?.value     || r.modelo     || '').trim(),
+      anio:       (document.getElementById('m-anio')?.value       || r.anio       || '').trim(),
+      color:      (document.getElementById('m-color')?.value      || r.color      || '').trim(),
+      monto_aseg: (document.getElementById('m-monto-aseg')?.value || r.monto_aseg || '').trim(),
+      placa:      (document.getElementById('m-placa')?.value      || r.placa      || '').trim().toUpperCase(),
+      coberturas: (document.getElementById('m-coberturas')?.value || r.coberturas || '').trim(),
       actualizado:    serverTimestamp()
     });
 
@@ -221,7 +222,7 @@ export async function generarSiguientePeriodo(r) {
   const enMemoria = state.polizas.find(
     x => x.poliza === r.poliza && x.desde === nextDesde
   );
-  if (enMemoria) return; // Ya existe, no duplicar
+  if (enMemoria) return;
 
   // 2. Verificar en Firestore por si la memoria no está actualizada
   try {
@@ -230,7 +231,7 @@ export async function generarSiguientePeriodo(r) {
         where('poliza', '==', r.poliza || ''),
         where('desde',  '==', nextDesde))
     );
-    if (!snapEx.empty) return; // Ya existe en Firebase, no duplicar
+    if (!snapEx.empty) return;
   } catch (e) {
     console.warn('[generarSiguientePeriodo] Error verificando:', e);
   }
@@ -241,6 +242,7 @@ export async function generarSiguientePeriodo(r) {
   const mesOrigen = calcMesOrigen(nextDesde);
 
   // 4. Crear el nuevo documento en Firebase
+  // Los datos del vehículo se propagan al próximo período
   await addDoc(collection(db, 'polizas'), {
     poliza:             r.poliza     || '',
     asegurado:          r.asegurado  || '',
@@ -264,11 +266,19 @@ export async function generarSiguientePeriodo(r) {
     mes_origen:         mesOrigen,
     tipo:               'RENOVACION',
     es_proyeccion:      true,
+    // Datos del vehículo se propagan al siguiente período
+    marca:              r.marca      || '',
+    modelo:             r.modelo     || '',
+    anio:               r.anio       || '',
+    color:              r.color      || '',
+    monto_aseg:         r.monto_aseg || '',
+    placa:              r.placa      || '',
+    coberturas:         r.coberturas || '',
     creado:             serverTimestamp(),
     actualizado:        serverTimestamp()
   });
 
-  // 5. Notificar al agente con un toast informativo
+  // 5. Notificar al agente
   const sym = r.moneda === 'CRC' ? '₡' : '$';
   toast(
     `📅 Próx. renovación generada: ${mesOrigen} · Vence ${fmtDate(nextHasta)} · ${sym}${fmt(r.total || 0)}`,
@@ -278,7 +288,6 @@ export async function generarSiguientePeriodo(r) {
 
 // ── Mostrar/ocultar historial de pagos inline ─────────────────
 // Se expande dentro del mismo modal detalle, sin abrir otro modal.
-// Carga todos los pagos registrados para esa póliza desde Firebase.
 export async function toggleHistorialInline(btn) {
   const panel = document.getElementById('historial-panel');
   if (!panel) return;
@@ -290,7 +299,6 @@ export async function toggleHistorialInline(btn) {
     return;
   }
 
-  // Obtener datos del botón
   const poliza = btn.dataset.poliza || '';
   const moneda = btn.dataset.moneda || 'CRC';
 
@@ -300,7 +308,6 @@ export async function toggleHistorialInline(btn) {
     '<div style="text-align:center;padding:20px;color:var(--muted);font-size:12px;">Cargando…</div>';
 
   try {
-    // Buscar todos los pagos de esta póliza en Firebase
     const snap = await getDocs(
       query(collection(db, 'pagos'), where('poliza', '==', poliza))
     );
@@ -311,14 +318,12 @@ export async function toggleHistorialInline(btn) {
       return;
     }
 
-    // Ordenar por fecha de pago descendente (más reciente primero)
     const rows  = snap.docs.map(d => d.data())
       .sort((a, b) => (b.fecha_pago || '').localeCompare(a.fecha_pago || ''));
     const sym   = moneda === 'CRC' ? '₡' : '$';
     const tc    = moneda === 'CRC' ? 'crc-t' : 'usd-t';
     const total = rows.reduce((s, p) => s + (p.monto || 0), 0);
 
-    // Construir HTML del historial
     document.getElementById('historial-inline-content').innerHTML = `
       <div style="display:flex;justify-content:space-between;margin-bottom:8px;font-size:11px;">
         <span style="color:var(--muted)">${rows.length} pago${rows.length !== 1 ? 's' : ''}</span>
