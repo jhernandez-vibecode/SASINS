@@ -135,7 +135,7 @@ export function renderCobros() {
 
   // Mensaje si no hay mes seleccionado
   if (!state.cobData.length) {
-    tbody.innerHTML = '<tr><td colspan="11" style="text-align:center;padding:40px;color:var(--muted);">Seleccione un mes activo en el panel izquierdo</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="12" style="text-align:center;padding:40px;color:var(--muted);">Seleccione un mes activo en el panel izquierdo</td></tr>';
     document.getElementById('pag-cobros').innerHTML = '';
     return;
   }
@@ -175,6 +175,7 @@ export function renderCobros() {
       <td class="mn">${trunc(r.poliza    || '', 18)}</td>
       <td class="nm">${trunc(r.asegurado || '', 22)}</td>
       <td style="font-size:11px;color:var(--yellow);">${trunc(r.prod || '', 20)}</td>
+      <td class="mn">${fmtDate(r.desde)}</td>
       <td class="mn">${fmtDate(r.hasta)}</td>
       <td><span class="pill pgr">${r.fr || '—'}</span></td>
       <td class="am ${tc}">${sym}${fmt(r.total || 0)}</td>
@@ -184,7 +185,7 @@ export function renderCobros() {
       <td><button class="btn-ghost" style="font-size:10px;padding:2px 7px;"
           onclick="window._openDet('${r._id}')">✏️</button></td>
     </tr>`;
-  }).join('') || '<tr><td colspan="11" style="text-align:center;padding:30px;color:var(--muted)">Sin registros para los filtros</td></tr>';
+  }).join('') || '<tr><td colspan="12" style="text-align:center;padding:30px;color:var(--muted)">Sin registros para los filtros</td></tr>';
 
   // Actualizar checkbox "seleccionar todos"
   const chkAll = document.getElementById('chk-all-cob');
