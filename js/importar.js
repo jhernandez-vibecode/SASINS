@@ -14,15 +14,14 @@ import { state } from './state.js';
 
 // ── Leer y previsualizar archivo XLS ─────────────────────────
 // Se dispara cuando el agente arrastra o selecciona un archivo.
-// Usa la librería XLSX (cargada en index.html) para leer el archivo
-// y muestra un preview con las primeras 20 filas antes de importar.
+// Usa la librería XLSX para leer el archivo y muestra un preview
+// con las primeras 20 filas antes de importar.
 export function handleXLS(file) {
   if (!file) return;
 
   const reader = new FileReader();
   reader.onload = e => {
     try {
-      // Leer el archivo con XLSX
       const wb   = XLSX.read(e.target.result, { type: 'binary' });
       const ws   = wb.Sheets[wb.SheetNames[0]];
       const rows = XLSX.utils.sheet_to_json(ws, { defval: '' });
@@ -39,7 +38,7 @@ export function handleXLS(file) {
         oct:9, nov:10, dec:11, dic:11
       };
 
-      // Convertir fecha del formato del INS "01-May-26" → "2026-05-01"
+      // Convertir fecha del formato INS "01-May-26" → "2026-05-01"
       const parseD = v => {
         if (!v) return '';
         const s = String(v).trim();
@@ -55,7 +54,7 @@ export function handleXLS(file) {
       };
 
       // Helper para buscar un valor en múltiples nombres de columna posibles
-      // (el INS a veces cambia los nombres de columnas entre versiones)
+      // El INS a veces cambia los nombres de columnas entre versiones del XLS
       const gv = (row, ...ks) => {
         for (const k of ks) {
           const v = row[k];
@@ -79,6 +78,15 @@ export function handleXLS(file) {
         const hasta  = parseD(gv(row, 'hasta',  'Hasta',  ''));
         const desde  = parseD(gv(row, 'desde',  'Desde',  ''));
 
+        // Extraer placa del XLS — el INS puede usar varios nombres de columna
+        // Si no viene en el XLS queda vacío y se puede completar manualmente
+        const placaRaw = String(gv(row,
+          'placa', 'Placa', 'PLACA',
+          'número_placa', 'numero_placa',
+          'placa_vehículo', 'placa_vehiculo',
+          'matrícula', 'matricula', ''
+        )).trim().toUpperCase();
+
         return {
           poliza:         String(gv(row, 'número_póliza', 'poliza', '')),
           asegurado:      String(gv(row, 'asegurado', '')),
@@ -100,7 +108,9 @@ export function handleXLS(file) {
           resultado:      String(gv(row, 'resultado_última_gestión', 'resultado', '')),
           proxima_renovacion: calcProx(hasta, fr),
           tipo:           String(gv(row, 'tipo', '')),
-          mes_origen:     mesNom
+          mes_origen:     mesNom,
+          // Placa del vehículo — se extrae si el XLS la incluye
+          placa:          placaRaw
         };
       }).filter(r => r.poliza && r.asegurado); // Descartar filas sin datos
 
@@ -121,6 +131,8 @@ export function handleXLS(file) {
       setEl('prev-mes',   mesNom);
 
       // Mostrar tabla preview con las primeras 20 filas
+      // Incluye columna de placa si al menos un registro la tiene
+      const hayPlacas = records.some(r => r.placa);
       const pb = document.getElementById('prev-tbody');
       if (pb) pb.innerHTML = records.slice(0, 20).map(r => `
         <tr>
@@ -134,9 +146,19 @@ export function handleXLS(file) {
           </td>
           <td><span style="font-size:10px;font-weight:700"
                class="${r.moneda === 'CRC' ? 'crc-t' : 'usd-t'}">${r.moneda}</span></td>
+          ${hayPlacas ? `<td class="mn">${r.placa || '—'}</td>` : ''}
         </tr>`).join('');
 
-      // Mostrar secciones de preview en ambas vistas
+      // Agregar encabezado de placa si hay datos
+      const thead = document.querySelector('#xls-preview table thead tr');
+      if (thead && hayPlacas && !thead.querySelector('.placa-th')) {
+        const th = document.createElement('th');
+        th.className = 'placa-th';
+        th.textContent = 'Placa';
+        thead.appendChild(th);
+      }
+
+      // Mostrar secciones de preview
       ['xls-preview', 'xls-prev'].forEach(id => {
         const e = document.getElementById(id);
         if (e) e.style.display = 'block';
@@ -152,7 +174,6 @@ export function handleXLS(file) {
 }
 
 // ── Confirmar e importar el XLS a Firebase ───────────────────
-// Se llama cuando el agente hace clic en "✅ Importar".
 // Deduplica por poliza+desde para no crear recibos repetidos.
 // Genera períodos futuros para contratos no-anuales.
 export async function confirmXLS() {
@@ -165,14 +186,12 @@ export async function confirmXLS() {
   const mes = records[0].mes_origen;
 
   // Construir mapa de recibos existentes para deduplicar
-  // clave: "poliza__desde" → ID del documento en Firebase
   const existingKeys = new Map(
     state.polizas
       .filter(r => r.poliza && r.desde)
       .map(r => [(r.poliza + '__' + r.desde), r._id])
   );
 
-  // Separar registros nuevos de duplicados
   const nuevas = records.filter(r =>
     !existingKeys.has((r.poliza || '') + '__' + (r.desde || ''))
   );
@@ -187,24 +206,22 @@ export async function confirmXLS() {
   const showFill = (id, show) => { const e = document.getElementById(id); if (e) e.style.display = show ? 'block' : 'none'; };
   const setFill  = (id, w)    => { const e = document.getElementById(id); if (e) e.style.width = w; };
   const setTxt   = (id, t)    => { const e = document.getElementById(id); if (e) e.textContent = t; };
-  showFill('xls-pg-wrap',   true);
-  showFill('progress-xls',  true);
+  showFill('xls-pg-wrap',  true);
+  showFill('progress-xls', true);
 
   let n = 0, nPer = 0;
 
   for (const r of nuevas) {
-    // Guardar el recibo principal en Firebase
+    // Guardar el recibo en Firebase incluyendo la placa si existe
     await addDoc(collection(db, 'polizas'), {
       ...r,
       creado:      serverTimestamp(),
       actualizado: serverTimestamp()
     });
 
-    // Registrar en el mapa local para que generarPeriodos no duplique
     existingKeys.set((r.poliza + '__' + r.desde), 'new');
 
-    // Generar períodos futuros del contrato anual para frecuencias no-anuales
-    // Ejemplo: si carga Mayo (trimestral), genera Agosto, Noviembre, Febrero
+    // Generar períodos futuros para frecuencias no-anuales
     const periodos = generarPeriodos(r, existingKeys);
     for (const p of periodos) {
       await addDoc(collection(db, 'polizas'), {
@@ -217,26 +234,23 @@ export async function confirmXLS() {
     }
 
     n++;
-    // Actualizar barras de progreso en ambas vistas
-    setFill('xls-fill',   Math.round(n / nuevas.length * 100) + '%');
-    setFill('mayo-fill',  Math.round(n / nuevas.length * 100) + '%');
-    setTxt('xls-ptxt',          `${n}/${nuevas.length} recibos · ${nPer} períodos…`);
-    setTxt('xls-progress-txt',  `Importando ${n} de ${nuevas.length}…`);
+    setFill('xls-fill',  Math.round(n / nuevas.length * 100) + '%');
+    setFill('mayo-fill', Math.round(n / nuevas.length * 100) + '%');
+    setTxt('xls-ptxt',         `${n}/${nuevas.length} recibos · ${nPer} períodos…`);
+    setTxt('xls-progress-txt', `Importando ${n} de ${nuevas.length}…`);
   }
 
-  // Mostrar resultado final
   showToast(
     `✅ ${n} recibos importados` +
     (nPer ? ` · ${nPer} períodos generados` : '') +
     (dup  ? ` · ${dup} ya existían` : '')
   );
 
-  cancelXLS(); // Limpiar UI del preview
-  window.loadAll(); // Recargar todos los datos
+  cancelXLS();
+  window.loadAll();
 }
 
 // ── Cancelar importación ─────────────────────────────────────
-// Limpia el estado y oculta el preview sin importar nada
 export function cancelXLS() {
   state.xlsPending = null;
   ['xls-preview', 'xls-prev', 'xls-pg-wrap', 'progress-xls'].forEach(id => {
@@ -249,7 +263,6 @@ export function cancelXLS() {
 }
 
 // ── Limpiar toda la colección de pólizas ─────────────────────
-// Muestra el modal de confirmación con la cantidad de registros
 export async function confirmLimpiar() {
   const snap = await getDocs(collection(db, 'polizas'));
   document.getElementById('limpiar-count').textContent = snap.size;
@@ -258,7 +271,6 @@ export async function confirmLimpiar() {
   document.getElementById('modal-limpiar').classList.add('open');
 }
 
-// Ejecutar limpieza total (requiere escribir CONFIRMAR en el modal)
 export async function ejecutarLimpiar() {
   window._closeModal('modal-limpiar');
   showToast('Eliminando registros…', 'w');
@@ -282,39 +294,30 @@ export async function ejecutarLimpiar() {
 
 // ── Generador de períodos futuros al importar XLS ────────────
 // Dado el primer recibo de un contrato no-anual, genera todos
-// los recibos restantes del año del contrato.
-// Ejemplo: contrato anual con pago trimestral →
-//   si carga Mayo, genera también Agosto, Noviembre, Febrero
-// Solo genera los que no existan ya en existingKeys.
+// los recibos restantes del año. La placa se propaga a todos
+// los períodos futuros automáticamente.
 export function generarPeriodos(base, existingKeys) {
   const incremento = FR_MESES[base.fr] || 12;
-
-  // Si es anual, no hay más períodos que generar
   if (incremento >= 12) return [];
 
   const periodos = [];
   const hoy      = new Date();
 
-  // El contrato dura 1 año desde el inicio del primer período
   const inicioContrato = new Date(base.desde + 'T12:00:00');
   const finContrato    = new Date(inicioContrato);
   finContrato.setFullYear(finContrato.getFullYear() + 1);
 
-  // Empezar desde donde termina el primer recibo
   let desdeActual = new Date(base.hasta + 'T12:00:00');
 
   while (desdeActual < finContrato) {
     const hastaActual = new Date(desdeActual);
     hastaActual.setMonth(hastaActual.getMonth() + incremento);
 
-    // El último período no puede superar el fin del contrato
     const hastaFinal = hastaActual > finContrato ? finContrato : hastaActual;
+    const desdeStr   = desdeActual.toISOString().split('T')[0];
+    const hastaStr   = hastaFinal.toISOString().split('T')[0];
+    const pKey       = (base.poliza || '') + '__' + desdeStr;
 
-    const desdeStr = desdeActual.toISOString().split('T')[0];
-    const hastaStr = hastaFinal.toISOString().split('T')[0];
-    const pKey     = (base.poliza || '') + '__' + desdeStr;
-
-    // Solo agregar si no existe ya
     if (!existingKeys.has(pKey)) {
       const diasVenc = Math.round((hastaFinal - hoy) / 86400000);
       periodos.push({
@@ -339,7 +342,9 @@ export function generarPeriodos(base, existingKeys) {
         proxima_renovacion: base.proxima_renovacion || '',
         mes_origen:         calcMesOrigen(desdeStr),
         tipo:               'RENOVACION',
-        es_proyeccion:      true
+        es_proyeccion:      true,
+        // La placa se propaga a todos los períodos futuros del contrato
+        placa:              base.placa     || ''
       });
     }
 
