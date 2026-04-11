@@ -56,6 +56,13 @@ export async function saveGestion() {
       estado_poliza:  estadoNuevo,
       medio_pago:     medioPago,
       pago_obs:       pagoObs,
+marca:      document.getElementById('m-marca')?.value      || r.marca      || '',
+modelo:     document.getElementById('m-modelo')?.value     || r.modelo     || '',
+anio:       document.getElementById('m-anio')?.value       || r.anio       || '',
+color:      document.getElementById('m-color')?.value      || r.color      || '',
+monto_aseg: document.getElementById('m-monto-aseg')?.value || r.monto_aseg || '',
+placa:      document.getElementById('m-placa')?.value      || r.placa      || '',
+coberturas: document.getElementById('m-coberturas')?.value || r.coberturas || '',
       actualizado:    serverTimestamp()
     });
 
